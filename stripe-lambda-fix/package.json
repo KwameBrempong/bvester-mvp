@@ -1,0 +1,17 @@
+{
+  "name": "stripe-lambda-fix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@stripe/stripe-js": "^7.9.0",
+    "stripe": "^18.5.0"
+  }
+}

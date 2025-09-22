@@ -1,0 +1,12 @@
+{
+  "name": "stripe-lambda-function",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for Stripe payment processing",
+  "main": "index.js",
+  "dependencies": {
+    "stripe": "^14.10.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}

@@ -1,40 +1,563 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
+import { useSubscription } from './useSubscription';
+import { useState, useEffect, Suspense, lazy, memo } from 'react';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import { useAppDispatch, useUser, useUserRole, useSubscriptionTier } from './store/hooks';
+import { fetchUserProfile, setAuthenticated, updateUserProfile } from './store/slices/userSlice';
+import ErrorBoundary from './components/ErrorBoundary';
+import PermissionWrapper from './components/PermissionWrapper';
+import UserProfileHeader from './components/UserProfileHeader';
+import ProfileCompletionWidget from './components/ProfileCompletionWidget';
+import './App.css';
 
-const client = generateClient<Schema>();
+// Lazy load components for better performance
+const SMEProfile = lazy(() => import('./SMEProfile'));
+const GrowthAccelerator = lazy(() => import('./GrowthAccelerator'));
+const ChatTransactionRecorder = lazy(() => import('./components/ChatTransactionRecorder'));
+const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
+const SubscriptionManager = lazy(() => import('./SubscriptionManager'));
+const UsageTracker = lazy(() => import('./components/UsageTracker'));
+const SubscriptionTierManager = lazy(() => import('./components/SubscriptionTierManager'));
+const BillingManager = lazy(() => import('./components/BillingManager'));
+const BusinessAnalysisDashboard = lazy(() => import('./components/BusinessAnalysisDashboard'));
 
-function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+// Loading component
+const LoadingSpinner = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '200px',
+    background: 'white',
+    borderRadius: '12px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+  }}>
+    <div style={{
+      width: '40px',
+      height: '40px',
+      border: '4px solid #f3f3f3',
+      borderTop: '4px solid #2E8B57',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite'
+    }}></div>
+  </div>
+);
 
+interface AppProps {
+  user?: any;
+  signOut?: () => void;
+}
+
+const AppContent = memo(({ user, signOut }: AppProps) => {
+  const dispatch = useAppDispatch();
+  const userState = useUser();
+  const userRole = useUserRole();
+  const subscriptionTier = useSubscriptionTier();
+  const [profileCompleted, setProfileCompleted] = useState(false);
+  const [showTransactionRecorder, setShowTransactionRecorder] = useState(false);
+  const [showBusinessAssessment, setShowBusinessAssessment] = useState(false);
+  const [showGrowthAccelerator, setShowGrowthAccelerator] = useState(false);
+  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
+  const [showSubscriptionTierManager, setShowSubscriptionTierManager] = useState(false);
+  const [showBillingManager, setShowBillingManager] = useState(false);
+  const [showBusinessAnalysis, setShowBusinessAnalysis] = useState(false);
+  const subscriptionStatus = useSubscription(user?.username);
+
+  // Initialize user authentication state
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
+    if (user?.username) {
+      dispatch(setAuthenticated({ userId: user.username, isAuthenticated: true }));
 
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
+      // Try to fetch user profile from Redux store or create it from localStorage
+      if (!userState.profile) {
+        const savedProfile = localStorage.getItem(`profile_${user.username}`);
+        if (savedProfile) {
+          try {
+            const parsedProfile = JSON.parse(savedProfile);
+            // Create a default profile with MVP permissions if one doesn't exist in Redux
+            const defaultProfile = {
+              ...parsedProfile,
+              role: parsedProfile.role || 'owner', // Default to owner for MVP
+              profileCompletionPercentage: parsedProfile.profileCompletionPercentage || 60
+            };
+
+            // Dispatch to update Redux state with localStorage profile
+            dispatch(updateUserProfile({
+              userId: user.username,
+              updates: defaultProfile
+            }));
+            setProfileCompleted(true);
+          } catch (error) {
+            console.warn('Error parsing localStorage profile, creating default');
+            setProfileCompleted(false);
+          }
+        } else {
+          // Try to fetch from database, but continue if it fails (MVP mode)
+          dispatch(fetchUserProfile(user.username)).catch(() => {
+            console.warn('Database unavailable, using MVP fallback');
+            // Create default MVP profile
+            const defaultProfile = {
+              userId: user.username,
+              role: 'owner' as const,
+              profileCompletionPercentage: 60,
+              businessType: 'SME',
+              employeeCount: '1-10',
+              businessStage: 'existing',
+              email: `${user.username}@example.com`,
+              isEmailVerified: false,
+              isPhoneVerified: false,
+              isBusinessVerified: false,
+              createdAt: new Date().toISOString(),
+              lastUpdated: new Date().toISOString()
+            };
+            dispatch(updateUserProfile({
+              userId: user.username,
+              updates: defaultProfile
+            }));
+            setProfileCompleted(true);
+          });
+        }
+      } else {
+        setProfileCompleted(userState.profile.profileCompletionPercentage > 50);
+      }
+    }
+  }, [user, dispatch, userState.profile]);
+
+  // Check if profile is completed based on Redux state
+  useEffect(() => {
+    if (userState.profile) {
+      setProfileCompleted(userState.profile.profileCompletionPercentage >= 60);
+    }
+  }, [userState.profile]);
+
+  const handleProfileComplete = (profileData: any) => {
+    // Store in localStorage for backward compatibility
+    localStorage.setItem(`profile_${user?.username}`, JSON.stringify(profileData));
+    setProfileCompleted(true);
+    // TODO: Save to database through Redux action
+  };
+
+  if (!profileCompleted) {
+    return (
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingSpinner />}>
+          <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
+        </Suspense>
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
-        ))}
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-          Review next step of this tutorial.
-        </a>
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: '#f5f5f5',
+      padding: '15px 0 0 0'
+    }}>
+      <div className="main-container">
+        
+        {/* Enhanced User Profile Header */}
+        <UserProfileHeader
+          user={user}
+          signOut={signOut}
+          onEditProfile={() => setProfileCompleted(false)}
+        />
+
+        {/* Dashboard Header */}
+        <div className="dashboard-header" style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '25px',
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          border: '1px solid #e8e8e8'
+        }}>
+          <div>
+            <h2 style={{ margin: 0, color: '#2E8B57', fontSize: '26px', fontWeight: 'bold' }}>Dashboard</h2>
+            <p style={{ color: '#666', margin: '8px 0 0 0', fontSize: '16px' }}>
+              Manage your business funding and growth
+            </p>
+          </div>
+          <div style={{ fontSize: '14px', color: '#666' }}>
+            Role: <strong>{userRole || 'Business Owner'}</strong>
+          </div>
+        </div>
+
+        {/* Usage Tracker */}
+        {user?.username && (
+          <div style={{ marginBottom: '30px' }}>
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingSpinner />}>
+                <UsageTracker userId={user.username} compact={true} />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        )}
+
+        {/* Dashboard Content - Mobile-first responsive */}
+        <div className="dashboard-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '20px',
+          marginBottom: '20px'
+        }}>
+
+          {/* Business Summary */}
+          <div className="dashboard-card" style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+          }}>
+            <h3 style={{ color: '#2E8B57', marginBottom: '20px', fontSize: '20px' }}>Business Overview</h3>
+            <div style={{ display: 'grid', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#666', fontSize: '14px' }}>Business Type</span>
+                <span style={{
+                  color: '#2E8B57',
+                  fontWeight: '600',
+                  background: '#f0f8f0',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '13px'
+                }}>
+                  {userState.profile?.businessType || 'SME'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#666', fontSize: '14px' }}>Team Size</span>
+                <span style={{
+                  color: '#3498db',
+                  fontWeight: '600',
+                  background: '#f0f7ff',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '13px'
+                }}>
+                  👥 {userState.profile?.employeeCount || '1-10'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#666', fontSize: '14px' }}>Business Stage</span>
+                <span style={{
+                  color: '#9b59b6',
+                  fontWeight: '600',
+                  background: '#f9f0ff',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  fontSize: '13px'
+                }}>
+                  🚀 {userState.profile?.businessStage || 'Existing'}
+                </span>
+              </div>
+
+              {/* Business Setup Progress */}
+              <div style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid #eee' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ color: '#666', fontSize: '14px' }}>Business Setup Progress</span>
+                  <span style={{ color: '#2E8B57', fontWeight: 'bold', fontSize: '14px' }}>
+                    {userState.profile?.profileCompletionPercentage || 60}%
+                  </span>
+                </div>
+                <div style={{
+                  background: '#e8e8e8',
+                  borderRadius: '10px',
+                  height: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    background: 'linear-gradient(90deg, #2E8B57, #3CB371)',
+                    height: '100%',
+                    width: `${userState.profile?.profileCompletionPercentage || 60}%`,
+                    borderRadius: '10px',
+                    transition: 'width 0.3s ease'
+                  }}></div>
+                </div>
+                <div style={{
+                  color: '#666',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  textAlign: 'center'
+                }}>
+                  {(userState.profile?.profileCompletionPercentage || 60) >= 80 ?
+                    '✅ Profile Complete' :
+                    '⚡ Complete your profile to unlock more features'
+                  }
+                </div>
+              </div>
+            </div>
+            {userState.profile?.businessDescription && (
+              <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+                <strong>Description:</strong>
+                <p style={{ marginTop: '8px', color: '#666', lineHeight: '1.5' }}>
+                  {userState.profile.businessDescription}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="dashboard-card" style={{
+            background: 'white',
+            borderRadius: '12px',
+            border: '1px solid #e0e0e0',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+          }}>
+            <h3 style={{ color: '#2E8B57', marginBottom: '20px', fontSize: '20px' }}>Quick Actions</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* PRIMARY ACTION - Most important for MVP */}
+              <button
+                className="action-button"
+                onClick={() => setShowGrowthAccelerator(true)}
+                aria-label="Start Growth Accelerator program - Primary business development tool"
+                tabIndex={0}
+                style={{
+                  background: 'linear-gradient(135deg, #2E8B57, #3CB371)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  boxShadow: '0 4px 15px rgba(46, 139, 87, 0.3)'
+                }}
+              >
+                🚀 Growth Accelerator - START HERE
+              </button>
+
+              {/* SECONDARY ACTIONS - Core features */}
+              <button
+                className="action-button"
+                onClick={() => setShowTransactionRecorder(true)}
+                aria-label="Open chat-style transaction recorder for quick business record keeping"
+                tabIndex={0}
+                style={{
+                  background: 'linear-gradient(135deg, #32CD32, #90EE90)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  boxShadow: '0 3px 12px rgba(50, 205, 50, 0.25)'
+                }}
+              >
+                💬 Quick Record Transactions
+              </button>
+
+              <button
+                className="action-button"
+                onClick={() => setShowBusinessAnalysis(true)}
+                aria-label="View AI-powered business analysis and insights dashboard"
+                tabIndex={0}
+                style={{
+                  background: 'linear-gradient(135deg, #FF6B6B, #FF8E8E)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  boxShadow: '0 3px 12px rgba(255, 107, 107, 0.25)'
+                }}
+              >
+                📊 Business Analysis
+              </button>
+
+              {/* TERTIARY ACTION */}
+              <button
+                className="action-button"
+                onClick={() => setShowBusinessAssessment(true)}
+                aria-label="Take comprehensive business assessment quiz"
+                tabIndex={0}
+                style={{
+                  background: 'linear-gradient(135deg, #4169E1, #6495ED)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  boxShadow: '0 2px 8px rgba(65, 105, 225, 0.2)'
+                }}
+              >
+                📋 Business Assessment
+              </button>
+
+              {/* SUBSCRIPTION MANAGEMENT */}
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '15px' }}>
+                <button
+                  className="action-button"
+                  onClick={() => setShowSubscriptionTierManager(true)}
+                  style={{
+                    background: subscriptionTier !== 'free' ?
+                      'linear-gradient(135deg, #27ae60, #2ecc71)' :
+                      'linear-gradient(135deg, #e74c3c, #c0392b)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    boxShadow: subscriptionTier !== 'free' ?
+                      '0 2px 8px rgba(39, 174, 96, 0.2)' :
+                      '0 2px 8px rgba(231, 76, 60, 0.2)'
+                  }}
+                >
+                  {subscriptionTier !== 'free' ? '⚙️ Manage Subscription' : '⬆️ Upgrade to Pro'}
+                </button>
+
+                {subscriptionTier !== 'free' && (
+                  <button
+                    className="action-button"
+                    onClick={() => setShowBillingManager(true)}
+                    style={{
+                      background: 'linear-gradient(135deg, #3498db, #5dade2)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      boxShadow: '0 2px 8px rgba(52, 152, 219, 0.2)',
+                      marginTop: '8px'
+                    }}
+                  >
+                    💳 Billing & Invoices
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Funding Progress */}
+        <div style={{ 
+          background: 'white', 
+          padding: '30px', 
+          borderRadius: '12px',
+          border: '1px solid #e0e0e0',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          marginBottom: '30px'
+        }}>
+          <h3 style={{ color: '#2E8B57', marginBottom: '20px', fontSize: '20px' }}>Funding Progress</h3>
+          <div style={{ background: '#e0e0e0', borderRadius: '10px', height: '12px', marginBottom: '15px' }}>
+            <div style={{ background: '#2E8B57', height: '100%', width: '0%', borderRadius: '10px' }}></div>
+          </div>
+          <p style={{ color: '#666', textAlign: 'center', fontSize: '16px' }}>
+            No active campaigns yet. Create your first funding campaign to start raising investment!
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div style={{ 
+          padding: '25px', 
+          background: '#f8f9fa', 
+          borderRadius: '12px', 
+          textAlign: 'center',
+          border: '1px solid #e0e0e0'
+        }}>
+          <p style={{ color: '#666', margin: 0, fontSize: '16px' }}>
+            Bvester - Connecting Ghana SMEs with Global Investment Opportunities
+          </p>
+          <p style={{ color: '#999', margin: '5px 0 0 0', fontSize: '14px' }}>
+            Empowering African businesses through technology and investment
+          </p>
+        </div>
+
+        {/* Lazy-loaded Modals with Error Boundaries - Moved outside for proper z-index */}
+        {showTransactionRecorder && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ChatTransactionRecorder
+                user={user}
+                onClose={() => setShowTransactionRecorder(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showBusinessAssessment && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <BusinessAssessment
+                user={user}
+                userProfile={userState.profile}
+                onClose={() => setShowBusinessAssessment(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showGrowthAccelerator && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <GrowthAccelerator
+                user={user}
+                userProfile={userState.profile}
+                onClose={() => setShowGrowthAccelerator(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showSubscriptionManager && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SubscriptionManager
+                user={user}
+                userProfile={userState.profile}
+                onClose={() => setShowSubscriptionManager(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showSubscriptionTierManager && user?.username && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <SubscriptionTierManager
+                userId={user.username}
+                userEmail={userState.profile?.email || `${user.username}@example.com`}
+                onClose={() => setShowSubscriptionTierManager(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showBillingManager && user?.username && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <BillingManager
+                userId={user.username}
+                userEmail={userState.profile?.email || `${user.username}@example.com`}
+                customerId={userState.profile?.stripeCustomerId}
+                onClose={() => setShowBillingManager(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {showBusinessAnalysis && user?.username && (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <BusinessAnalysisDashboard
+                user={user}
+                onClose={() => setShowBusinessAnalysis(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
       </div>
-    </main>
+    </div>
   );
-}
+});
+
+AppContent.displayName = 'AppContent';
+
+// Main App component that wraps everything with Redux
+const App = (props: AppProps) => (
+  <Provider store={store}>
+    <ErrorBoundary>
+      <AppContent {...props} />
+    </ErrorBoundary>
+  </Provider>
+);
 
 export default App;

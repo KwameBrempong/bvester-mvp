@@ -1,0 +1,7 @@
+{
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": "{\"action\":\"create_checkout_session\",\"priceId\":\"price_1S9ohYGUhOvqkzBNKogIKA9A\",\"successUrl\":\"https://example.com/success\",\"cancelUrl\":\"https://example.com/cancel\",\"customerEmail\":\"test@example.com\",\"userId\":\"test123\"}"
+}
