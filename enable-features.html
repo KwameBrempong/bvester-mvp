@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bvester Feature Flags Control Panel</title>
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0A0A0A, #1A1A1A);
+      color: white;
+      padding: 40px;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #D4AF37;
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      color: #D4AF37;
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #999;
+      margin-bottom: 40px;
+    }
+    .feature-grid {
+      display: grid;
+      gap: 20px;
+    }
+    .feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #D4AF37;
+    }
+    .feature-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .feature-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #FFD700;
+    }
+    .feature-description {
+      color: #AAA;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #D4AF37;
+    }
+    input:checked + .slider:before {
+      transform: translateX(30px);
+    }
+    .action-buttons {
+      margin-top: 40px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #D4AF37, #FFD700);
+      color: #0A0A0A;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: #D4AF37;
+      border: 2px solid #D4AF37;
+    }
+    .btn-secondary:hover {
+      background: rgba(212, 175, 55, 0.1);
+    }
+    .status {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.1);
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+    .status.show {
+      display: block;
+    }
+    .warning {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      color: #FFC107;
+    }
+    .category {
+      color: #888;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Bvester Feature Flags Control</h1>
+    <p class="subtitle">Enable or disable enhanced features for testing</p>
+
+    <div class="warning">
+      ⚠️ <strong>Testing Mode:</strong> Features are enabled via localStorage. Refresh the app after making changes to see the effects.
+    </div>
+
+    <div class="feature-grid">
+      <!-- Theme Features -->
+      <div class="feature-card">
+        <div class="category">Theme</div>
+        <div class="feature-header">
+          <span class="feature-name">Premium Black/Gold Theme</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="useBlackGoldTheme">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Enable the premium black, gold, and white color scheme for a more professional investment platform look.
+        </div>
+      </div>
+
+      <!-- Assessment Features -->
+      <div class="feature-card">
+        <div class="category">Assessment</div>
+        <div class="feature-header">
+          <span class="feature-name">Investment X-Ray (7 min)</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="useInvestmentXRay">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Replace the generic assessment with powerful, revealing questions that expose investment readiness gaps.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="category">Assessment</div>
+        <div class="feature-header">
+          <span class="feature-name">Blind Spot Analysis</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showBlindSpotAnalysis">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Show users their #1 hidden investment blocker with actionable insights.
+        </div>
+      </div>
+
+      <!-- Accelerator Features -->
+      <div class="feature-card">
+        <div class="category">Accelerator</div>
+        <div class="feature-header">
+          <span class="feature-name">30-Day Investment Bootcamp</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="use30DayBootcamp">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Transform the Growth Accelerator into a focused 30-day investment readiness bootcamp with clear weekly deliverables.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="category">Accelerator</div>
+        <div class="feature-header">
+          <span class="feature-name">Tiered Pricing Display</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showPricingTiers">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Show Self-Paced (₵497), Group Cohort (₵997), and VIP Track (₵2,497) pricing options.
+        </div>
+      </div>
+
+      <!-- Homepage Features -->
+      <div class="feature-card">
+        <div class="category">Homepage</div>
+        <div class="feature-header">
+          <span class="feature-name">Optimized Homepage</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="useOptimizedHomepage">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Use conversion-focused homepage with powerful headline and single CTA.
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="category">Homepage</div>
+        <div class="feature-header">
+          <span class="feature-name">Trust Badges</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="showTrustBadges">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Display security, SEC-compliance, and Ghana-focused trust indicators.
+        </div>
+      </div>
+
+      <!-- Analytics Features -->
+      <div class="feature-card">
+        <div class="category">Analytics</div>
+        <div class="feature-header">
+          <span class="feature-name">Conversion Tracking</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="enableConversionTracking">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Track user journey from assessment to enrollment with detailed funnel analytics.
+        </div>
+      </div>
+
+      <!-- Simplification Features -->
+      <div class="feature-card">
+        <div class="category">Simplification</div>
+        <div class="feature-header">
+          <span class="feature-name">Hide Complex Features</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="hideComplexFeatures">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="feature-description">
+          Hide non-essential features to focus on core MVP functionality.
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn btn-primary" onclick="enableAll()">Enable All Features</button>
+      <button class="btn btn-secondary" onclick="enableRecommended()">Enable Recommended</button>
+      <button class="btn btn-secondary" onclick="resetAll()">Reset to Defaults</button>
+    </div>
+
+    <div id="status" class="status">
+      Features updated! Refresh the Bvester app to see changes.
+    </div>
+  </div>
+
+  <script>
+    // Feature flag keys
+    const features = [
+      'useBlackGoldTheme',
+      'useInvestmentXRay',
+      'showBlindSpotAnalysis',
+      'use30DayBootcamp',
+      'showPricingTiers',
+      'useOptimizedHomepage',
+      'showTrustBadges',
+      'enableConversionTracking',
+      'hideComplexFeatures'
+    ];
+
+    // Recommended features for optimal MVP experience
+    const recommendedFeatures = [
+      'useBlackGoldTheme',
+      'useInvestmentXRay',
+      'showBlindSpotAnalysis',
+      'use30DayBootcamp',
+      'showPricingTiers',
+      'enableConversionTracking'
+    ];
+
+    // Load current state
+    function loadCurrentState() {
+      const savedFlags = localStorage.getItem('featureFlags');
+      const flags = savedFlags ? JSON.parse(savedFlags) : {};
+
+      features.forEach(feature => {
+        const checkbox = document.getElementById(feature);
+        if (checkbox) {
+          checkbox.checked = flags[feature] === true;
+        }
+      });
+    }
+
+    // Save state to localStorage
+    function saveState() {
+      const flags = {};
+      features.forEach(feature => {
+        const checkbox = document.getElementById(feature);
+        if (checkbox) {
+          flags[feature] = checkbox.checked;
+        }
+      });
+
+      localStorage.setItem('featureFlags', JSON.stringify(flags));
+      showStatus();
+    }
+
+    // Enable all features
+    function enableAll() {
+      features.forEach(feature => {
+        const checkbox = document.getElementById(feature);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+      saveState();
+    }
+
+    // Enable recommended features
+    function enableRecommended() {
+      features.forEach(feature => {
+        const checkbox = document.getElementById(feature);
+        if (checkbox) {
+          checkbox.checked = recommendedFeatures.includes(feature);
+        }
+      });
+      saveState();
+    }
+
+    // Reset all features
+    function resetAll() {
+      features.forEach(feature => {
+        const checkbox = document.getElementById(feature);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+      });
+      localStorage.removeItem('featureFlags');
+      showStatus();
+    }
+
+    // Show status message
+    function showStatus() {
+      const status = document.getElementById('status');
+      status.classList.add('show');
+      setTimeout(() => {
+        status.classList.remove('show');
+      }, 3000);
+    }
+
+    // Add change listeners to all checkboxes
+    features.forEach(feature => {
+      const checkbox = document.getElementById(feature);
+      if (checkbox) {
+        checkbox.addEventListener('change', saveState);
+      }
+    });
+
+    // Load current state on page load
+    loadCurrentState();
+
+    // Add keyboard shortcut (Ctrl+Shift+F) to open in app
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && e.key === 'F') {
+        console.log('Feature flags panel shortcut activated');
+      }
+    });
+  </script>
+</body>
+</html>

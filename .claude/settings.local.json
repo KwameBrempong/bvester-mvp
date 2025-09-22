@@ -17,7 +17,9 @@
       "Bash(/dev/null)",
       "mcp__ide__getDiagnostics",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

@@ -8,13 +8,20 @@ import ErrorBoundary from './components/ErrorBoundary';
 import PermissionWrapper from './components/PermissionWrapper';
 import UserProfileHeader from './components/UserProfileHeader';
 import ProfileCompletionWidget from './components/ProfileCompletionWidget';
+import { isFeatureEnabled } from './config/featureFlags';
 import './App.css';
+// Import premium theme if enabled
+if (isFeatureEnabled('useBlackGoldTheme')) {
+  import('./styles/premium-theme.css');
+}
 
 // Lazy load components for better performance
 const SMEProfile = lazy(() => import('./SMEProfile'));
 const GrowthAccelerator = lazy(() => import('./GrowthAccelerator'));
+const InvestmentBootcamp = lazy(() => import('./components/InvestmentBootcamp'));
 const ChatTransactionRecorder = lazy(() => import('./components/ChatTransactionRecorder'));
 const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
+const InvestmentXRay = lazy(() => import('./components/InvestmentXRay'));
 const SubscriptionManager = lazy(() => import('./SubscriptionManager'));
 const UsageTracker = lazy(() => import('./components/UsageTracker'));
 const SubscriptionTierManager = lazy(() => import('./components/SubscriptionTierManager'));
@@ -308,11 +315,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* PRIMARY ACTION - Most important for MVP */}
               <button
-                className="action-button"
+                className={isFeatureEnabled('useBlackGoldTheme') ? "btn-premium" : "action-button"}
                 onClick={() => setShowGrowthAccelerator(true)}
-                aria-label="Start Growth Accelerator program - Primary business development tool"
+                aria-label={isFeatureEnabled('use30DayBootcamp') ? "Join 30-Day Investment Readiness Bootcamp" : "Start Growth Accelerator program - Primary business development tool"}
                 tabIndex={0}
-                style={{
+                style={!isFeatureEnabled('useBlackGoldTheme') ? {
                   background: 'linear-gradient(135deg, #2E8B57, #3CB371)',
                   color: 'white',
                   border: 'none',
@@ -320,9 +327,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                   cursor: 'pointer',
                   fontWeight: 'bold',
                   boxShadow: '0 4px 15px rgba(46, 139, 87, 0.3)'
-                }}
+                } : { width: '100%', marginBottom: '10px' }}
               >
-                🚀 Growth Accelerator - START HERE
+                {isFeatureEnabled('use30DayBootcamp') ? '🎯 30-Day Investment Bootcamp - START HERE' : '🚀 Growth Accelerator - START HERE'}
               </button>
 
               {/* SECONDARY ACTIONS - Core features */}
@@ -362,13 +369,13 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                 📊 Business Analysis
               </button>
 
-              {/* TERTIARY ACTION */}
+              {/* TERTIARY ACTION - Use Investment X-Ray if enabled */}
               <button
-                className="action-button"
+                className={isFeatureEnabled('useBlackGoldTheme') ? "btn-premium" : "action-button"}
                 onClick={() => setShowBusinessAssessment(true)}
-                aria-label="Take comprehensive business assessment quiz"
+                aria-label={isFeatureEnabled('useInvestmentXRay') ? "Take 7-minute Investment X-Ray assessment" : "Take comprehensive business assessment quiz"}
                 tabIndex={0}
-                style={{
+                style={!isFeatureEnabled('useBlackGoldTheme') ? {
                   background: 'linear-gradient(135deg, #4169E1, #6495ED)',
                   color: 'white',
                   border: 'none',
@@ -376,9 +383,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                   cursor: 'pointer',
                   fontWeight: '500',
                   boxShadow: '0 2px 8px rgba(65, 105, 225, 0.2)'
-                }}
+                } : undefined}
               >
-                📋 Business Assessment
+                {isFeatureEnabled('useInvestmentXRay') ? '🎯 Investment X-Ray (7 min)' : '📋 Business Assessment'}
               </button>
 
               {/* SUBSCRIPTION MANAGEMENT */}
@@ -475,11 +482,23 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {showBusinessAssessment && (
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              <BusinessAssessment
-                user={user}
-                userProfile={userState.profile}
-                onClose={() => setShowBusinessAssessment(false)}
-              />
+              {isFeatureEnabled('useInvestmentXRay') ? (
+                <InvestmentXRay
+                  user={user}
+                  userProfile={userState.profile}
+                  onClose={() => setShowBusinessAssessment(false)}
+                  onComplete={(score, insights) => {
+                    console.log('Investment X-Ray completed:', { score, insights });
+                    // Handle completion - could trigger accelerator enrollment
+                  }}
+                />
+              ) : (
+                <BusinessAssessment
+                  user={user}
+                  userProfile={userState.profile}
+                  onClose={() => setShowBusinessAssessment(false)}
+                />
+              )}
             </Suspense>
           </ErrorBoundary>
         )}
@@ -487,11 +506,19 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {showGrowthAccelerator && (
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              <GrowthAccelerator
-                user={user}
-                userProfile={userState.profile}
-                onClose={() => setShowGrowthAccelerator(false)}
-              />
+              {isFeatureEnabled('use30DayBootcamp') ? (
+                <InvestmentBootcamp
+                  user={user}
+                  userProfile={userState.profile}
+                  onClose={() => setShowGrowthAccelerator(false)}
+                />
+              ) : (
+                <GrowthAccelerator
+                  user={user}
+                  userProfile={userState.profile}
+                  onClose={() => setShowGrowthAccelerator(false)}
+                />
+              )}
             </Suspense>
           </ErrorBoundary>
         )}
