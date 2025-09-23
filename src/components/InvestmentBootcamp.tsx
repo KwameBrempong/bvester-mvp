@@ -107,47 +107,51 @@ const bootcampWeeks: BootcampWeek[] = [
   }
 ];
 
+// Using EXISTING Stripe pricing - DO NOT CHANGE THESE
+// These are the actual price IDs from your Stripe account
 const pricingTiers: PricingTier[] = [
   {
-    name: 'Self-Paced',
-    price: 497,
-    priceId: 'price_selfpaced_497',
+    name: 'Accelerator Installment',
+    price: 200, // Existing price - 3 monthly payments
+    priceId: 'price_1S9pPsGUhOvqkzBNt6pmrvF1', // Existing Stripe price ID
     features: [
+      'Complete 30-day program',
       'All course materials',
-      'Templates & tools',
-      'Community access',
-      'Email support',
-      'Lifetime updates'
+      'Group sessions access',
+      'Community support',
+      'Pay over 3 months',
+      'Total: ₵600 (₵200 x 3)'
     ]
   },
   {
-    name: 'Group Cohort',
-    price: 997,
-    priceId: 'price_cohort_997',
+    name: 'Accelerator Full Payment',
+    price: 500, // Existing price - one-time payment
+    priceId: 'price_1S9omIGUhOvqkzBNnonB74p5', // Existing Stripe price ID
     features: [
-      'Everything in Self-Paced',
+      'Complete 30-day program',
       '8 live group sessions',
       'Peer review & feedback',
       'Weekly office hours',
       'Cohort WhatsApp group',
-      'Certificate of completion'
+      'Certificate of completion',
+      'Save ₵100 vs installments'
     ],
     recommended: true,
-    savings: 'Most Popular'
+    savings: 'Best Value - Save ₵100'
   },
   {
-    name: 'VIP Track',
-    price: 2497,
-    priceId: 'price_vip_2497',
+    name: 'Pro Subscription',
+    price: 50, // Existing monthly subscription
+    priceId: 'price_1S9ohYGUhOvqkzBNKogIKA9A', // Existing Stripe price ID
     features: [
-      'Everything in Group Cohort',
-      '4 one-on-one coaching sessions',
-      'Personal pitch review',
-      'Direct investor introductions',
-      'Priority support',
-      'Success guarantee*'
+      'Ongoing access to materials',
+      'Monthly group sessions',
+      'Community access',
+      'Email support',
+      'Cancel anytime',
+      '14-day free trial'
     ],
-    savings: 'Best Results'
+    savings: 'Monthly Access'
   }
 ];
 
@@ -174,19 +178,33 @@ const InvestmentBootcamp: React.FC<InvestmentBootcampProps> = ({
   const nextCohortDate = getNextMonday();
   const spotsRemaining = 12 - Math.floor(Math.random() * 5); // Dynamic spots for urgency
 
-  const handleEnroll = () => {
+  const handleEnroll = async () => {
     console.log('Enrolling in tier:', selectedTier);
-    // Trigger Stripe checkout or enrollment process
-    const event = new CustomEvent('initiateEnrollment', {
-      detail: {
-        tier: selectedTier,
-        userId: user?.username,
-        userEmail: userProfile?.email,
-        score: enrollmentScore,
+
+    // Import Stripe service
+    const { stripeService } = await import('../stripeService');
+
+    // Prepare checkout parameters
+    const checkoutParams = {
+      priceId: selectedTier.priceId,
+      userId: user?.username || '',
+      customerEmail: userProfile?.email || user?.email || '',
+      successUrl: `${window.location.origin}/dashboard?enrollment=success`,
+      cancelUrl: `${window.location.origin}/dashboard?enrollment=cancelled`,
+      metadata: {
+        program: '30-Day Investment Bootcamp',
+        tier: selectedTier.name,
+        assessmentScore: enrollmentScore?.toString() || 'N/A',
       }
-    });
-    window.dispatchEvent(event);
-    setShowEnrollment(true);
+    };
+
+    try {
+      // Initiate Stripe checkout with existing price IDs
+      await stripeService.createCheckoutSession(checkoutParams);
+    } catch (error) {
+      console.error('Error initiating enrollment:', error);
+      alert('Unable to process enrollment. Please try again.');
+    }
   };
 
   const usePremiumTheme = isFeatureEnabled('useBlackGoldTheme');
