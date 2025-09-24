@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import amplifyOutputs from '../amplify_outputs.json';
 import App from './App';
 import Homepage from './components/Homepage';
 
-Amplify.configure(amplifyOutputs);
+// Amplify configuration removed - using standalone Lambda backend
 
 const AppRouter: React.FC = () => {
   const [showSignIn, setShowSignIn] = useState(false);
