@@ -401,19 +401,21 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* PRIMARY ACTION - Most important for MVP */}
               <button
-                className={isFeatureEnabled('useBlackGoldTheme') ? "btn-premium" : "action-button"}
+                className="action-button"
                 onClick={() => setShowGrowthAccelerator(true)}
                 aria-label={isFeatureEnabled('use30DayBootcamp') ? "Join 30-Day Investment Readiness Bootcamp" : "Start Growth Accelerator program - Primary business development tool"}
                 tabIndex={0}
-                style={!isFeatureEnabled('useBlackGoldTheme') ? {
+                style={{
                   background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
                   color: '#0A0A0A',
                   border: 'none',
                   borderRadius: '12px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
-                } : { width: '100%', marginBottom: '10px' }}
+                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+                  width: '100%',
+                  marginBottom: '10px'
+                }}
               >
                 {isFeatureEnabled('use30DayBootcamp') ? '🎯 30-Day Investment Bootcamp - START HERE' : '🚀 Growth Accelerator - START HERE'}
               </button>
@@ -457,11 +459,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
 
               {/* TERTIARY ACTION - Use Investment X-Ray if enabled */}
               <button
-                className={isFeatureEnabled('useBlackGoldTheme') ? "btn-premium" : "action-button"}
+                className="action-button"
                 onClick={() => setShowBusinessAssessment(true)}
                 aria-label={isFeatureEnabled('useInvestmentXRay') ? "Take 7-minute Investment X-Ray assessment" : "Take comprehensive business assessment quiz"}
                 tabIndex={0}
-                style={!isFeatureEnabled('useBlackGoldTheme') ? {
+                style={{
                   background: 'linear-gradient(135deg, #FFFFFF, #F9F9F9)',
                   color: '#0A0A0A',
                   border: '2px solid #D4AF37',
@@ -469,7 +471,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                   cursor: 'pointer',
                   fontWeight: '500',
                   boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)'
-                } : undefined}
+                }}
               >
                 {isFeatureEnabled('useInvestmentXRay') ? '🎯 Investment X-Ray (7 min)' : '📋 Business Assessment'}
               </button>

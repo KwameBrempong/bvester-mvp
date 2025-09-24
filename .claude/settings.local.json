@@ -33,7 +33,18 @@
       "Bash(git push:*)",
       "Bash(git rm:*)",
       "Bash(start test-connections.html)",
-      "Bash(copy stripe-lambda\\index-enhanced.js stripe-lambda\\index.js)"
+      "Bash(copy stripe-lambda\\index-enhanced.js stripe-lambda\\index.js)",
+      "Bash(aws amplify list-apps:*)",
+      "Bash(aws amplify start-job:*)",
+      "Bash(aws amplify list-jobs:*)",
+      "Bash(aws amplify get-job:*)",
+      "Bash(echo:*)",
+      "Bash(aws amplify list-domain-associations:*)",
+      "Bash(aws amplify create-domain-association:*)",
+      "Bash(aws amplify get-domain-association:*)",
+      "Bash(aws amplify delete-domain-association:*)",
+      "Bash(nslookup:*)",
+      "Bash(aws cloudfront list-distributions:*)"
     ],
     "deny": [],
     "ask": []

@@ -31,7 +31,7 @@ interface FeatureFlags {
 // Default configuration - start with all enhancements disabled for safety
 const defaultFlags: FeatureFlags = {
   // Gradually enable theme (low risk)
-  useBlackGoldTheme: false,
+  useBlackGoldTheme: true,
 
   // Assessment features (medium risk - test thoroughly)
   useInvestmentXRay: false,
