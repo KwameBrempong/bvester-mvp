@@ -48,7 +48,7 @@ const LoadingSpinner = () => (
       width: '40px',
       height: '40px',
       border: '4px solid #f3f3f3',
-      borderTop: '4px solid var(--gold-primary, #D4AF37)',
+      borderTop: '4px solid #D4AF37',
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     }}></div>
@@ -244,7 +244,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     <div style={{
       width: '100%',
       minHeight: '100vh',
-      background: 'var(--white-off, #FAFAFA)',
+      background: '#FAFAFA',
       padding: '15px 0 0 0'
     }}>
       <div className="main-container">
@@ -264,10 +264,10 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           background: 'white',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid var(--gray-200, #E5E5E5)'
+          border: '1px solid #E5E5E5'
         }}>
           <div>
-            <h2 style={{ margin: 0, color: 'var(--black-primary, #0A0A0A)', fontSize: '26px', fontWeight: 'bold' }}>Dashboard</h2>
+            <h2 style={{ margin: 0, color: '#0A0A0A', fontSize: '26px', fontWeight: 'bold' }}>Dashboard</h2>
             <p style={{ color: '#666', margin: '8px 0 0 0', fontSize: '16px' }}>
               Manage your business funding and growth
             </p>
@@ -300,17 +300,17 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           <div className="dashboard-card" style={{
             background: 'white',
             borderRadius: '12px',
-            border: '1px solid var(--gray-200, #E5E5E5)',
+            border: '1px solid #E5E5E5',
             boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ color: 'var(--black-primary, #0A0A0A)', marginBottom: '20px', fontSize: '20px' }}>Business Overview</h3>
+            <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Business Overview</h3>
             <div style={{ display: 'grid', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#666', fontSize: '14px' }}>Business Type</span>
                 <span style={{
-                  color: 'var(--gold-deep, #B8960F)',
+                  color: '#B8960F',
                   fontWeight: '600',
-                  background: 'var(--gold-subtle, #FAF4E4)',
+                  background: '#FAF4E4',
                   padding: '4px 8px',
                   borderRadius: '6px',
                   fontSize: '13px'
@@ -321,9 +321,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#666', fontSize: '14px' }}>Team Size</span>
                 <span style={{
-                  color: 'var(--black-secondary, #1A1A1A)',
+                  color: '#1A1A1A',
                   fontWeight: '600',
-                  background: 'var(--gray-100, #F0F0F0)',
+                  background: '#F0F0F0',
                   padding: '4px 8px',
                   borderRadius: '6px',
                   fontSize: '13px'
@@ -334,9 +334,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#666', fontSize: '14px' }}>Business Stage</span>
                 <span style={{
-                  color: 'var(--gold-primary, #D4AF37)',
+                  color: '#D4AF37',
                   fontWeight: '600',
-                  background: 'var(--gold-subtle, #FAF4E4)',
+                  background: '#FAF4E4',
                   padding: '4px 8px',
                   borderRadius: '6px',
                   fontSize: '13px'
@@ -349,18 +349,18 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
               <div style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid #eee' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ color: '#666', fontSize: '14px' }}>Business Setup Progress</span>
-                  <span style={{ color: 'var(--gold-deep, #B8960F)', fontWeight: 'bold', fontSize: '14px' }}>
+                  <span style={{ color: '#B8960F', fontWeight: 'bold', fontSize: '14px' }}>
                     {userState.profile?.profileCompletionPercentage || 60}%
                   </span>
                 </div>
                 <div style={{
-                  background: 'var(--gray-200, #E5E5E5)',
+                  background: '#E5E5E5',
                   borderRadius: '10px',
                   height: '8px',
                   overflow: 'hidden'
                 }}>
                   <div style={{
-                    background: 'linear-gradient(90deg, var(--gold-primary, #D4AF37), var(--gold-accent, #FFD700))',
+                    background: 'linear-gradient(90deg, #D4AF37, #FFD700)',
                     height: '100%',
                     width: `${userState.profile?.profileCompletionPercentage || 60}%`,
                     borderRadius: '10px',
@@ -394,10 +394,10 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           <div className="dashboard-card" style={{
             background: 'white',
             borderRadius: '12px',
-            border: '1px solid var(--gray-200, #E5E5E5)',
+            border: '1px solid #E5E5E5',
             boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
           }}>
-            <h3 style={{ color: 'var(--black-primary, #0A0A0A)', marginBottom: '20px', fontSize: '20px' }}>Quick Actions</h3>
+            <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Quick Actions</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* PRIMARY ACTION - Most important for MVP */}
               <button
@@ -406,8 +406,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                 aria-label={isFeatureEnabled('use30DayBootcamp') ? "Join 30-Day Investment Readiness Bootcamp" : "Start Growth Accelerator program - Primary business development tool"}
                 tabIndex={0}
                 style={!isFeatureEnabled('useBlackGoldTheme') ? {
-                  background: 'linear-gradient(135deg, var(--gold-primary, #D4AF37), var(--gold-accent, #FFD700))',
-                  color: 'var(--black-primary, #0A0A0A)',
+                  background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
+                  color: '#0A0A0A',
                   border: 'none',
                   borderRadius: '12px',
                   cursor: 'pointer',
@@ -425,8 +425,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                 aria-label="Open chat-style transaction recorder for quick business record keeping"
                 tabIndex={0}
                 style={{
-                  background: 'linear-gradient(135deg, var(--black-primary, #0A0A0A), var(--black-secondary, #1A1A1A))',
-                  color: 'var(--gold-primary, #D4AF37)',
+                  background: 'linear-gradient(135deg, #0A0A0A, #1A1A1A)',
+                  color: '#D4AF37',
                   border: 'none',
                   borderRadius: '10px',
                   cursor: 'pointer',
@@ -443,8 +443,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                 aria-label="View AI-powered business analysis and insights dashboard"
                 tabIndex={0}
                 style={{
-                  background: 'linear-gradient(135deg, var(--gold-deep, #B8960F), var(--gold-primary, #D4AF37))',
-                  color: 'var(--white-primary, #FFFFFF)',
+                  background: 'linear-gradient(135deg, #B8960F, #D4AF37)',
+                  color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '10px',
                   cursor: 'pointer',
@@ -462,9 +462,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                 aria-label={isFeatureEnabled('useInvestmentXRay') ? "Take 7-minute Investment X-Ray assessment" : "Take comprehensive business assessment quiz"}
                 tabIndex={0}
                 style={!isFeatureEnabled('useBlackGoldTheme') ? {
-                  background: 'linear-gradient(135deg, var(--white-primary, #FFFFFF), var(--gray-50, #F9F9F9))',
-                  color: 'var(--black-primary, #0A0A0A)',
-                  border: '2px solid var(--gold-primary, #D4AF37)',
+                  background: 'linear-gradient(135deg, #FFFFFF, #F9F9F9)',
+                  color: '#0A0A0A',
+                  border: '2px solid #D4AF37',
                   borderRadius: '8px',
                   cursor: 'pointer',
                   fontWeight: '500',
@@ -481,9 +481,9 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                   onClick={() => setShowSubscriptionTierManager(true)}
                   style={{
                     background: subscriptionTier !== 'free' ?
-                      'linear-gradient(135deg, var(--gold-primary, #D4AF37), var(--gold-accent, #FFD700))' :
-                      'linear-gradient(135deg, var(--black-primary, #0A0A0A), var(--black-secondary, #1A1A1A))',
-                    color: subscriptionTier !== 'free' ? 'var(--black-primary, #0A0A0A)' : 'var(--gold-primary, #D4AF37)',
+                      'linear-gradient(135deg, #D4AF37, #FFD700)' :
+                      'linear-gradient(135deg, #0A0A0A, #1A1A1A)',
+                    color: subscriptionTier !== 'free' ? '#0A0A0A' : '#D4AF37',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: 'pointer',
@@ -501,8 +501,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                     className="action-button"
                     onClick={() => setShowBillingManager(true)}
                     style={{
-                      background: 'linear-gradient(135deg, var(--black-secondary, #1A1A1A), var(--black-tertiary, #2A2A2A))',
-                      color: 'var(--gold-primary, #D4AF37)',
+                      background: 'linear-gradient(135deg, #1A1A1A, #2A2A2A)',
+                      color: '#D4AF37',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer',
@@ -524,13 +524,13 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           background: 'white', 
           padding: '30px', 
           borderRadius: '12px',
-          border: '1px solid var(--gray-200, #E5E5E5)',
+          border: '1px solid #E5E5E5',
           boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
           marginBottom: '30px'
         }}>
-          <h3 style={{ color: 'var(--black-primary, #0A0A0A)', marginBottom: '20px', fontSize: '20px' }}>Funding Progress</h3>
-          <div style={{ background: 'var(--gray-200, #E5E5E5)', borderRadius: '10px', height: '12px', marginBottom: '15px' }}>
-            <div style={{ background: 'linear-gradient(90deg, var(--gold-primary, #D4AF37), var(--gold-accent, #FFD700))', height: '100%', width: '0%', borderRadius: '10px' }}></div>
+          <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Funding Progress</h3>
+          <div style={{ background: '#E5E5E5', borderRadius: '10px', height: '12px', marginBottom: '15px' }}>
+            <div style={{ background: 'linear-gradient(90deg, #D4AF37, #FFD700)', height: '100%', width: '0%', borderRadius: '10px' }}></div>
           </div>
           <p style={{ color: '#666', textAlign: 'center', fontSize: '16px' }}>
             No active campaigns yet. Create your first funding campaign to start raising investment!
@@ -540,10 +540,10 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {/* Footer */}
         <div style={{ 
           padding: '25px', 
-          background: 'var(--gray-50, #F9F9F9)', 
+          background: '#F9F9F9', 
           borderRadius: '12px', 
           textAlign: 'center',
-          border: '1px solid var(--gray-200, #E5E5E5)'
+          border: '1px solid #E5E5E5'
         }}>
           <p style={{ color: '#666', margin: 0, fontSize: '16px' }}>
             Bvester - Connecting Ghana SMEs with Global Investment Opportunities
