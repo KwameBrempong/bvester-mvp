@@ -4,7 +4,7 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import amplifyOutputs from '../amplify_outputs.json';
 import App from './App';
-import HomepageNew from './components/HomepageNew';
+import Homepage from './components/Homepage';
 
 Amplify.configure(amplifyOutputs);
 
@@ -58,7 +58,7 @@ const AppRouter: React.FC = () => {
     );
   }
 
-  return <HomepageNew onGetStarted={handleGetStarted} />;
+  return <Homepage onGetStarted={handleGetStarted} />;
 };
 
 export default AppRouter;

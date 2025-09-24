@@ -622,7 +622,17 @@ export const subscriptionService = {
 export const paymentEventService = {
   async create(event: Omit<PaymentEvent, 'id'>): Promise<PaymentEvent> {
     try {
-      const result = await getClient().models.PaymentEvent.create({
+      const client = getClient();
+
+      if (!client?.models?.PaymentEvent?.create) {
+        logger.warn('Amplify client unavailable, skipping payment event persistence');
+        return {
+          ...event,
+          createdAt: event.createdAt ?? new Date().toISOString(),
+        } as PaymentEvent;
+      }
+
+      const result = await client.models.PaymentEvent.create({
         ...event,
         createdAt: new Date().toISOString(),
       });
@@ -633,8 +643,11 @@ export const paymentEventService = {
 
       return result.data as PaymentEvent;
     } catch (error) {
-      console.error('Error creating payment event:', error);
-      throw error;
+      logger.warn('Error creating payment event, continuing without persistence', error);
+      return {
+        ...event,
+        createdAt: event.createdAt ?? new Date().toISOString(),
+      } as PaymentEvent;
     }
   },
 

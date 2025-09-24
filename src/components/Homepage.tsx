@@ -1,1361 +1,437 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import '../styles/homepage-perfect.css';
 
 interface HomepageProps {
   onGetStarted: () => void;
 }
 
-const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
-  const [email, setEmail] = useState('');
+const navLinks = [
+  { label: 'Home', href: '#home' },
+  { label: 'Features', href: '#features' },
+  { label: 'How It Works', href: '#programs' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'Contact', href: '#contact' },
+];
 
-  const handleEmailSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      // Store email for later signup
-      localStorage.setItem('preSignupEmail', email);
-      onGetStarted();
+const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const handleNavClick = (href: string) => {
+    setMenuOpen(false);
+    const el = document.querySelector(href);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <div style={{ width: '100%', minHeight: '100vh', background: '#fff' }}>
+    <div className="homepage">
+      <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
+        <div className="nav__inner">
+          <a href="#home" className="nav__logo" onClick={() => handleNavClick('#home')}>
+            <span className="nav__logo-mark">BV</span>
+            <span className="nav__logo-text">Bvester</span>
+          </a>
 
-      {/* Hero Section */}
-      <section style={{
-        background: 'linear-gradient(135deg, #2E8B57 0%, #1e5f3f 100%)',
-        color: 'white',
-        padding: '60px 20px 80px 20px',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        {/* Background Pattern */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-          zIndex: 1
-        }} />
-
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          position: 'relative',
-          zIndex: 2
-        }}>
-          {/* Navigation */}
-          <nav style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '60px',
-            flexWrap: 'wrap',
-            gap: '20px'
-          }}>
-            <div style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              color: 'white'
-            }}>
-              Bvester
+          <nav className={`nav__links ${menuOpen ? 'nav__links--open' : ''}`}>
+            <ul>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <button type="button" onClick={() => handleNavClick(link.href)}>
+                    {link.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="nav__cta nav__cta--mobile">
+              <button className="btn btn--ghost" onClick={onGetStarted}>Log In</button>
+              <button className="btn btn--gold" onClick={onGetStarted}>Get Started</button>
             </div>
-            <button
-              onClick={onGetStarted}
-              style={{
-                background: 'rgba(255,255,255,0.2)',
-                border: '2px solid rgba(255,255,255,0.3)',
-                color: 'white',
-                padding: '12px 24px',
-                borderRadius: '25px',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                backdropFilter: 'blur(10px)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-                e.currentTarget.style.transform = 'translateY(0px)';
-              }}
-            >
-              Sign In
-            </button>
           </nav>
 
-          {/* Hero Content */}
-          <div style={{
-            maxWidth: '800px',
-            margin: '0 auto'
-          }}>
-            <h1 style={{
-              fontSize: 'clamp(36px, 5vw, 64px)',
-              fontWeight: 'bold',
-              marginBottom: '24px',
-              lineHeight: '1.2',
-              textShadow: '2px 2px 4px rgba(0,0,0,0.2)'
-            }}>
-              Turn Your Business Into an
-              <span style={{
-                background: 'linear-gradient(45deg, #FFD700, #FFA500)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                display: 'block',
-                marginTop: '10px'
-              }}>
-                Investment Magnet
-              </span>
-            </h1>
-
-            <p style={{
-              fontSize: 'clamp(18px, 3vw, 24px)',
-              marginBottom: '40px',
-              opacity: 0.95,
-              lineHeight: '1.5',
-              fontWeight: '300'
-            }}>
-              AI-powered tools that help Ghanaian SMEs grow revenue, streamline operations,
-              and become irresistible to investors — all in one platform.
-            </p>
-
-            {/* Key Stats */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-              gap: '20px',
-              marginBottom: '50px',
-              maxWidth: '600px',
-              margin: '0 auto 50px auto'
-            }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#FFD700' }}>500+</div>
-                <div style={{ fontSize: '14px', opacity: 0.8 }}>Active SMEs</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#FFD700' }}>₵2.5M+</div>
-                <div style={{ fontSize: '14px', opacity: 0.8 }}>Revenue Tracked</div>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#FFD700' }}>15hrs</div>
-                <div style={{ fontSize: '14px', opacity: 0.8 }}>Saved/Week</div>
-              </div>
-            </div>
-
-            {/* CTA Form */}
-            <form onSubmit={handleEmailSignup} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '20px',
-              maxWidth: '500px',
-              margin: '0 auto'
-            }}>
-              <div style={{
-                display: 'flex',
-                width: '100%',
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: '50px',
-                padding: '6px',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                flexDirection: 'column',
-                gap: '10px'
-              }}
-              className="hero-form"
-              >
-                <style>
-                  {`
-                    @media (min-width: 768px) {
-                      .hero-form {
-                        flex-direction: row !important;
-                        gap: 0 !important;
-                      }
-                    }
-                  `}
-                </style>
-                <input
-                  type="email"
-                  placeholder="Enter your business email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={{
-                    flex: 1,
-                    padding: '16px 24px',
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'white',
-                    fontSize: '16px',
-                    outline: 'none',
-                    borderRadius: '25px'
-                  }}
-                  className="hero-input"
-                />
-                <style>
-                  {`
-                    @media (min-width: 768px) {
-                      .hero-input {
-                        border-radius: 0 !important;
-                      }
-                    }
-                  `}
-                </style>
-                <button
-                  type="submit"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
-                    color: '#2E8B57',
-                    border: 'none',
-                    padding: '16px 32px',
-                    borderRadius: '25px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0px)';
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
-                  }}
-                >
-                  Start Free Trial
-                </button>
-              </div>
-              <p style={{
-                fontSize: '14px',
-                opacity: 0.8,
-                margin: 0
-              }}>
-                🔥 <strong>Early Bird Special:</strong> 50% off first 3 months • No credit card required
-              </p>
-            </form>
-          </div>
-        </div>
-      </section>
-
-      {/* Problem Section */}
-      <section style={{
-        padding: '80px 20px',
-        background: '#f8f9fa'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          textAlign: 'center'
-        }}>
-          <h2 style={{
-            fontSize: 'clamp(28px, 4vw, 48px)',
-            fontWeight: 'bold',
-            marginBottom: '24px',
-            color: '#2c3e50'
-          }}>
-            Are You Struggling With These Business Challenges?
-          </h2>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '30px',
-            marginTop: '50px'
-          }}>
-            {[
-              {
-                icon: '📊',
-                title: 'No Clear Financial Picture',
-                description: 'Spending hours on spreadsheets but still can\'t see where your money goes or how profitable you really are.'
-              },
-              {
-                icon: '💸',
-                title: 'Missing Growth Opportunities',
-                description: 'Feeling stuck at the same revenue level with no clear path to scale or attract serious investors.'
-              },
-              {
-                icon: '⏰',
-                title: 'Drowning in Admin Work',
-                description: 'Wasting 15+ hours weekly on bookkeeping and reporting instead of growing your business.'
-              },
-              {
-                icon: '🚫',
-                title: 'Investment-Ready? No Idea.',
-                description: 'Want to raise capital but don\'t know if your business is attractive to investors or what to improve.'
-              }
-            ].map((problem, index) => (
-              <div key={index} style={{
-                background: 'white',
-                padding: '40px 30px',
-                borderRadius: '16px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                border: '1px solid #e8e8e8',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
-              }}>
-                <div style={{
-                  fontSize: '48px',
-                  marginBottom: '20px'
-                }}>
-                  {problem.icon}
-                </div>
-                <h3 style={{
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  marginBottom: '16px',
-                  color: '#2c3e50'
-                }}>
-                  {problem.title}
-                </h3>
-                <p style={{
-                  color: '#666',
-                  lineHeight: '1.6',
-                  fontSize: '16px'
-                }}>
-                  {problem.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Solution Preview */}
-      <section style={{
-        padding: '80px 20px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <h2 style={{
-            fontSize: 'clamp(32px, 4vw, 48px)',
-            fontWeight: 'bold',
-            marginBottom: '24px'
-          }}>
-            What If You Could Solve All of This in One Platform?
-          </h2>
-          <p style={{
-            fontSize: '20px',
-            marginBottom: '40px',
-            opacity: 0.9,
-            lineHeight: '1.6'
-          }}>
-            Bvester gives you AI-powered business intelligence, automated bookkeeping,
-            and a proven growth framework that has helped 500+ SMEs become investment-ready.
-          </p>
-          <button
-            onClick={onGetStarted}
-            style={{
-              background: 'linear-gradient(135deg, #FFD700, #FFA500)',
-              color: '#2E8B57',
-              border: 'none',
-              padding: '20px 40px',
-              borderRadius: '30px',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 6px 20px rgba(255, 215, 0, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-3px)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(255, 215, 0, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0px)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 215, 0, 0.3)';
-            }}
-          >
-            See How It Works — Free Demo
-          </button>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section style={{
-        padding: '80px 20px',
-        background: 'white'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{
-              fontSize: 'clamp(32px, 4vw, 48px)',
-              fontWeight: 'bold',
-              marginBottom: '24px',
-              color: '#2c3e50'
-            }}>
-              Three Game-Changing Tools for SME Growth
-            </h2>
-            <p style={{
-              fontSize: '18px',
-              color: '#666',
-              maxWidth: '600px',
-              margin: '0 auto',
-              lineHeight: '1.6'
-            }}>
-              Everything you need to scale your business and attract investors, powered by AI
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '40px'
-          }}>
-            {[
-              {
-                icon: '🚀',
-                title: 'Growth Accelerator Program',
-                subtitle: 'Your Path to Investment Readiness',
-                description: 'Step-by-step framework that has helped 200+ businesses increase revenue by 40% and become irresistible to investors.',
-                features: [
-                  '✅ Personalized growth strategy',
-                  '✅ Investment readiness assessment',
-                  '✅ Revenue optimization playbook',
-                  '✅ Investor pitch preparation'
-                ],
-                highlight: 'Most Popular',
-                color: '#2E8B57'
-              },
-              {
-                icon: '💬',
-                title: 'AI-Powered Quick Record',
-                subtitle: 'Bookkeeping Made Simple',
-                description: 'Chat with our AI to record transactions instantly. No more spreadsheets, no more confusion — just smart, automated bookkeeping.',
-                features: [
-                  '✅ Chat-style transaction entry',
-                  '✅ Auto-categorization',
-                  '✅ Real-time financial insights',
-                  '✅ Export to any format'
-                ],
-                highlight: 'Time Saver',
-                color: '#32CD32'
-              },
-              {
-                icon: '📊',
-                title: 'Business Intelligence Dashboard',
-                subtitle: 'See Your Business Like Never Before',
-                description: 'Get instant insights that usually cost ₵50,000+ from consultants. See exactly where your money goes and how to optimize.',
-                features: [
-                  '✅ Real-time profit analysis',
-                  '✅ Cash flow predictions',
-                  '✅ Growth opportunities AI',
-                  '✅ Investor-ready reports'
-                ],
-                highlight: 'AI-Powered',
-                color: '#FF6B6B'
-              }
-            ].map((feature, index) => (
-              <div key={index} style={{
-                background: 'white',
-                padding: '40px',
-                borderRadius: '20px',
-                boxShadow: '0 15px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e8e8e8',
-                position: 'relative',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px)';
-                e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0px)';
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(0,0,0,0.1)';
-              }}>
-                {/* Highlight Badge */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  right: '20px',
-                  background: `linear-gradient(135deg, ${feature.color}, ${feature.color}dd)`,
-                  color: 'white',
-                  padding: '6px 16px',
-                  borderRadius: '20px',
-                  fontSize: '12px',
-                  fontWeight: 'bold',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-                }}>
-                  {feature.highlight}
-                </div>
-
-                <div style={{
-                  fontSize: '64px',
-                  marginBottom: '20px',
-                  textAlign: 'center'
-                }}>
-                  {feature.icon}
-                </div>
-
-                <h3 style={{
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  marginBottom: '8px',
-                  color: '#2c3e50',
-                  textAlign: 'center'
-                }}>
-                  {feature.title}
-                </h3>
-
-                <p style={{
-                  fontSize: '16px',
-                  color: feature.color,
-                  fontWeight: '600',
-                  marginBottom: '20px',
-                  textAlign: 'center'
-                }}>
-                  {feature.subtitle}
-                </p>
-
-                <p style={{
-                  color: '#666',
-                  lineHeight: '1.6',
-                  fontSize: '16px',
-                  marginBottom: '24px',
-                  textAlign: 'center'
-                }}>
-                  {feature.description}
-                </p>
-
-                <div style={{
-                  background: '#f8f9fa',
-                  padding: '20px',
-                  borderRadius: '12px',
-                  marginBottom: '24px'
-                }}>
-                  {feature.features.map((feat, idx) => (
-                    <div key={idx} style={{
-                      marginBottom: '8px',
-                      fontSize: '14px',
-                      color: '#555'
-                    }}>
-                      {feat}
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={onGetStarted}
-                  style={{
-                    width: '100%',
-                    background: `linear-gradient(135deg, ${feature.color}, ${feature.color}dd)`,
-                    color: 'white',
-                    border: 'none',
-                    padding: '16px',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0px)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  Try This Feature
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Section */}
-      <section style={{
-        padding: '80px 20px',
-        background: '#f8f9fa'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{
-              fontSize: 'clamp(32px, 4vw, 48px)',
-              fontWeight: 'bold',
-              marginBottom: '24px',
-              color: '#2c3e50'
-            }}>
-              Join 500+ Growing Businesses
-            </h2>
-            <p style={{
-              fontSize: '18px',
-              color: '#666',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              See why SMEs across Ghana trust Bvester to grow their businesses
-            </p>
-          </div>
-
-          {/* Success Metrics */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '30px',
-            marginBottom: '60px'
-          }}>
-            {[
-              { number: '₵2.5M+', label: 'Revenue Tracked Monthly' },
-              { number: '15hrs', label: 'Average Time Saved/Week' },
-              { number: '40%', label: 'Average Revenue Increase' },
-              { number: '92%', label: 'Customer Satisfaction' }
-            ].map((stat, index) => (
-              <div key={index} style={{
-                background: 'white',
-                padding: '30px 20px',
-                borderRadius: '16px',
-                textAlign: 'center',
-                boxShadow: '0 8px 25px rgba(0,0,0,0.1)'
-              }}>
-                <div style={{
-                  fontSize: '36px',
-                  fontWeight: 'bold',
-                  color: '#2E8B57',
-                  marginBottom: '8px'
-                }}>
-                  {stat.number}
-                </div>
-                <div style={{
-                  fontSize: '14px',
-                  color: '#666',
-                  fontWeight: '500'
-                }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonials */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '30px'
-          }}>
-            {[
-              {
-                name: 'Kwame Asante',
-                business: 'Asante Trading Ltd',
-                location: 'Kumasi',
-                text: 'Bvester helped us increase revenue by 45% in just 6 months. The Growth Accelerator program showed us exactly what investors look for.',
-                avatar: '👨🏿‍💼'
-              },
-              {
-                name: 'Akosua Mensah',
-                business: 'Fresh Farms Ghana',
-                location: 'Accra',
-                text: 'Before Bvester, I spent 20 hours a week on bookkeeping. Now it takes me 2 hours with their AI chat feature. Game changer!',
-                avatar: '👩🏿‍🌾'
-              },
-              {
-                name: 'Emmanuel Tetteh',
-                business: 'TechSolutions GH',
-                location: 'Tema',
-                text: 'The business insights dashboard revealed profit leaks I never knew existed. Fixed them and improved our margins by 30%.',
-                avatar: '👨🏿‍💻'
-              }
-            ].map((testimonial, index) => (
-              <div key={index} style={{
-                background: 'white',
-                padding: '30px',
-                borderRadius: '16px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                border: '1px solid #e8e8e8'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginBottom: '20px'
-                }}>
-                  <div style={{
-                    fontSize: '48px',
-                    marginRight: '16px'
-                  }}>
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div style={{
-                      fontWeight: 'bold',
-                      fontSize: '16px',
-                      color: '#2c3e50',
-                      marginBottom: '4px'
-                    }}>
-                      {testimonial.name}
-                    </div>
-                    <div style={{
-                      fontSize: '14px',
-                      color: '#2E8B57',
-                      fontWeight: '600'
-                    }}>
-                      {testimonial.business}
-                    </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#666'
-                    }}>
-                      📍 {testimonial.location}
-                    </div>
-                  </div>
-                </div>
-                <p style={{
-                  color: '#555',
-                  lineHeight: '1.6',
-                  fontSize: '16px',
-                  fontStyle: 'italic'
-                }}>
-                  "{testimonial.text}"
-                </p>
-                <div style={{
-                  color: '#FFD700',
-                  fontSize: '18px',
-                  marginTop: '16px'
-                }}>
-                  ⭐⭐⭐⭐⭐
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section style={{
-        padding: '80px 20px',
-        background: 'linear-gradient(135deg, #2E8B57 0%, #1e5f3f 100%)',
-        color: 'white'
-      }}>
-        <div style={{
-          maxWidth: '1000px',
-          margin: '0 auto',
-          textAlign: 'center'
-        }}>
-          <h2 style={{
-            fontSize: 'clamp(32px, 4vw, 48px)',
-            fontWeight: 'bold',
-            marginBottom: '24px'
-          }}>
-            Special Launch Pricing
-          </h2>
-          <p style={{
-            fontSize: '20px',
-            marginBottom: '50px',
-            opacity: 0.9
-          }}>
-            🔥 Early Bird Special: Get 50% off your first 3 months
-          </p>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '30px',
-            maxWidth: '900px',
-            margin: '0 auto'
-          }}>
-            {/* Free Plan */}
-            <div style={{
-              background: 'rgba(255,255,255,0.1)',
-              padding: '40px 30px',
-              borderRadius: '20px',
-              border: '2px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <h3 style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                marginBottom: '16px'
-              }}>
-                Starter
-              </h3>
-              <div style={{
-                fontSize: '48px',
-                fontWeight: 'bold',
-                marginBottom: '8px'
-              }}>
-                FREE
-              </div>
-              <p style={{
-                opacity: 0.8,
-                marginBottom: '30px'
-              }}>
-                Perfect for getting started
-              </p>
-              <div style={{
-                textAlign: 'left',
-                marginBottom: '30px'
-              }}>
-                {[
-                  '✅ Up to 20 transactions/month',
-                  '✅ Basic business insights',
-                  '✅ Email support',
-                  '❌ Growth Accelerator',
-                  '❌ Advanced analytics'
-                ].map((feature, idx) => (
-                  <div key={idx} style={{
-                    marginBottom: '8px',
-                    fontSize: '14px'
-                  }}>
-                    {feature}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={onGetStarted}
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.2)',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  color: 'white',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-                }}
-              >
-                Start Free
-              </button>
-            </div>
-
-            {/* Pro Plan - Most Popular */}
-            <div style={{
-              background: 'white',
-              padding: '40px 30px',
-              borderRadius: '20px',
-              color: '#2c3e50',
-              position: 'relative',
-              transform: 'scale(1.05)',
-              border: '3px solid #FFD700'
-            }}>
-              {/* Popular Badge */}
-              <div style={{
-                position: 'absolute',
-                top: '-15px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'linear-gradient(135deg, #FFD700, #FFA500)',
-                color: '#2E8B57',
-                padding: '8px 24px',
-                borderRadius: '20px',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)'
-              }}>
-                🔥 MOST POPULAR
-              </div>
-
-              <h3 style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                marginBottom: '16px',
-                marginTop: '20px'
-              }}>
-                Pro
-              </h3>
-              <div style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'center',
-                marginBottom: '8px'
-              }}>
-                <span style={{
-                  fontSize: '24px',
-                  color: '#666',
-                  textDecoration: 'line-through',
-                  marginRight: '8px'
-                }}>
-                  ₵199
-                </span>
-                <span style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  color: '#2E8B57'
-                }}>
-                  ₵99
-                </span>
-                <span style={{
-                  fontSize: '16px',
-                  color: '#666',
-                  marginLeft: '4px'
-                }}>
-                  /month
-                </span>
-              </div>
-              <p style={{
-                color: '#e74c3c',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                marginBottom: '20px'
-              }}>
-                50% OFF for 3 months!
-              </p>
-              <div style={{
-                textAlign: 'left',
-                marginBottom: '30px'
-              }}>
-                {[
-                  '✅ Unlimited transactions',
-                  '✅ Growth Accelerator Program',
-                  '✅ Advanced AI insights',
-                  '✅ Priority support',
-                  '✅ Export capabilities',
-                  '✅ Investment readiness tools'
-                ].map((feature, idx) => (
-                  <div key={idx} style={{
-                    marginBottom: '8px',
-                    fontSize: '14px',
-                    color: '#2c3e50'
-                  }}>
-                    {feature}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={onGetStarted}
-                style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, #2E8B57, #3CB371)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 6px 20px rgba(46, 139, 87, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(46, 139, 87, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(46, 139, 87, 0.3)';
-                }}
-              >
-                Start Pro Trial
-              </button>
-            </div>
-
-            {/* Business Plan */}
-            <div style={{
-              background: 'rgba(255,255,255,0.1)',
-              padding: '40px 30px',
-              borderRadius: '20px',
-              border: '2px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <h3 style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                marginBottom: '16px'
-              }}>
-                Business
-              </h3>
-              <div style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                justifyContent: 'center',
-                marginBottom: '8px'
-              }}>
-                <span style={{
-                  fontSize: '24px',
-                  opacity: 0.6,
-                  textDecoration: 'line-through',
-                  marginRight: '8px'
-                }}>
-                  ₵399
-                </span>
-                <span style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold'
-                }}>
-                  ₵199
-                </span>
-                <span style={{
-                  fontSize: '16px',
-                  opacity: 0.8,
-                  marginLeft: '4px'
-                }}>
-                  /month
-                </span>
-              </div>
-              <p style={{
-                color: '#FFD700',
-                fontWeight: 'bold',
-                fontSize: '14px',
-                marginBottom: '20px'
-              }}>
-                50% OFF for 3 months!
-              </p>
-              <div style={{
-                textAlign: 'left',
-                marginBottom: '30px'
-              }}>
-                {[
-                  '✅ Everything in Pro',
-                  '✅ Multi-user access (10 users)',
-                  '✅ Custom branding',
-                  '✅ Phone support',
-                  '✅ Advanced integrations',
-                  '✅ Dedicated success manager'
-                ].map((feature, idx) => (
-                  <div key={idx} style={{
-                    marginBottom: '8px',
-                    fontSize: '14px'
-                  }}>
-                    {feature}
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={onGetStarted}
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.2)',
-                  border: '2px solid rgba(255,255,255,0.3)',
-                  color: 'white',
-                  padding: '16px',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.25)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
-                }}
-              >
-                Start Business Trial
-              </button>
-            </div>
-          </div>
-
-          <p style={{
-            fontSize: '14px',
-            opacity: 0.8,
-            marginTop: '40px'
-          }}>
-            💡 All plans include 14-day free trial • Cancel anytime • No setup fees
-          </p>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section style={{
-        padding: '80px 20px',
-        background: 'white',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          maxWidth: '800px',
-          margin: '0 auto'
-        }}>
-          <h2 style={{
-            fontSize: 'clamp(32px, 4vw, 48px)',
-            fontWeight: 'bold',
-            marginBottom: '24px',
-            color: '#2c3e50'
-          }}>
-            Ready to Transform Your Business?
-          </h2>
-          <p style={{
-            fontSize: '20px',
-            color: '#666',
-            marginBottom: '40px',
-            lineHeight: '1.6'
-          }}>
-            Join 500+ SMEs already using Bvester to grow revenue, streamline operations,
-            and prepare for investment opportunities.
-          </p>
-
-          {/* Urgency Elements */}
-          <div style={{
-            background: '#fff3cd',
-            border: '1px solid #ffeaa7',
-            borderRadius: '12px',
-            padding: '20px',
-            marginBottom: '40px'
-          }}>
-            <div style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#856404',
-              marginBottom: '8px'
-            }}>
-              ⏰ Limited Time Offer
-            </div>
-            <div style={{
-              color: '#856404',
-              fontSize: '16px'
-            }}>
-              Only <strong>47 spots left</strong> in our Growth Accelerator program this month.
-              Early bird pricing ends in 5 days!
-            </div>
+          <div className="nav__cta nav__cta--desktop">
+            <button className="btn btn--ghost" onClick={onGetStarted}>Log In</button>
+            <button className="btn btn--gold" onClick={onGetStarted}>Get Started</button>
           </div>
 
           <button
-            onClick={onGetStarted}
-            style={{
-              background: 'linear-gradient(135deg, #2E8B57, #3CB371)',
-              color: 'white',
-              border: 'none',
-              padding: '24px 48px',
-              borderRadius: '30px',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 8px 25px rgba(46, 139, 87, 0.3)',
-              marginBottom: '20px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-3px)';
-              e.currentTarget.style.boxShadow = '0 12px 35px rgba(46, 139, 87, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0px)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(46, 139, 87, 0.3)';
-            }}
+            className={`nav__toggle ${menuOpen ? 'nav__toggle--open' : ''}`}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation menu"
           >
-            🚀 Start Your Free Trial Now
+            <span></span>
+            <span></span>
+            <span></span>
           </button>
-
-          <p style={{
-            fontSize: '14px',
-            color: '#999',
-            marginTop: '16px'
-          }}>
-            No credit card required • 14-day free trial • Setup takes 2 minutes
-          </p>
         </div>
-      </section>
+      </header>
 
-      {/* Footer */}
-      <footer style={{
-        background: '#2c3e50',
-        color: 'white',
-        padding: '60px 20px 40px 20px'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto'
-        }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '40px',
-            marginBottom: '40px'
-          }}>
-            {/* Company Info */}
-            <div>
-              <div style={{
-                fontSize: '28px',
-                fontWeight: 'bold',
-                marginBottom: '16px',
-                color: '#2E8B57'
-              }}>
-                Bvester
-              </div>
-              <p style={{
-                color: '#bdc3c7',
-                lineHeight: '1.6',
-                marginBottom: '20px'
-              }}>
-                Empowering Ghanaian SMEs with AI-powered tools to grow revenue,
-                streamline operations, and attract investors.
+      <main>
+        <section className="hero" id="home">
+          <div className="hero__content">
+            <div className="hero__copy">
+              <span className="pill pill--light">Investment &amp; Growth Platform for African SMEs</span>
+              <h1>
+                Empowering African SMEs <br />
+                <span>with Smart Investment</span>
+              </h1>
+              <p>
+                Bridge the funding gap. Scale your business. Bvester keeps your records organised like a chat, builds
+                your investor story, and connects you with diaspora capital you can trust.
               </p>
-              <div style={{
-                display: 'flex',
-                gap: '16px'
-              }}>
-                {['📧', '📱', '🌐'].map((icon, idx) => (
-                  <div key={idx} style={{
-                    width: '40px',
-                    height: '40px',
-                    background: 'rgba(46, 139, 87, 0.2)',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#2E8B57';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(46, 139, 87, 0.2)';
-                  }}>
-                    {icon}
-                  </div>
-                ))}
+              <div className="hero__actions">
+                <button className="btn btn--gold" onClick={onGetStarted}>Check Investment Readiness</button>
+                <button className="btn btn--ghost" onClick={() => handleNavClick('#programs')}>Join Accelerator Cohort</button>
+              </div>
+              <div className="hero__metrics">
+                <div>
+                  <strong>500+</strong>
+                  <span>SMEs Registered</span>
+                </div>
+                <div>
+                  <strong>&#8373;2M+</strong>
+                  <span>Total Raised</span>
+                </div>
+                <div>
+                  <strong>150+</strong>
+                  <span>Investor Partners</span>
+                </div>
               </div>
             </div>
-
-            {/* Quick Links */}
-            <div>
-              <h4 style={{
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '16px',
-                color: 'white'
-              }}>
-                Features
-              </h4>
-              {[
-                'Growth Accelerator',
-                'Quick Record',
-                'Business Analysis',
-                'Investment Tools',
-                'Pricing'
-              ].map((link, idx) => (
-                <div key={idx} style={{
-                  marginBottom: '8px',
-                  color: '#bdc3c7',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#2E8B57';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#bdc3c7';
-                }}>
-                  {link}
+            <div className="hero__visual">
+              <div className="hero__card">
+                <div className="hero__score">
+                  <span className="hero__score-label">Your Business Score</span>
+                  <span className="hero__score-value">85</span>
+                  <span className="hero__score-status">Investment Ready</span>
                 </div>
-              ))}
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 style={{
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '16px',
-                color: 'white'
-              }}>
-                Support
-              </h4>
-              {[
-                'Help Center',
-                'Contact Us',
-                'Live Chat',
-                'Tutorials',
-                'Success Stories'
-              ].map((link, idx) => (
-                <div key={idx} style={{
-                  marginBottom: '8px',
-                  color: '#bdc3c7',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#2E8B57';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#bdc3c7';
-                }}>
-                  {link}
-                </div>
-              ))}
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 style={{
-                fontSize: '18px',
-                fontWeight: 'bold',
-                marginBottom: '16px',
-                color: 'white'
-              }}>
-                Contact
-              </h4>
-              <div style={{
-                color: '#bdc3c7',
-                lineHeight: '1.6'
-              }}>
-                <div style={{ marginBottom: '8px' }}>📍 Accra, Ghana</div>
-                <div style={{ marginBottom: '8px' }}>📧 hello@bvester.com</div>
-                <div style={{ marginBottom: '8px' }}>📱 +233 XX XXX XXXX</div>
+                <ul className="hero__insights">
+                  <li>
+                    <span>Financial Health</span>
+                    <div><span style={{ width: '85%' }} /></div>
+                  </li>
+                  <li>
+                    <span>Market Position</span>
+                    <div><span style={{ width: '70%' }} /></div>
+                  </li>
+                  <li>
+                    <span>Growth Potential</span>
+                    <div><span style={{ width: '90%' }} /></div>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Bottom Bar */}
-          <div style={{
-            borderTop: '1px solid #34495e',
-            paddingTop: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '20px'
-          }}>
-            <div style={{
-              color: '#bdc3c7',
-              fontSize: '14px'
-            }}>
-              © 2024 Bvester. All rights reserved.
+        <section className="impact" id="impact">
+          <div className="section-heading">
+            <span className="pill pill--dark">Trusted by ambitious founders</span>
+            <h2>Building sustainable SMEs across Ghana</h2>
+            <p>
+              From Kumasi to Accra, founders use Bvester to professionalise their operations, prove traction, and
+              pitch with data investors trust.
+            </p>
+          </div>
+          <div className="impact__grid">
+            <div className="impact__card">
+              <h3>12k+</h3>
+              <p>Transactions recorded via chat-style bookkeeping in the last 90 days.</p>
             </div>
-            <div style={{
-              display: 'flex',
-              gap: '20px',
-              fontSize: '14px'
-            }}>
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link, idx) => (
-                <div key={idx} style={{
-                  color: '#bdc3c7',
-                  cursor: 'pointer',
-                  transition: 'color 0.3s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#2E8B57';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#bdc3c7';
-                }}>
-                  {link}
-                </div>
-              ))}
+            <div className="impact__card">
+              <h3>87%</h3>
+              <p>Of accelerator graduates progressed to investor conversations within 6 weeks.</p>
             </div>
+            <div className="impact__card">
+              <h3>4.9 / 5</h3>
+              <p>Average NPS from SMEs on the Bvester Growth Accelerator experience.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="features" id="features">
+          <div className="section-heading section-heading--split">
+            <div>
+              <span className="pill pill--light">Product pillars</span>
+              <h2>Everything you need to become investment ready</h2>
+            </div>
+            <p>
+              We designed every workflow alongside accountants, investors, and SME operators so that your data,
+              documents, and daily actions stay connected.
+            </p>
+          </div>
+          <div className="features__grid">
+            <article className="feature-card">
+              <div className="feature-card__icon">💬</div>
+              <h3>Chat-Based Record Keeping</h3>
+              <p>
+                Log income and expenses with natural language. Our AI parses the entry, categorises it, and syncs
+                instantly to your financial dashboard.
+              </p>
+              <ul>
+                <li>Voice note and WhatsApp-style inputs</li>
+                <li>Automated cashflow categorisation</li>
+                <li>Investor-ready ledger exports</li>
+              </ul>
+            </article>
+            <article className="feature-card">
+              <div className="feature-card__icon">📊</div>
+              <h3>Business Health X-Ray</h3>
+              <p>
+                Answer a 7-minute diagnostic and receive a tailored score, blind-spot analysis, and action plan based
+                on Ghanaian market benchmarks.
+              </p>
+              <ul>
+                <li>Dynamic scoring across 5 growth pillars</li>
+                <li>Auto-generated investor briefing deck</li>
+                <li>Access to curated capital matches</li>
+              </ul>
+            </article>
+            <article className="feature-card">
+              <div className="feature-card__icon">🚀</div>
+              <h3>Growth Accelerator</h3>
+              <p>
+                A 30-day blended accelerator with masterclasses, mentorship, and data room preparation to close your
+                next funding round faster.
+              </p>
+              <ul>
+                <li>Weekly investment clinics &amp; office hours</li>
+                <li>Investor pipeline templates</li>
+                <li>Certification recognised by partners</li>
+              </ul>
+            </article>
+            <article className="feature-card">
+              <div className="feature-card__icon">🤝</div>
+              <h3>Diaspora Investor Network</h3>
+              <p>
+                Showcase your profile to pre-vetted diaspora angels and impact funds looking to deploy in African SMEs
+                with strong fundamentals.
+              </p>
+              <ul>
+                <li>Curated investor introductions</li>
+                <li>Virtual demo days every quarter</li>
+                <li>Secure data room sharing</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="programs" id="programs">
+          <div className="section-heading">
+            <span className="pill pill--dark">30-Day Accelerator Journey</span>
+            <h2>From organised records to investor-ready in four sprints</h2>
+          </div>
+          <div className="timeline">
+            <div className="timeline__item">
+              <div className="timeline__badge">Week 1</div>
+              <h3>Stabilise your numbers</h3>
+              <p>Clean historical records, automate weekly reporting, and understand your funding gap.</p>
+            </div>
+            <div className="timeline__item">
+              <div className="timeline__badge">Week 2</div>
+              <h3>Assess and benchmark</h3>
+              <p>Complete the Bvester X-Ray, receive investor-grade diagnostics, and map quick wins.</p>
+            </div>
+            <div className="timeline__item">
+              <div className="timeline__badge">Week 3</div>
+              <h3>Craft your narrative</h3>
+              <p>Build a compelling data room with guided templates, traction summaries, and growth roadmap.</p>
+            </div>
+            <div className="timeline__item">
+              <div className="timeline__badge">Week 4</div>
+              <h3>Connect &amp; pitch</h3>
+              <p>Join demo day, receive personalised investor matches, and prepare for diligence.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="pricing" id="pricing">
+          <div className="section-heading section-heading--split">
+            <div>
+              <span className="pill pill--light">Flexible membership</span>
+              <h2>Start free, unlock pro growth when you are ready</h2>
+            </div>
+            <p>
+              Fair, transparent pricing for founders at every stage. Upgrade for deeper analytics, accelerator access,
+              and investor introductions.
+            </p>
+          </div>
+          <div className="pricing__grid">
+            <div className="plan plan--free">
+              <div className="plan__header">
+                <h3>Launch</h3>
+                <p>Organise your business fundamentals</p>
+                <strong>₵0</strong>
+                <span>per month</span>
+              </div>
+              <ul>
+                <li>Chat-style transaction recorder</li>
+                <li>Starter financial dashboards</li>
+                <li>Quarterly investment health check</li>
+              </ul>
+              <button className="btn btn--outline" onClick={onGetStarted}>Start for Free</button>
+            </div>
+            <div className="plan plan--featured">
+              <div className="plan__header">
+                <span className="plan__tag">Most popular</span>
+                <h3>Pro</h3>
+                <p>Elevate your reporting &amp; investor story</p>
+                <strong>₵50</strong>
+                <span>per month</span>
+              </div>
+              <ul>
+                <li>Unlimited transactions &amp; smart analytics</li>
+                <li>Full business health X-Ray &amp; benchmarks</li>
+                <li>Diaspora investor introductions</li>
+              </ul>
+              <button className="btn btn--gold" onClick={onGetStarted}>Upgrade to Pro</button>
+            </div>
+            <div className="plan plan--enterprise">
+              <div className="plan__header">
+                <h3>Accelerator</h3>
+                <p>Go from readiness to capital in 30 days</p>
+                <strong>₵2,000</strong>
+                <span>one-time cohort fee</span>
+              </div>
+              <ul>
+                <li>Guided investor prep &amp; pitch reviews</li>
+                <li>Dedicated growth coach &amp; experts</li>
+                <li>Priority access to partner capital</li>
+              </ul>
+              <button className="btn btn--ghost" onClick={onGetStarted}>Join Next Cohort</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="testimonials">
+          <div className="section-heading">
+            <span className="pill pill--dark">Proof from the field</span>
+            <h2>Founders and investors rely on Bvester</h2>
+          </div>
+          <div className="testimonials__grid">
+            <blockquote>
+              “Bvester transformed our messy WhatsApp receipts into a credible financial story. We closed ₵350k from
+              diaspora angels in three months.”
+              <cite>— Ama K., Founder, AgroBridge Ghana</cite>
+            </blockquote>
+            <blockquote>
+              “The accelerator sharpened our pitch and taught us how to communicate metrics investors care about. We are
+              now rolling out to two additional regions.”
+              <cite>— Joshua M., CEO, PayBuddy</cite>
+            </blockquote>
+            <blockquote>
+              “As an investor abroad, the platform gives me real-time visibility into SME performance, making diligence
+              faster and more transparent.”
+              <cite>— Nadia A., Diaspora Angel Investor</cite>
+            </blockquote>
+          </div>
+        </section>
+
+        <section className="cta">
+          <div className="cta__card">
+            <span className="pill pill--light">Launch in minutes</span>
+            <h2>Your next investor conversation can start today</h2>
+            <p>
+              Build your digital profile, invite your team, and start recording transactions in under five minutes. The
+              earlier you start, the faster you unlock growth capital.
+            </p>
+            <div className="cta__actions">
+              <button className="btn btn--gold" onClick={onGetStarted}>Create Free Account</button>
+              <button className="btn btn--ghost" onClick={() => handleNavClick('#programs')}>Explore Accelerator</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="faqs" id="faqs">
+          <div className="section-heading">
+            <span className="pill pill--dark">Frequently asked</span>
+            <h2>Answers for founders &amp; investors</h2>
+          </div>
+          <div className="faqs__grid">
+            <div className="faq">
+              <h3>What makes Bvester different from accounting software?</h3>
+              <p>
+                We go beyond bookkeeping. Bvester connects your daily records to investor-ready reporting, health
+                diagnostics, and curated capital introductions.
+              </p>
+            </div>
+            <div className="faq">
+              <h3>Can I invite my accountant or co-founder?</h3>
+              <p>
+                Yes. Pro plans support up to three seats with role-based access control so your team can collaborate
+                securely.
+              </p>
+            </div>
+            <div className="faq">
+              <h3>Do investors pay to access SMEs?</h3>
+              <p>
+                Investors join by invitation and pay success-based fees. This keeps the platform aligned with founder
+                outcomes.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer" id="contact">
+        <div className="footer__inner">
+          <div className="footer__brand">
+            <div className="nav__logo">
+              <span className="nav__logo-mark">BV</span>
+              <span className="nav__logo-text">Bvester</span>
+            </div>
+            <p>Connecting African SMEs with diaspora capital, accountability, and growth guidance.</p>
+          </div>
+          <div className="footer__links">
+            <div>
+              <h4>Platform</h4>
+              <ul>
+                <li><button type="button" onClick={() => handleNavClick('#features')}>Features</button></li>
+                <li><button type="button" onClick={() => handleNavClick('#programs')}>Accelerator</button></li>
+                <li><button type="button" onClick={() => handleNavClick('#pricing')}>Pricing</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Company</h4>
+              <ul>
+                <li><a href="mailto:hello@bvester.com">Contact</a></li>
+                <li><a href="https://www.linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a></li>
+                <li><a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer__cta">
+            <h4>Ready to grow?</h4>
+            <button className="btn btn--gold" onClick={onGetStarted}>Join Bvester</button>
+          </div>
+        </div>
+        <div className="footer__legal">
+          <span>© {new Date().getFullYear()} Bvester. All rights reserved.</span>
+          <div>
+            <a href="#privacy">Privacy</a>
+            <a href="#terms">Terms</a>
           </div>
         </div>
       </footer>

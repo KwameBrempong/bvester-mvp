@@ -1,6 +1,7 @@
 import { useSubscription } from './useSubscription';
 import { useUsageLimits } from './hooks/useUsageLimits';
 import React, { useState, useEffect } from 'react';
+import { transactionService, Transaction as PersistedTransaction } from './services/dataService';
 
 interface Transaction {
   id: string;
@@ -72,52 +73,73 @@ export default function TransactionRecorder({ user, onClose }: TransactionRecord
   };
 
   const addTransaction = async () => {
-    if (!newTransaction.trim()) return;
+    if (!newTransaction.trim() || !user?.username) {
+      return;
+    }
 
-    if (!user?.username) return;
-
-    // Check and consume usage limit
     const limitResult = await consumeUsage({ type: 'transactions', userId: user.username });
     setUsageLimitResult(limitResult);
 
     if (!limitResult.canProceed) {
-      return; // Usage limit reached, stop execution
+      return;
     }
 
     const parsed = parseTransaction(newTransaction);
+    const timestamp = new Date().toISOString();
     const transaction: Transaction = {
       id: Date.now().toString(),
       text: newTransaction,
       amount: parsed.amount || 0,
       type: parsed.type || 'expense',
       category: parsed.category || 'other',
-      timestamp: new Date().toLocaleString()
+      timestamp,
     };
 
     const updated = [transaction, ...transactions];
     setTransactions(updated);
 
     try {
-      localStorage.setItem(`transactions_${user?.username}`, JSON.stringify(updated));
+      localStorage.setItem(`transactions_${user.username}`, JSON.stringify(updated));
     } catch (error) {
-      console.error('Error saving transactions:', error);
+      console.error('Error saving transactions locally:', error);
+    }
+
+    try {
+      await transactionService.create({
+        userId: user.username,
+        transactionId: transaction.id,
+        date: timestamp,
+        type: transaction.type,
+        category: transaction.category ?? 'other',
+        amount: transaction.amount,
+        description: transaction.text,
+        paymentMethod: 'unspecified',
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.warn('Failed to sync transaction to backend, continuing with local cache', error);
     }
 
     setNewTransaction('');
   };
 
-  const deleteTransaction = (id: string) => {
+  const deleteTransaction = async (id: string) => {
     const updated = transactions.filter(t => t.id !== id);
     setTransactions(updated);
 
     try {
       localStorage.setItem(`transactions_${user?.username}`, JSON.stringify(updated));
     } catch (error) {
-      console.error('Error saving transactions:', error);
+      console.error('Error saving transactions locally:', error);
     }
 
-    // Refresh usage limit check after deletion
     if (user?.username) {
+      try {
+        await transactionService.delete(id, user.username);
+      } catch (error) {
+        console.warn('Failed to remove transaction from backend', error);
+      }
+
       const limitCheck = checkUsageLimit({ type: 'transactions', userId: user.username });
       setUsageLimitResult(limitCheck);
     }

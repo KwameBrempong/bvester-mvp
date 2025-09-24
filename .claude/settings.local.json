@@ -19,7 +19,19 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git config:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(curl:*)",
+      "Read(//c/Users/BREMPONG/Desktop/dev/web-app/**)",
+      "Bash(touch:*)",
+      "Bash(start http://localhost:5173)",
+      "Bash(start http://localhost:5174)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(npx amplify:*)",
+      "Bash(npx ampx:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

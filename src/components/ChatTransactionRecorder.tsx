@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useUsageLimits } from '../hooks/useUsageLimits';
+import { transactionService, Transaction as PersistedTransaction } from '../services/dataService';
 
 interface Transaction {
   id: string;
@@ -30,27 +31,67 @@ const ChatTransactionRecorder: React.FC<ChatTransactionRecorderProps> = ({ user,
   const [usageLimitResult, setUsageLimitResult] = useState<any>(null);
 
   useEffect(() => {
-    loadTransactions();
-    checkUsage();
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    const initialize = async () => {
+      await loadTransactions();
+      checkUsage();
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    };
+
+    initialize();
   }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [transactions]);
 
-  const loadTransactions = () => {
-    const saved = localStorage.getItem(`transactions_${user?.username}`);
-    if (saved) {
-      try {
-        const loadedTransactions = JSON.parse(saved);
-        setTransactions(loadedTransactions.slice(0, 50)); // Keep last 50 for performance
-      } catch (error) {
-        console.error('Error loading transactions:', error);
+  const loadTransactions = async () => {
+    if (!user?.username) {
+      setTransactions([]);
+      return;
+    }
+
+    const username = user.username;
+    let hydratedTransactions: Transaction[] | null = null;
+
+    try {
+      const remoteTransactions = await transactionService.list(username, 50);
+      if (remoteTransactions?.length) {
+        hydratedTransactions = remoteTransactions
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+          .map((item) => ({
+            id: item.transactionId,
+            text: item.description || '',
+            amount: item.amount,
+            type: item.type,
+            category: item.category,
+            timestamp: item.date,
+            confidence: 1,
+          }));
+      }
+    } catch (error) {
+      console.warn('Unable to fetch remote transactions, using cached data', error);
+    }
+
+    if (!hydratedTransactions) {
+      const saved = localStorage.getItem(`transactions_${username}`);
+      if (saved) {
+        try {
+          hydratedTransactions = JSON.parse(saved);
+        } catch (parseError) {
+          console.error('Error parsing cached transactions:', parseError);
+        }
       }
     }
+
+    if (!hydratedTransactions) {
+      hydratedTransactions = [];
+    }
+
+    const trimmed = hydratedTransactions.slice(0, 50);
+    setTransactions(trimmed);
+    localStorage.setItem(`transactions_${username}`, JSON.stringify(trimmed));
   };
 
   const checkUsage = () => {
@@ -209,7 +250,25 @@ const ChatTransactionRecorder: React.FC<ChatTransactionRecorderProps> = ({ user,
     try {
       localStorage.setItem(`transactions_${user?.username}`, JSON.stringify(updated));
     } catch (error) {
-      console.error('Error saving transaction:', error);
+      console.error('Error saving transaction locally:', error);
+    }
+
+    if (user?.username) {
+      try {
+        await transactionService.create({
+          userId: user.username,
+          transactionId: transaction.id,
+          date: transaction.timestamp,
+          type: transaction.type,
+          category: transaction.category,
+          amount: transaction.amount,
+          description: transaction.text,
+          paymentMethod: 'unspecified',
+          createdAt: new Date().toISOString(),
+        });
+      } catch (error) {
+        console.warn('Failed to sync transaction to backend, it will be retried later', error);
+      }
     }
 
     setShowSuggestions(false);

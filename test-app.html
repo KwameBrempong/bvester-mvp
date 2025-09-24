@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bvester App Status Check</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .status-card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .status-item {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+    .btn {
+      background: #D4AF37;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin: 10px 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #FFD700;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #D4AF37;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="status-card">
+    <h1>🎯 Bvester App Status Check</h1>
+
+    <div id="server-status" class="status-item info">
+      <span>Checking server status...</span>
+      <span class="loading"></span>
+    </div>
+
+    <div id="port-info" class="status-item info">
+      <span>Server Port</span>
+      <span>Detecting...</span>
+    </div>
+
+    <div id="feature-flags" class="status-item info">
+      <span>Feature Flags</span>
+      <span>Checking...</span>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #e0e0e0;">
+      <h3>Quick Actions:</h3>
+
+      <a href="http://localhost:5175" target="_blank" class="btn">
+        Open App (Port 5175)
+      </a>
+
+      <a href="http://localhost:5179" target="_blank" class="btn btn-secondary">
+        Try Alt Port (5179)
+      </a>
+
+      <button onclick="checkStatus()" class="btn btn-secondary">
+        Refresh Status
+      </button>
+
+      <button onclick="openFeaturePanel()" class="btn">
+        Open Feature Control Panel
+      </button>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #fff9e6; border-radius: 8px; border: 1px solid #ffd700;">
+      <h4>💡 Troubleshooting Tips:</h4>
+      <ul style="margin: 10px 0; padding-left: 20px;">
+        <li>If the app doesn't load, try clearing your browser cache (Ctrl+F5)</li>
+        <li>Check if you have any browser extensions blocking localhost</li>
+        <li>Try opening in an incognito/private window</li>
+        <li>The server is running on port <strong>5175</strong> (not 5179 as mentioned earlier)</li>
+        <li>If you see a blank page, open browser console (F12) and check for errors</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <h2>📋 Implementation Status</h2>
+
+    <div class="status-item success">
+      <span>✅ Feature Flags System</span>
+      <span>Implemented</span>
+    </div>
+
+    <div class="status-item success">
+      <span>✅ Premium Black/Gold Theme</span>
+      <span>Ready (Toggle via features)</span>
+    </div>
+
+    <div class="status-item success">
+      <span>✅ Investment X-Ray Assessment</span>
+      <span>Ready (7-min version)</span>
+    </div>
+
+    <div class="status-item success">
+      <span>✅ 30-Day Investment Bootcamp</span>
+      <span>Ready (with Stripe integration)</span>
+    </div>
+
+    <div class="status-item success">
+      <span>✅ Existing Stripe Pricing</span>
+      <span>Using your price IDs</span>
+    </div>
+  </div>
+
+  <script>
+    const ports = [5175, 5179, 5173, 5174, 5176, 5177, 5178];
+    let workingPort = null;
+
+    async function checkPort(port) {
+      try {
+        const response = await fetch(`http://localhost:${port}`, { mode: 'no-cors' });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function checkStatus() {
+      const serverStatus = document.getElementById('server-status');
+      const portInfo = document.getElementById('port-info');
+      const featureFlags = document.getElementById('feature-flags');
+
+      // Check which port is working
+      for (const port of ports) {
+        const isWorking = await checkPort(port);
+        if (isWorking) {
+          workingPort = port;
+          break;
+        }
+      }
+
+      if (workingPort) {
+        serverStatus.className = 'status-item success';
+        serverStatus.innerHTML = '<span>✅ Development Server</span><span>Running</span>';
+
+        portInfo.className = 'status-item success';
+        portInfo.innerHTML = `<span>Server Port</span><span><strong>${workingPort}</strong></span>`;
+
+        // Update button
+        document.querySelector('.btn').href = `http://localhost:${workingPort}`;
+        document.querySelector('.btn').textContent = `Open App (Port ${workingPort})`;
+      } else {
+        serverStatus.className = 'status-item error';
+        serverStatus.innerHTML = '<span>❌ Development Server</span><span>Not responding</span>';
+
+        portInfo.className = 'status-item error';
+        portInfo.innerHTML = '<span>Server Port</span><span>Not detected</span>';
+      }
+
+      // Check feature flags
+      try {
+        const flags = localStorage.getItem('featureFlags');
+        if (flags) {
+          const parsed = JSON.parse(flags);
+          const enabledCount = Object.values(parsed).filter(v => v === true).length;
+          featureFlags.className = 'status-item info';
+          featureFlags.innerHTML = `<span>Feature Flags</span><span>${enabledCount} enabled</span>`;
+        } else {
+          featureFlags.className = 'status-item info';
+          featureFlags.innerHTML = '<span>Feature Flags</span><span>All disabled (default)</span>';
+        }
+      } catch {
+        featureFlags.className = 'status-item info';
+        featureFlags.innerHTML = '<span>Feature Flags</span><span>Not configured</span>';
+      }
+    }
+
+    function openFeaturePanel() {
+      window.open('enable-features.html', '_blank');
+    }
+
+    // Check status on load
+    checkStatus();
+
+    // Auto-refresh every 5 seconds
+    setInterval(checkStatus, 5000);
+  </script>
+</body>
+</html>

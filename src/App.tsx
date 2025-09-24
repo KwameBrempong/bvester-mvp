@@ -3,17 +3,22 @@ import { useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppDispatch, useUser, useUserRole, useSubscriptionTier } from './store/hooks';
-import { fetchUserProfile, setAuthenticated, updateUserProfile } from './store/slices/userSlice';
+import {
+  fetchUserProfile,
+  setAuthenticated,
+  updateUserProfile,
+  createUserProfile,
+  hydrateProfile
+} from './store/slices/userSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionWrapper from './components/PermissionWrapper';
 import UserProfileHeader from './components/UserProfileHeader';
 import ProfileCompletionWidget from './components/ProfileCompletionWidget';
 import { isFeatureEnabled } from './config/featureFlags';
+import { profileUtils, UserProfile } from './services/dataService';
 import './App.css';
-// Import premium theme if enabled
-if (isFeatureEnabled('useBlackGoldTheme')) {
-  import('./styles/premium-theme.css');
-}
+// Import premium theme - it will only apply when feature is enabled
+import './styles/premium-theme.css';
 
 // Lazy load components for better performance
 const SMEProfile = lazy(() => import('./SMEProfile'));
@@ -50,6 +55,66 @@ const LoadingSpinner = () => (
   </div>
 );
 
+const buildUserProfile = (username: string, overrides: Partial<UserProfile> = {}): UserProfile => {
+  const now = new Date().toISOString();
+
+  const securitySettings = {
+    mfaEnabled: overrides.securitySettings?.mfaEnabled ?? false,
+    loginAttempts: overrides.securitySettings?.loginAttempts ?? 0,
+    accountLocked: overrides.securitySettings?.accountLocked ?? false,
+    lastPasswordChange: overrides.securitySettings?.lastPasswordChange,
+    lockoutUntil: overrides.securitySettings?.lockoutUntil,
+  };
+
+  const preferences = {
+    language: overrides.preferences?.language ?? 'en',
+    currency: overrides.preferences?.currency ?? 'GHS',
+    timezone: overrides.preferences?.timezone ?? 'Africa/Accra',
+    notifications: {
+      email: overrides.preferences?.notifications?.email ?? true,
+      sms: overrides.preferences?.notifications?.sms ?? true,
+      push: overrides.preferences?.notifications?.push ?? true,
+    },
+  };
+
+  const profile: UserProfile = {
+    userId: username,
+    businessName: overrides.businessName ?? 'My Business',
+    ownerName: overrides.ownerName ?? username,
+    email: overrides.email ?? `${username}@example.com`,
+    phone: overrides.phone ?? '',
+    location: overrides.location ?? 'Accra',
+    region: overrides.region ?? 'Greater Accra',
+    businessType: overrides.businessType ?? 'SME',
+    businessDescription: overrides.businessDescription ?? '',
+    registrationNumber: overrides.registrationNumber ?? '',
+    tinNumber: overrides.tinNumber ?? '',
+    yearEstablished: overrides.yearEstablished ?? '',
+    employeeCount: overrides.employeeCount ?? '',
+    businessStage: overrides.businessStage ?? 'existing',
+    profileCompletedAt: overrides.profileCompletedAt,
+    lastUpdated: overrides.lastUpdated ?? now,
+    role: overrides.role ?? 'owner',
+    profileCompletionPercentage: overrides.profileCompletionPercentage ?? 0,
+    isEmailVerified: overrides.isEmailVerified ?? false,
+    isPhoneVerified: overrides.isPhoneVerified ?? false,
+    isBusinessVerified: overrides.isBusinessVerified ?? false,
+    stripeCustomerId: overrides.stripeCustomerId,
+    verificationDocuments: overrides.verificationDocuments,
+    securitySettings,
+    preferences,
+  };
+
+  const updatedCompletion = profileUtils.calculateCompletionPercentage(profile);
+  profile.profileCompletionPercentage = updatedCompletion;
+  if (updatedCompletion >= 100 && !profile.profileCompletedAt) {
+    profile.profileCompletedAt = now;
+  }
+  profile.lastUpdated = overrides.lastUpdated ?? now;
+
+  return profile;
+};
+
 interface AppProps {
   user?: any;
   signOut?: () => void;
@@ -70,78 +135,99 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [showBusinessAnalysis, setShowBusinessAnalysis] = useState(false);
   const subscriptionStatus = useSubscription(user?.username);
 
-  // Initialize user authentication state
+  // Initialize user authentication state and hydrate profile
   useEffect(() => {
-    if (user?.username) {
-      dispatch(setAuthenticated({ userId: user.username, isAuthenticated: true }));
-
-      // Try to fetch user profile from Redux store or create it from localStorage
-      if (!userState.profile) {
-        const savedProfile = localStorage.getItem(`profile_${user.username}`);
-        if (savedProfile) {
-          try {
-            const parsedProfile = JSON.parse(savedProfile);
-            // Create a default profile with MVP permissions if one doesn't exist in Redux
-            const defaultProfile = {
-              ...parsedProfile,
-              role: parsedProfile.role || 'owner', // Default to owner for MVP
-              profileCompletionPercentage: parsedProfile.profileCompletionPercentage || 60
-            };
-
-            // Dispatch to update Redux state with localStorage profile
-            dispatch(updateUserProfile({
-              userId: user.username,
-              updates: defaultProfile
-            }));
-            setProfileCompleted(true);
-          } catch (error) {
-            console.warn('Error parsing localStorage profile, creating default');
-            setProfileCompleted(false);
-          }
-        } else {
-          // Try to fetch from database, but continue if it fails (MVP mode)
-          dispatch(fetchUserProfile(user.username)).catch(() => {
-            console.warn('Database unavailable, using MVP fallback');
-            // Create default MVP profile
-            const defaultProfile = {
-              userId: user.username,
-              role: 'owner' as const,
-              profileCompletionPercentage: 60,
-              businessType: 'SME',
-              employeeCount: '1-10',
-              businessStage: 'existing',
-              email: `${user.username}@example.com`,
-              isEmailVerified: false,
-              isPhoneVerified: false,
-              isBusinessVerified: false,
-              createdAt: new Date().toISOString(),
-              lastUpdated: new Date().toISOString()
-            };
-            dispatch(updateUserProfile({
-              userId: user.username,
-              updates: defaultProfile
-            }));
-            setProfileCompleted(true);
-          });
-        }
-      } else {
-        setProfileCompleted(userState.profile.profileCompletionPercentage > 50);
-      }
+    if (!user?.username) {
+      return;
     }
-  }, [user, dispatch, userState.profile]);
+
+    const username = user.username;
+
+    const initializeProfile = async () => {
+      dispatch(setAuthenticated({ userId: username, isAuthenticated: true }));
+
+      if (userState.profile) {
+        setProfileCompleted(userState.profile.profileCompletionPercentage >= 60);
+        return;
+      }
+
+      try {
+        const fetchedProfile = await dispatch(fetchUserProfile(username)).unwrap();
+        if (fetchedProfile) {
+          dispatch(hydrateProfile(fetchedProfile));
+          localStorage.setItem(`profile_${username}`, JSON.stringify(fetchedProfile));
+          setProfileCompleted(fetchedProfile.profileCompletionPercentage >= 60);
+          return;
+        }
+      } catch (error) {
+        console.warn('Unable to fetch profile from backend, using cached data if available', error);
+      }
+
+      let storedProfile: Partial<UserProfile> | undefined;
+      const cached = localStorage.getItem(`profile_${username}`);
+      if (cached) {
+        try {
+          storedProfile = JSON.parse(cached);
+        } catch (parseError) {
+          console.warn('Failed to parse cached profile data, continuing with defaults', parseError);
+        }
+      }
+
+      const fallbackProfile = buildUserProfile(username, storedProfile ?? {});
+      dispatch(hydrateProfile(fallbackProfile));
+      localStorage.setItem(`profile_${username}`, JSON.stringify(fallbackProfile));
+      setProfileCompleted(fallbackProfile.profileCompletionPercentage >= 60);
+
+      try {
+        await dispatch(createUserProfile({ ...fallbackProfile })).unwrap();
+      } catch (creationError) {
+        console.warn('Profile creation skipped (likely offline/local mode)', creationError);
+      }
+    };
+
+    initializeProfile();
+  }, [user?.username, dispatch, userState.profile]);
 
   // Check if profile is completed based on Redux state
   useEffect(() => {
-    if (userState.profile) {
+    if (user?.username && userState.profile) {
+      localStorage.setItem(`profile_${user.username}`, JSON.stringify(userState.profile));
       setProfileCompleted(userState.profile.profileCompletionPercentage >= 60);
     }
-  }, [userState.profile]);
+  }, [user?.username, userState.profile]);
 
-  const handleProfileComplete = (profileData: any) => {
-    // Store in localStorage for backward compatibility
-    localStorage.setItem(`profile_${user?.username}`, JSON.stringify(profileData));
-    setProfileCompleted(true);
-    // TODO: Save to database through Redux action
+  const handleProfileComplete = async (profileData: any) => {
+    if (!user?.username) {
+      return;
+    }
+
+    const username = user.username;
+    const role = profileData.userType === 'investor' ? 'viewer' : 'owner';
+    const normalizedProfile = buildUserProfile(username, {
+      ...userState.profile,
+      businessName: profileData.businessName,
+      businessType: profileData.businessType,
+      location: profileData.location,
+      region: profileData.region,
+      yearEstablished: profileData.yearEstablished,
+      employeeCount: profileData.numberOfEmployees,
+      businessDescription: profileData.businessDescription,
+      role,
+    });
+
+    localStorage.setItem(`profile_${username}`, JSON.stringify(normalizedProfile));
+    dispatch(hydrateProfile(normalizedProfile));
+    setProfileCompleted(normalizedProfile.profileCompletionPercentage >= 60);
+
+    try {
+      if (userState.profile) {
+        await dispatch(updateUserProfile({ userId: username, updates: normalizedProfile })).unwrap();
+      } else {
+        await dispatch(createUserProfile({ ...normalizedProfile })).unwrap();
+      }
+    } catch (error) {
+      console.warn('Failed to persist profile details to backend', error);
+    }
   };
 
   if (!profileCompleted) {

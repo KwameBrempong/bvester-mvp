@@ -170,6 +170,14 @@ const userSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    hydrateProfile: (state, action: PayloadAction<UserProfile>) => {
+      state.profile = action.payload;
+      state.permissions = rbacService.getRolePermissions(action.payload.role);
+      state.profileCompletion.percentage = action.payload.profileCompletionPercentage ?? 0;
+      state.profileCompletion.missingFields = profileUtils.getRequiredFieldsForCompletion(action.payload);
+      state.profileCompletion.lastUpdated = new Date().toISOString();
+      state.error = null;
+    },
     updateProfileCompletion: (state) => {
       if (state.profile) {
         state.profileCompletion.percentage = state.profile.profileCompletionPercentage;
@@ -276,9 +284,10 @@ const userSlice = createSlice({
 export const {
   setAuthenticated,
   clearUser,
-  clearError,
-  updateProfileCompletion,
-  updatePermissions,
-  updateVerificationStatus
+    clearError,
+    updateProfileCompletion,
+    updatePermissions,
+    updateVerificationStatus,
+    hydrateProfile
 } = userSlice.actions;
 export default userSlice.reducer;

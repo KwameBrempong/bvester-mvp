@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSubscription } from './useSubscription';
+import { assessmentService } from './services/dataService';
 
 interface Question {
   id: string;
@@ -179,13 +180,15 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      generateAssessment(newAnswers);
+      void generateAssessment(newAnswers);
     }
   };
 
-  const generateAssessment = (finalAnswers: { [key: string]: any }) => {
+  const generateAssessment = async (finalAnswers: { [key: string]: any }) => {
     let totalScore = 0;
     let maxScore = 0;
+    const categoryTotals: Record<string, number> = {};
+    const categoryMaxima: Record<string, number> = {};
 
     questions.forEach(question => {
       const answer = finalAnswers[question.id];
@@ -202,10 +205,27 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
       }
 
       totalScore += questionScore;
+
+      categoryTotals[question.category] = (categoryTotals[question.category] || 0) + questionScore;
+      categoryMaxima[question.category] = (categoryMaxima[question.category] || 0) + (question.weight * 100);
     });
 
     const finalScore = Math.round((totalScore / maxScore) * 100);
     const recommendations = generateRecommendations(finalAnswers, finalScore);
+
+    const computeCategoryScore = (category: string): number => {
+      if (!categoryTotals[category] || !categoryMaxima[category]) {
+        return 0;
+      }
+      return Math.round((categoryTotals[category] / categoryMaxima[category]) * 100);
+    };
+
+    const financialScore = computeCategoryScore('financial');
+    const marketScore = computeCategoryScore('market');
+    const operationsScore = computeCategoryScore('operations');
+    const growthScore = computeCategoryScore('growth');
+    const complianceScore = computeCategoryScore('compliance');
+    const teamScore = computeCategoryScore('team') || complianceScore || operationsScore;
 
     const newAssessment: Assessment = {
       answers: finalAnswers,
@@ -218,6 +238,27 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
     localStorage.setItem(`assessment_${user?.username}`, JSON.stringify(newAssessment));
     setAssessment(newAssessment);
     setShowResults(true);
+
+    if (user?.username) {
+      try {
+        await assessmentService.create({
+          userId: user.username,
+          assessmentId: `${user.username}-${Date.now()}`,
+          marketScore,
+          financialScore,
+          operationsScore,
+          teamScore,
+          growthScore,
+          totalScore: finalScore,
+          responses: finalAnswers,
+          recommendations: { priorityActions: recommendations },
+          completedAt: new Date().toISOString(),
+          reportGenerated: false,
+        });
+      } catch (error) {
+        console.warn('Failed to persist assessment to backend', error);
+      }
+    }
   };
 
   const generateRecommendations = (answers: { [key: string]: any }, score: number): string[] => {

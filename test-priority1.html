@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Priority 1 Testing Script</title>
+</head>
+<body>
+    <h1>Bvester MVP - Priority 1 Testing</h1>
+    <div id="results"></div>
+
+    <script>
+        // Test 1: Check localStorage data
+        function checkLocalStorage() {
+            const userData = localStorage.getItem('userData');
+            const transactions = localStorage.getItem('transactions');
+            const assessmentResults = localStorage.getItem('assessmentResults');
+            const subscriptionData = localStorage.getItem('subscriptionData');
+
+            console.log('=== LocalStorage Data ===');
+            console.log('User Data:', userData ? JSON.parse(userData) : 'Not found');
+            console.log('Transactions:', transactions ? JSON.parse(transactions) : 'Not found');
+            console.log('Assessment:', assessmentResults ? JSON.parse(assessmentResults) : 'Not found');
+            console.log('Subscription:', subscriptionData ? JSON.parse(subscriptionData) : 'Not found');
+
+            return {
+                hasUserData: !!userData,
+                hasTransactions: !!transactions,
+                hasAssessment: !!assessmentResults,
+                hasSubscription: !!subscriptionData
+            };
+        }
+
+        // Test 2: Create test data if none exists
+        function createTestData() {
+            // Create test user profile
+            const testUser = {
+                userId: 'test-user-123',
+                businessName: 'Test Business Ghana',
+                ownerName: 'Kofi Mensah',
+                email: 'test@bvester.com',
+                phone: '+233244123456',
+                location: 'Accra',
+                region: 'Greater Accra',
+                businessType: 'Retail',
+                businessDescription: 'Test retail business',
+                registrationNumber: 'BN123456',
+                tinNumber: 'TIN789012',
+                yearEstablished: '2020',
+                employeeCount: '10-50',
+                businessStage: 'growth',
+                role: 'owner',
+                profileCompletionPercentage: 85,
+                isEmailVerified: false,
+                isPhoneVerified: false,
+                isBusinessVerified: false,
+                securitySettings: {
+                    mfaEnabled: false,
+                    loginAttempts: 0,
+                    accountLocked: false
+                },
+                preferences: {
+                    language: 'en',
+                    currency: 'GHS',
+                    timezone: 'Africa/Accra',
+                    notifications: {
+                        email: true,
+                        sms: true,
+                        push: false
+                    }
+                }
+            };
+
+            // Create test transactions
+            const testTransactions = [
+                {
+                    userId: 'test-user-123',
+                    transactionId: 'txn-001',
+                    date: '2025-01-15',
+                    type: 'income',
+                    category: 'Sales',
+                    amount: 5000,
+                    description: 'Product sales',
+                    paymentMethod: 'Mobile Money',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    userId: 'test-user-123',
+                    transactionId: 'txn-002',
+                    date: '2025-01-16',
+                    type: 'expense',
+                    category: 'Inventory',
+                    amount: 2000,
+                    description: 'Stock purchase',
+                    paymentMethod: 'Bank Transfer',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    userId: 'test-user-123',
+                    transactionId: 'txn-003',
+                    date: '2025-01-17',
+                    type: 'income',
+                    category: 'Services',
+                    amount: 3500,
+                    description: 'Consulting service',
+                    paymentMethod: 'Cash',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    userId: 'test-user-123',
+                    transactionId: 'txn-004',
+                    date: '2025-01-18',
+                    type: 'expense',
+                    category: 'Utilities',
+                    amount: 800,
+                    description: 'Electricity bill',
+                    paymentMethod: 'Mobile Money',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    userId: 'test-user-123',
+                    transactionId: 'txn-005',
+                    date: '2025-01-19',
+                    type: 'expense',
+                    category: 'Salaries',
+                    amount: 10000,
+                    description: 'Monthly salaries',
+                    paymentMethod: 'Bank Transfer',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+
+            // Create test assessment
+            const testAssessment = {
+                userId: 'test-user-123',
+                assessmentId: 'assess-001',
+                marketScore: 75,
+                financialScore: 68,
+                operationsScore: 82,
+                teamScore: 70,
+                growthScore: 77,
+                totalScore: 74.4,
+                responses: {
+                    'q1': 'yes',
+                    'q2': 5,
+                    'q3': ['option1', 'option2'],
+                    'q4': 'Expanding to new markets'
+                },
+                recommendations: {
+                    marketRecommendations: ['Explore digital marketing', 'Research new customer segments'],
+                    financialRecommendations: ['Implement better cash flow management', 'Consider external funding'],
+                    operationsRecommendations: ['Automate inventory tracking', 'Improve supply chain'],
+                    teamRecommendations: ['Invest in employee training', 'Develop leadership structure'],
+                    growthRecommendations: ['Create 3-year growth plan', 'Explore partnerships'],
+                    priorityActions: ['Cash flow management', 'Digital marketing', 'Employee training']
+                },
+                completedAt: new Date().toISOString(),
+                reportGenerated: true
+            };
+
+            // Create test subscription
+            const testSubscription = {
+                userId: 'test-user-123',
+                platformTier: 'free',
+                stripeCustomerId: null,
+                stripeSubscriptionId: null,
+                cancelAtPeriodEnd: false,
+                acceleratorAccess: 'none',
+                createdAt: new Date().toISOString(),
+                lastUpdated: new Date().toISOString(),
+                totalPaid: 0
+            };
+
+            // Save to localStorage
+            localStorage.setItem('userData', JSON.stringify(testUser));
+            localStorage.setItem('transactions', JSON.stringify(testTransactions));
+            localStorage.setItem('assessmentResults', JSON.stringify(testAssessment));
+            localStorage.setItem('subscriptionData', JSON.stringify(testSubscription));
+
+            console.log('=== Test Data Created ===');
+            return true;
+        }
+
+        // Run tests
+        function runTests() {
+            const results = document.getElementById('results');
+
+            // Check existing data
+            const existing = checkLocalStorage();
+
+            let html = '<h2>Test Results</h2>';
+            html += '<h3>1. LocalStorage Status</h3>';
+            html += '<ul>';
+            html += `<li>User Data: ${existing.hasUserData ? '✅ Found' : '❌ Not found'}</li>`;
+            html += `<li>Transactions: ${existing.hasTransactions ? '✅ Found' : '❌ Not found'}</li>`;
+            html += `<li>Assessment: ${existing.hasAssessment ? '✅ Found' : '❌ Not found'}</li>`;
+            html += `<li>Subscription: ${existing.hasSubscription ? '✅ Found' : '❌ Not found'}</li>`;
+            html += '</ul>';
+
+            // Create test data if needed
+            if (!existing.hasUserData || !existing.hasTransactions) {
+                createTestData();
+                html += '<h3>2. Test Data Creation</h3>';
+                html += '<p>✅ Test data created successfully</p>';
+            }
+
+            html += '<h3>3. Next Steps</h3>';
+            html += '<ol>';
+            html += '<li>Open the Bvester app at <a href="http://localhost:5173" target="_blank">http://localhost:5173</a></li>';
+            html += '<li>Sign in or create an account</li>';
+            html += '<li>Check if the test data appears in the app</li>';
+            html += '<li>Verify data migration to DynamoDB</li>';
+            html += '</ol>';
+
+            html += '<h3>4. Environment Variables</h3>';
+            html += '<pre>';
+            html += `VITE_STRIPE_PUBLISHABLE_KEY: ${import.meta?.env?.VITE_STRIPE_PUBLISHABLE_KEY || 'Check .env file'}
+VITE_STRIPE_API_BASE_URL: ${import.meta?.env?.VITE_STRIPE_API_BASE_URL || 'Check .env file'}
+VITE_ENABLE_DATA_MIGRATION: ${import.meta?.env?.VITE_ENABLE_DATA_MIGRATION || 'Check .env file'}`;
+            html += '</pre>';
+
+            results.innerHTML = html;
+        }
+
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html>

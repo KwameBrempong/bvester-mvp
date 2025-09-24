@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { isFeatureEnabled } from '../config/featureFlags';
+import '../styles/premium-theme.css';
 
 interface HomepageNewProps {
   onGetStarted: () => void;
@@ -8,6 +10,10 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+
+  // Check if premium theme is enabled
+  const usePremiumTheme = isFeatureEnabled('useBlackGoldTheme');
+  const useOptimizedHomepage = isFeatureEnabled('useOptimizedHomepage');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,9 +77,9 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
 
   return (
     <div style={{
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      background: '#ffffff',
-      color: '#1a1a1a',
+      fontFamily: usePremiumTheme ? 'var(--font-premium)' : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      background: usePremiumTheme ? 'var(--black-primary)' : '#ffffff',
+      color: usePremiumTheme ? 'var(--white-primary)' : '#1a1a1a',
       lineHeight: 1.6,
       margin: 0,
       padding: 0,
@@ -88,8 +94,13 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
         left: 0,
         right: 0,
         height: '70px',
-        background: scrolled ? 'rgba(255, 255, 255, 0.98)' : '#ffffff',
-        boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.1)' : 'none',
+        background: usePremiumTheme
+          ? (scrolled ? 'rgba(10, 10, 10, 0.98)' : 'var(--black-primary)')
+          : (scrolled ? 'rgba(255, 255, 255, 0.98)' : '#ffffff'),
+        borderBottom: usePremiumTheme ? '2px solid var(--gold-primary)' : 'none',
+        boxShadow: scrolled
+          ? (usePremiumTheme ? '0 2px 20px rgba(212, 175, 55, 0.2)' : '0 2px 20px rgba(0,0,0,0.1)')
+          : 'none',
         transition: 'all 0.3s ease',
         zIndex: 1000,
         display: 'flex',
@@ -106,12 +117,15 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
         }}>
           {/* Logo */}
           <div style={{
-            fontSize: '24px',
+            fontSize: '28px',
             fontWeight: 'bold',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: usePremiumTheme
+              ? 'linear-gradient(135deg, var(--gold-primary), var(--gold-accent))'
+              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            letterSpacing: '-0.5px'
           }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             Bvester
@@ -130,7 +144,7 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#666',
+                  color: usePremiumTheme ? 'var(--white-primary)' : '#666',
                   fontSize: '15px',
                   cursor: 'pointer',
                   padding: '8px 0',
@@ -138,8 +152,8 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                   fontWeight: '500',
                   transition: 'color 0.3s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#667eea'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#666'}
+                onMouseEnter={(e) => e.currentTarget.style.color = usePremiumTheme ? 'var(--gold-primary)' : '#667eea'}
+                onMouseLeave={(e) => e.currentTarget.style.color = usePremiumTheme ? 'var(--white-primary)' : '#666'}
               >
                 {item}
               </button>
@@ -147,7 +161,8 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
 
             <button
               onClick={onGetStarted}
-              style={{
+              className={usePremiumTheme ? "btn-premium" : ""}
+              style={!usePremiumTheme ? {
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: '#ffffff',
                 border: 'none',
@@ -158,14 +173,18 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
-              }}
+              } : {}}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                if (!usePremiumTheme) {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                if (!usePremiumTheme) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                }
               }}
             >
               Start Free Trial
@@ -181,7 +200,7 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               border: 'none',
               fontSize: '24px',
               cursor: 'pointer',
-              color: '#1a1a1a'
+              color: usePremiumTheme ? 'var(--gold-primary)' : '#1a1a1a'
             }}
             className="mobile-menu-btn"
           >
@@ -198,7 +217,7 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(255, 255, 255, 0.98)',
+          background: usePremiumTheme ? 'rgba(10, 10, 10, 0.98)' : 'rgba(255, 255, 255, 0.98)',
           zIndex: 999,
           padding: '32px',
           display: 'flex',
@@ -213,10 +232,10 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                 background: 'none',
                 border: 'none',
                 fontSize: '18px',
-                color: '#1a1a1a',
+                color: usePremiumTheme ? 'var(--white-primary)' : '#1a1a1a',
                 textAlign: 'left',
                 padding: '12px 0',
-                borderBottom: '1px solid #e0e0e0',
+                borderBottom: usePremiumTheme ? '1px solid var(--gold-primary)' : '1px solid #e0e0e0',
                 cursor: 'pointer'
               }}
             >
@@ -226,8 +245,10 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
           <button
             onClick={onGetStarted}
             style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: '#ffffff',
+              background: usePremiumTheme
+                ? 'linear-gradient(135deg, var(--gold-primary), var(--gold-accent))'
+                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: usePremiumTheme ? 'var(--black-primary)' : '#ffffff',
               border: 'none',
               padding: '16px',
               borderRadius: '12px',
@@ -245,7 +266,9 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
       <section style={{
         paddingTop: '120px',
         paddingBottom: '80px',
-        background: 'linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%)',
+        background: usePremiumTheme
+          ? 'linear-gradient(180deg, var(--black-primary) 0%, var(--black-secondary) 100%)'
+          : 'linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%)',
         minHeight: '90vh',
         display: 'flex',
         alignItems: 'center'
@@ -265,13 +288,14 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
-              background: 'rgba(102, 126, 234, 0.1)',
+              background: usePremiumTheme ? 'rgba(212, 175, 55, 0.1)' : 'rgba(102, 126, 234, 0.1)',
               borderRadius: '20px',
               padding: '8px 16px',
               marginBottom: '24px',
               fontSize: '14px',
-              color: '#667eea',
-              fontWeight: '600'
+              color: usePremiumTheme ? 'var(--gold-primary)' : '#667eea',
+              fontWeight: '600',
+              border: usePremiumTheme ? '1px solid var(--gold-primary)' : 'none'
             }}>
               ⚡ 500+ SMEs transformed in 6 months
             </div>
@@ -281,11 +305,13 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               fontWeight: '800',
               lineHeight: '1.1',
               marginBottom: '24px',
-              color: '#1a1a1a'
+              color: usePremiumTheme ? 'var(--white-primary)' : '#1a1a1a'
             }}>
               Your Business. <br />
               <span style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: usePremiumTheme
+                  ? 'linear-gradient(135deg, var(--gold-primary), var(--gold-accent))'
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}>
@@ -297,7 +323,7 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
             <p style={{
               fontSize: '20px',
               lineHeight: '1.6',
-              color: '#666',
+              color: usePremiumTheme ? 'var(--gray-300)' : '#666',
               marginBottom: '32px'
             }}>
               Stop losing money to poor records. Stop missing growth opportunities.
@@ -318,8 +344,12 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               ].map((benefit, idx) => (
                 <div key={idx} style={{
                   fontSize: '16px',
-                  color: '#333',
-                  fontWeight: '500'
+                  color: usePremiumTheme ? 'var(--white-primary)' : '#333',
+                  fontWeight: '500',
+                  padding: usePremiumTheme ? '8px 12px' : '0',
+                  background: usePremiumTheme ? 'rgba(212, 175, 55, 0.05)' : 'transparent',
+                  borderRadius: usePremiumTheme ? '8px' : '0',
+                  borderLeft: usePremiumTheme ? '3px solid var(--gold-primary)' : 'none'
                 }}>
                   {benefit}
                 </div>
@@ -334,7 +364,8 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
             }}>
               <button
                 onClick={onGetStarted}
-                style={{
+                className={usePremiumTheme ? "btn-premium" : ""}
+                style={!usePremiumTheme ? {
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: '#ffffff',
                   border: 'none',
@@ -345,14 +376,18 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
-                }}
+                } : { fontSize: '16px', padding: '16px 32px' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.4)';
+                  if (!usePremiumTheme) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.4)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.3)';
+                  if (!usePremiumTheme) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 10px 30px rgba(102, 126, 234, 0.3)';
+                  }
                 }}
               >
                 Start 14-Day Free Trial →
@@ -360,7 +395,8 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
 
               <button
                 onClick={() => scrollToSection('how-it-works')}
-                style={{
+                className={usePremiumTheme ? "btn-premium-black" : ""}
+                style={!usePremiumTheme ? {
                   background: 'transparent',
                   color: '#667eea',
                   border: '2px solid #667eea',
@@ -370,14 +406,18 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                   fontWeight: '600',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease'
-                }}
+                } : { fontSize: '16px' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#667eea';
-                  e.currentTarget.style.color = '#ffffff';
+                  if (!usePremiumTheme) {
+                    e.currentTarget.style.background = '#667eea';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#667eea';
+                  if (!usePremiumTheme) {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#667eea';
+                  }
                 }}
               >
                 See How It Works
@@ -708,8 +748,10 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
           <button
             onClick={onGetStarted}
             style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: '#ffffff',
+              background: usePremiumTheme
+                ? 'linear-gradient(135deg, var(--gold-primary), var(--gold-accent))'
+                : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: usePremiumTheme ? 'var(--black-primary)' : '#ffffff',
               border: 'none',
               padding: '18px 40px',
               borderRadius: '30px',

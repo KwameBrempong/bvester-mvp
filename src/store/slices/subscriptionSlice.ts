@@ -1,5 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { subscriptionService, UserSubscription, paymentEventService } from '../../services/dataService';
+import {
+  subscriptionService,
+  UserSubscription,
+  paymentEventService,
+  transactionService,
+  assessmentService,
+} from '../../services/dataService';
 import { stripeService } from '../../stripeService';
 import { rbacService } from '../../services/rbacService';
 import { logger } from '../../config/environment';
@@ -360,13 +366,41 @@ export const refreshUsageStats = createAsyncThunk(
     try {
       logger.info('Refreshing usage statistics', { userId });
 
-      // Get current usage from various sources
-      // This would typically fetch from transaction, report, and user services
-      // For now, we'll use mock data
+      let transactionsCount = 0;
+      let reportsCount = 0;
+
+      try {
+        const [transactions, assessments] = await Promise.all([
+          transactionService.list(userId, 500),
+          assessmentService.list(userId),
+        ]);
+
+        transactionsCount = transactions.length;
+        reportsCount = assessments.length;
+      } catch (dataError) {
+        logger.warn('Unable to fetch remote usage stats, falling back to cached values', dataError);
+
+        if (typeof window !== 'undefined') {
+          const cachedTransactions = window.localStorage.getItem(`transactions_${userId}`);
+          if (cachedTransactions) {
+            try {
+              transactionsCount = JSON.parse(cachedTransactions).length;
+            } catch (parseError) {
+              logger.warn('Failed to parse cached transactions for usage stats', parseError);
+            }
+          }
+
+          const cachedAssessments = window.localStorage.getItem(`assessment_${userId}`);
+          if (cachedAssessments) {
+            reportsCount = 1;
+          }
+        }
+      }
+
       const currentUsage = {
-        transactions: 15, // This would come from transactionService.count(userId)
-        reports: 2,       // This would come from reportService.count(userId)
-        users: 1,         // This would come from userService.count(userId)
+        transactions: transactionsCount,
+        reports: reportsCount,
+        users: 1,
       };
 
       const state = getState() as { subscription: SubscriptionState };
