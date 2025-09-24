@@ -3,7 +3,7 @@ import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import App from './App';
-import Homepage from './components/Homepage';
+import HomepageRevenue from './components/HomepageRevenue';
 
 // Amplify configuration removed - using standalone Lambda backend
 
@@ -57,7 +57,7 @@ const AppRouter: React.FC = () => {
     );
   }
 
-  return <Homepage onGetStarted={handleGetStarted} />;
+  return <HomepageRevenue onGetStarted={handleGetStarted} />;
 };
 
 export default AppRouter;
