@@ -42,13 +42,13 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
     <>
       {/* Enhanced Welcome Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #2E8B57, #228B22, #32CD32)',
+        background: 'linear-gradient(135deg, #0A0A0A, #1A1A1A, #2A2A2A)',
         color: 'white',
         padding: '25px 30px',
         borderRadius: '15px',
         marginBottom: '25px',
-        boxShadow: '0 8px 16px rgba(46, 139, 87, 0.3)',
-        border: '2px solid #1F5F3F'
+        boxShadow: '0 8px 16px rgba(212, 175, 55, 0.3)',
+        border: '2px solid #D4AF37'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ flex: 1 }}>
