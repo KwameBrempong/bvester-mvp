@@ -1,0 +1,16 @@
+{
+  "name": "bvester-aws-setup",
+  "version": "1.0.0",
+  "description": "AWS infrastructure setup for Bvester production deployment",
+  "main": "dynamodb-setup.js",
+  "scripts": {
+    "setup-dynamodb": "node dynamodb-setup.js",
+    "list-tables": "node dynamodb-setup.js list",
+    "package-lambda": "cd ../stripe-lambda && zip -r ../aws-setup/lambda-deployment.zip index-enhanced.js package.json node_modules/"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1691.0"
+  },
+  "author": "Bvester Team",
+  "license": "MIT"
+}

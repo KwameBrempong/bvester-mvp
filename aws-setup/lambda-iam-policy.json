@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-user-profiles",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-user-profiles/index/*",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-transactions",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-transactions/index/*",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-assessments",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-assessments/index/*",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-subscriptions",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-subscriptions/index/*",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-payment-events",
+        "arn:aws:dynamodb:eu-west-2:*:table/bvester-payment-events/index/*"
+      ]
+    }
+  ]
+}

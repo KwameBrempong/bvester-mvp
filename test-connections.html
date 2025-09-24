@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Backend Connections</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .pending {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-connected { background: #28a745; color: white; }
+        .status-disconnected { background: #dc3545; color: white; }
+        .status-checking { background: #ffc107; color: black; }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Backend Connection Test Suite</h1>
+        <p class="subtitle">Testing connections between Frontend → Lambda → DynamoDB</p>
+
+        <!-- Lambda API Test -->
+        <div class="test-section">
+            <h2>1. Lambda API Connection <span id="lambda-status" class="status-badge status-checking">Checking...</span></h2>
+            <button onclick="testLambdaConnection()">Test Lambda API</button>
+            <button onclick="testStripeCheckout()">Test Stripe Checkout</button>
+            <div id="lambda-results"></div>
+        </div>
+
+        <!-- DynamoDB Test (via dataService) -->
+        <div class="test-section">
+            <h2>2. DynamoDB Connection <span id="dynamo-status" class="status-badge status-checking">Not Configured</span></h2>
+            <p><strong>Note:</strong> DynamoDB is accessed through Amplify Data, which requires proper AWS Cognito authentication.</p>
+            <div id="dynamo-results" class="test-result warning">
+                DynamoDB tables are managed by Amplify backend. Since we removed Amplify backend configuration,
+                DynamoDB is not directly connected. The app is running in "fallback mode" using localStorage.
+            </div>
+        </div>
+
+        <!-- Current Configuration -->
+        <div class="test-section">
+            <h2>3. Current Configuration</h2>
+            <div id="config-info"></div>
+        </div>
+
+        <!-- Full Integration Test -->
+        <div class="test-section">
+            <h2>4. Full Integration Test</h2>
+            <button onclick="runFullTest()">Run Complete Test</button>
+            <div id="integration-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const LAMBDA_API_URL = 'https://y3ouaxtpf8.execute-api.eu-west-2.amazonaws.com/prod';
+        const STRIPE_PUBLISHABLE_KEY = 'pk_test_51P7ZjIGUhOvqkzBNnglGPKs5vWkW9dxydyQ4KmmwyNax38puWqABMPJVtiYR244XIvTDGoqlfI4zYllwXos5b8Hr00mpNqmfJ9';
+
+        // Display configuration
+        document.getElementById('config-info').innerHTML = `
+            <div class="test-result pending">
+                <strong>Lambda API Endpoint:</strong> ${LAMBDA_API_URL}<br>
+                <strong>Stripe Key:</strong> ${STRIPE_PUBLISHABLE_KEY.substring(0, 20)}...<br>
+                <strong>DynamoDB:</strong> Not directly connected (requires Amplify Auth)<br>
+                <strong>Storage Mode:</strong> localStorage (fallback mode)
+            </div>
+        `;
+
+        async function testLambdaConnection() {
+            const resultDiv = document.getElementById('lambda-results');
+            const statusBadge = document.getElementById('lambda-status');
+
+            resultDiv.innerHTML = '<div class="test-result pending">Testing Lambda connection...</div>';
+            statusBadge.className = 'status-badge status-checking';
+            statusBadge.textContent = 'Testing...';
+
+            try {
+                // Test OPTIONS (CORS preflight)
+                const optionsResponse = await fetch(LAMBDA_API_URL, {
+                    method: 'OPTIONS'
+                });
+
+                if (!optionsResponse.ok) {
+                    throw new Error(`OPTIONS request failed: ${optionsResponse.status}`);
+                }
+
+                // Test actual API call
+                const response = await fetch(LAMBDA_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'get_subscription_status',
+                        userId: 'test-user-' + Date.now()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            ✅ Lambda API is connected and responding!<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                    statusBadge.className = 'status-badge status-connected';
+                    statusBadge.textContent = 'Connected';
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="test-result warning">
+                            ⚠️ Lambda responded with error:<br>
+                            Status: ${response.status}<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                    statusBadge.className = 'status-badge status-connected';
+                    statusBadge.textContent = 'Connected (with errors)';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Failed to connect to Lambda API<br>
+                        Error: ${error.message}<br><br>
+                        <strong>Possible issues:</strong><br>
+                        - CORS not configured on API Gateway<br>
+                        - Lambda function not deployed<br>
+                        - API endpoint incorrect
+                    </div>
+                `;
+                statusBadge.className = 'status-badge status-disconnected';
+                statusBadge.textContent = 'Disconnected';
+            }
+        }
+
+        async function testStripeCheckout() {
+            const resultDiv = document.getElementById('lambda-results');
+
+            resultDiv.innerHTML = '<div class="test-result pending">Creating test checkout session...</div>';
+
+            try {
+                const response = await fetch(LAMBDA_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create_checkout_session',
+                        priceId: 'price_1QW9M2GUhOvqkzBNv7UXGJG0', // Pro plan price ID
+                        successUrl: window.location.origin + '/success',
+                        cancelUrl: window.location.origin + '/cancel',
+                        customerEmail: 'test@example.com',
+                        userId: 'test-user-' + Date.now(),
+                        productType: 'subscription'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.sessionId) {
+                    resultDiv.innerHTML = `
+                        <div class="test-result success">
+                            ✅ Stripe Checkout Session Created!<br>
+                            Session ID: ${data.sessionId}<br>
+                            <a href="${data.url}" target="_blank">Open Checkout (Test Mode)</a>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="test-result error">
+                            ❌ Failed to create checkout session<br>
+                            Response: <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Failed to create checkout session<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function runFullTest() {
+            const resultDiv = document.getElementById('integration-results');
+            const tests = [];
+
+            resultDiv.innerHTML = '<div class="test-result pending">Running full integration test...</div>';
+
+            // Test 1: Lambda connectivity
+            try {
+                const lambdaResponse = await fetch(LAMBDA_API_URL, {
+                    method: 'OPTIONS'
+                });
+                tests.push({
+                    name: 'Lambda API Connectivity',
+                    status: lambdaResponse.ok ? 'PASS' : 'FAIL',
+                    details: `Status: ${lambdaResponse.status}`
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'Lambda API Connectivity',
+                    status: 'FAIL',
+                    details: error.message
+                });
+            }
+
+            // Test 2: Stripe integration
+            try {
+                const stripeResponse = await fetch(LAMBDA_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'get_subscription_status',
+                        userId: 'integration-test'
+                    })
+                });
+                const data = await stripeResponse.json();
+                tests.push({
+                    name: 'Stripe Integration',
+                    status: stripeResponse.ok ? 'PASS' : 'FAIL',
+                    details: `Response received: ${stripeResponse.ok ? 'Success' : data.error}`
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'Stripe Integration',
+                    status: 'FAIL',
+                    details: error.message
+                });
+            }
+
+            // Test 3: LocalStorage (fallback for DynamoDB)
+            try {
+                const testData = { test: 'data', timestamp: Date.now() };
+                localStorage.setItem('integration-test', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('integration-test'));
+                localStorage.removeItem('integration-test');
+
+                tests.push({
+                    name: 'LocalStorage (DynamoDB Fallback)',
+                    status: retrieved.test === 'data' ? 'PASS' : 'FAIL',
+                    details: 'LocalStorage working as database fallback'
+                });
+            } catch (error) {
+                tests.push({
+                    name: 'LocalStorage (DynamoDB Fallback)',
+                    status: 'FAIL',
+                    details: error.message
+                });
+            }
+
+            // Display results
+            const allPassed = tests.every(t => t.status === 'PASS');
+            const summary = allPassed ?
+                '<div class="test-result success">✅ All tests passed!</div>' :
+                '<div class="test-result warning">⚠️ Some tests failed</div>';
+
+            const testResults = tests.map(test => `
+                <div class="test-result ${test.status === 'PASS' ? 'success' : 'error'}">
+                    ${test.status === 'PASS' ? '✅' : '❌'} ${test.name}<br>
+                    <small>${test.details}</small>
+                </div>
+            `).join('');
+
+            resultDiv.innerHTML = summary + testResults;
+        }
+
+        // Run initial test on load
+        window.onload = () => {
+            testLambdaConnection();
+        };
+    </script>
+</body>
+</html>

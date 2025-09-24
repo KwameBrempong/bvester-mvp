@@ -31,7 +31,9 @@
       "Bash(npx amplify:*)",
       "Bash(npx ampx:*)",
       "Bash(git push:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(start test-connections.html)",
+      "Bash(copy stripe-lambda\\index-enhanced.js stripe-lambda\\index.js)"
     ],
     "deny": [],
     "ask": []
