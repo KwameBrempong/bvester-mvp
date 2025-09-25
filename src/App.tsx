@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import PermissionWrapper from './components/PermissionWrapper';
 import UserProfileHeader from './components/UserProfileHeader';
 import ProfileCompletionWidget from './components/ProfileCompletionWidget';
+import EmailVerificationBanner from './components/EmailVerificationBanner';
 import { isFeatureEnabled } from './config/featureFlags';
 import { profileUtils, UserProfile } from './services/dataService';
 import './App.css';
@@ -133,7 +134,22 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [showSubscriptionTierManager, setShowSubscriptionTierManager] = useState(false);
   const [showBillingManager, setShowBillingManager] = useState(false);
   const [showBusinessAnalysis, setShowBusinessAnalysis] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   const subscriptionStatus = useSubscription(user?.username);
+
+  // Authentication state management
+  useEffect(() => {
+    if (!user) {
+      setIsLoading(false);
+      setAuthError('No user session found');
+      return;
+    }
+
+    // Clear any previous errors
+    setAuthError(null);
+    setIsLoading(false);
+  }, [user]);
 
   // Initialize user authentication state and hydrate profile
   useEffect(() => {
@@ -230,11 +246,94 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     }
   };
 
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: '#FAFAFA'
+      }}>
+        <LoadingSpinner />
+        <p style={{ marginTop: '1rem', color: '#666' }}>Setting up your account...</p>
+      </div>
+    );
+  }
+
+  // Handle authentication errors
+  if (authError) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: '#FAFAFA',
+        padding: '2rem'
+      }}>
+        <div style={{
+          background: 'white',
+          padding: '2rem',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          textAlign: 'center',
+          maxWidth: '400px'
+        }}>
+          <h3 style={{ color: '#D4AF37', marginBottom: '1rem' }}>Authentication Error</h3>
+          <p style={{ color: '#666', marginBottom: '1.5rem' }}>{authError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
+              color: '#0A0A0A',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            Retry Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle profile completion flow
   if (!profileCompleted) {
     return (
       <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner />}>
-          <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
+          <div style={{
+            background: '#FAFAFA',
+            minHeight: '100vh',
+            padding: '2rem 0'
+          }}>
+            {/* Welcome message for new users */}
+            {user?.attributes?.email && (
+              <div style={{
+                background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
+                color: '#0A0A0A',
+                padding: '1rem 2rem',
+                textAlign: 'center',
+                marginBottom: '2rem'
+              }}>
+                <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
+                  🎉 Welcome to Bvester, {user.attributes.email}!
+                </h2>
+                <p style={{ margin: 0, fontSize: '1rem' }}>
+                  Let's set up your business profile to get started
+                </p>
+              </div>
+            )}
+            <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
+          </div>
         </Suspense>
       </ErrorBoundary>
     );
@@ -248,7 +347,18 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       padding: '15px 0 0 0'
     }}>
       <div className="main-container">
-        
+
+        {/* Email Verification Banner */}
+        {user && !user.attributes?.email_verified && (
+          <EmailVerificationBanner
+            userEmail={user.attributes?.email}
+            onVerificationSuccess={() => {
+              // Refresh the page to get updated user attributes
+              window.location.reload();
+            }}
+          />
+        )}
+
         {/* Enhanced User Profile Header */}
         <UserProfileHeader
           user={user}

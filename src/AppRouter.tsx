@@ -4,8 +4,10 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import App from './App';
 import HomepageRevenue from './components/HomepageRevenue';
+import outputs from '../amplify_outputs.json';
 
-// Amplify configuration removed - using standalone Lambda backend
+// Configure Amplify with backend outputs
+Amplify.configure(outputs);
 
 const AppRouter: React.FC = () => {
   const [showSignIn, setShowSignIn] = useState(false);
@@ -20,34 +22,91 @@ const AppRouter: React.FC = () => {
 
   if (showSignIn) {
     return (
-      <Authenticator>
-        {({ signOut, user }) => (
-          <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-            {/* Add back to homepage option for unauthenticated state */}
-            {!user && (
+      <Authenticator
+        formFields={{
+          signUp: {
+            email: {
+              order: 1,
+              placeholder: 'Enter your business email',
+              label: 'Business Email *',
+              isRequired: true
+            },
+            password: {
+              order: 2,
+              placeholder: 'Create a strong password',
+              label: 'Password *'
+            },
+            confirm_password: {
+              order: 3,
+              label: 'Confirm Password *'
+            }
+          }
+        }}
+        components={{
+          Header() {
+            return (
+              <div style={{ textAlign: 'center', padding: '2rem 1rem 1rem' }}>
+                <div style={{
+                  fontSize: '2rem',
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  marginBottom: '0.5rem'
+                }}>
+                  Welcome to Bvester
+                </div>
+                <p style={{ color: '#666', fontSize: '1rem', margin: 0 }}>
+                  🇬🇭 Join thousands of SMEs accessing growth capital
+                </p>
+              </div>
+            );
+          },
+          Footer() {
+            return (
               <div style={{
-                position: 'fixed',
-                top: '20px',
-                left: '20px',
-                zIndex: 1000
+                textAlign: 'center',
+                padding: '1rem',
+                borderTop: '1px solid #eee',
+                marginTop: '2rem'
               }}>
                 <button
                   onClick={handleBackToHome}
                   style={{
-                    background: 'rgba(46, 139, 87, 0.9)',
-                    color: 'white',
+                    background: 'none',
                     border: 'none',
-                    padding: '12px 20px',
-                    borderRadius: '25px',
+                    color: '#D4AF37',
                     fontSize: '14px',
-                    fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    backdropFilter: 'blur(10px)'
+                    textDecoration: 'underline'
                   }}
                 >
-                  ← Back to Home
+                  ← Back to Homepage
                 </button>
+              </div>
+            );
+          }
+        }}
+        socialProviders={[]}
+      >
+        {({ signOut, user }) => (
+          <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+            {/* Loading state while user profile is being set up */}
+            {user && !user.attributes?.email_verified && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                background: '#FFF3CD',
+                color: '#856404',
+                padding: '12px',
+                textAlign: 'center',
+                fontSize: '14px',
+                borderBottom: '1px solid #FFEAA7',
+                zIndex: 1000
+              }}>
+                📧 Please verify your email address to complete your account setup
               </div>
             )}
             <App user={user} signOut={signOut} />

@@ -44,7 +44,8 @@
       "Bash(aws amplify get-domain-association:*)",
       "Bash(aws amplify delete-domain-association:*)",
       "Bash(nslookup:*)",
-      "Bash(aws cloudfront list-distributions:*)"
+      "Bash(aws cloudfront list-distributions:*)",
+      "Bash(aws amplify get-app:*)"
     ],
     "deny": [],
     "ask": []
