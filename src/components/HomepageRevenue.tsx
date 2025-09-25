@@ -303,8 +303,8 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               </div>
 
               <h1>
-                Empowering SMEs with <br />
-                <span className="gradient-text">Smart Investment</span>
+                <span style={{ color: 'white', fontWeight: 'bold' }}>Is Your Business</span> <br />
+                <span className="gradient-text" style={{ color: '#D4AF37', fontWeight: 'bold' }}>Investment Ready?</span>
               </h1>
 
               <p className="hero__subheading">

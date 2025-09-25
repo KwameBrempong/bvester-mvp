@@ -287,11 +287,29 @@ const AppRouter: React.FC = () => {
         }}
         socialProviders={[]}
       >
-        {({ signOut, user }) => (
-          <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-            <App user={user} signOut={signOut} />
-          </div>
-        )}
+        {({ signOut, user }) => {
+          // Create a custom signOut handler that redirects to homepage
+          const handleCustomSignOut = async () => {
+            try {
+              await signOut();
+              // Clear all application state
+              window.location.reload(); // This will clear all Redux state and restart from homepage
+            } catch (error) {
+              console.error('Sign out error:', error);
+              // Still reset state even if there's an error
+              setShowSignIn(false);
+              setIsAuthenticated(false);
+              // Force reload to clear any cached state
+              window.location.reload();
+            }
+          };
+
+          return (
+            <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+              <App user={user} signOut={handleCustomSignOut} />
+            </div>
+          );
+        }}
       </Authenticator>
     );
   }
