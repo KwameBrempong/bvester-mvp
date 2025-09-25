@@ -376,9 +376,8 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
         <section className="features" id="features">
           <div className="container">
             <div className="section-header">
-              <div className="section__badge">Core Features</div>
-              <h2>Everything SMEs Need to Become Investment Ready</h2>
-              <p>Built specifically for African businesses seeking growth capital</p>
+              <h2>Everything You Need to Scale</h2>
+              <p>Comprehensive tools designed for African SMEs to manage, grow, and secure investment</p>
             </div>
 
             <div className="features__grid">
