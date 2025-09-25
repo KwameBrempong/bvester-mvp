@@ -10,7 +10,6 @@ const navLinks = [
   { label: 'Assessment', href: '#assessment' },
   { label: 'Features', href: '#features' },
   { label: 'Pricing', href: '#pricing' },
-  { label: 'Success Stories', href: '#success' },
   { label: 'Trust', href: '#trust' },
   { label: 'Bootcamp', href: '#program' },
 ];
@@ -233,9 +232,13 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               </div>
 
               <h1>
-                Is Your Business Really <br />
-                <span className="gradient-text">Investment Ready?</span>
+                Empowering SMEs with <br />
+                <span className="gradient-text">Smart Investment</span>
               </h1>
+
+              <p className="hero__subheading">
+                Bridge the funding gap. Scale your business.
+              </p>
 
               <p className="hero__subtitle">
                 Take our 5-minute assessment and discover the blind spots costing you millions.
@@ -252,9 +255,9 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                 </button>
                 <button
                   className="btn btn--ghost"
-                  onClick={() => handleNavClick('#success')}
+                  onClick={() => handleNavClick('#program')}
                 >
-                  ▶ Watch Success Stories
+                  JOIN GROWTH ACCELERATOR
                 </button>
               </div>
 
@@ -518,129 +521,6 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           </div>
         </section>
 
-        {/* Success Stories Section */}
-        <section className="success-stories" id="success">
-          <div className="container">
-            <div className="section-header">
-              <div className="section__badge">Success Stories</div>
-              <h2>Real SMEs, Real Results</h2>
-              <p>See how businesses like yours became investment ready</p>
-            </div>
-
-            <div className="stories__grid">
-              <div className="story-card">
-                <div className="story__header">
-                  <div className="story__avatar">
-                    <img src="/api/placeholder/60/60" alt="Kwame" />
-                  </div>
-                  <div className="story__meta">
-                    <h4>Kwame Asante</h4>
-                    <span>Tech Startup, Accra</span>
-                    <div className="story__rating">⭐⭐⭐⭐⭐</div>
-                  </div>
-                </div>
-                <div className="story__content">
-                  <blockquote>
-                    "Went from 23/100 to 87/100 in just 30 days. Secured ₵2M in seed funding within 60 days of completing the bootcamp."
-                  </blockquote>
-                  <div className="story__metrics">
-                    <div className="metric">
-                      <span className="metric__label">Score Improvement</span>
-                      <span className="metric__value">+64 points</span>
-                    </div>
-                    <div className="metric">
-                      <span className="metric__label">Funding Raised</span>
-                      <span className="metric__value">₵2M</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="story-card">
-                <div className="story__header">
-                  <div className="story__avatar">
-                    <img src="/api/placeholder/60/60" alt="Ama" />
-                  </div>
-                  <div className="story__meta">
-                    <h4>Ama Osei</h4>
-                    <span>Fashion Brand, Kumasi</span>
-                    <div className="story__rating">⭐⭐⭐⭐⭐</div>
-                  </div>
-                </div>
-                <div className="story__content">
-                  <blockquote>
-                    "The chat-based tracking saved me 10 hours per week. My investment readiness score jumped from 45 to 78. Now talking to 3 VCs!"
-                  </blockquote>
-                  <div className="story__metrics">
-                    <div className="metric">
-                      <span className="metric__label">Time Saved</span>
-                      <span className="metric__value">10hrs/week</span>
-                    </div>
-                    <div className="metric">
-                      <span className="metric__label">Active VCs</span>
-                      <span className="metric__value">3 meetings</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="story-card">
-                <div className="story__header">
-                  <div className="story__avatar">
-                    <img src="/api/placeholder/60/60" alt="Kofi" />
-                  </div>
-                  <div className="story__meta">
-                    <h4>Kofi Mensah</h4>
-                    <span>AgriTech, Tamale</span>
-                    <div className="story__rating">⭐⭐⭐⭐⭐</div>
-                  </div>
-                </div>
-                <div className="story__content">
-                  <blockquote>
-                    "Finally understood what investors wanted. The 30-day bootcamp connected me directly with 2 investors. Closed Series A last month!"
-                  </blockquote>
-                  <div className="story__metrics">
-                    <div className="metric">
-                      <span className="metric__label">Series A Closed</span>
-                      <span className="metric__value">₵5M</span>
-                    </div>
-                    <div className="metric">
-                      <span className="metric__label">Timeline</span>
-                      <span className="metric__value">45 days</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="success__stats">
-              <div className="stat">
-                <div className="stat__number">89%</div>
-                <div className="stat__label">Get Funded Within 90 Days</div>
-              </div>
-              <div className="stat">
-                <div className="stat__number">₵45M+</div>
-                <div className="stat__label">Total Capital Raised</div>
-              </div>
-              <div className="stat">
-                <div className="stat__number">156+</div>
-                <div className="stat__label">Success Stories</div>
-              </div>
-              <div className="stat">
-                <div className="stat__number">4.9/5</div>
-                <div className="stat__label">Average Rating</div>
-              </div>
-            </div>
-
-            <div className="success__cta">
-              <h3>Ready to Join Them?</h3>
-              <p>Take the first step with our free assessment</p>
-              <button className="btn btn--primary btn--large" onClick={startAssessment}>
-                Start Your Success Story →
-              </button>
-            </div>
-          </div>
-        </section>
 
         {/* Trust & Authority Section */}
         <section className="trust-authority" id="trust">
