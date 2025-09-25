@@ -35,8 +35,8 @@
   --gradient-error: linear-gradient(135deg, var(--error-color), #dc2626);
 
   /* Layout */
-  --max-width: 1200px;
-  --padding: clamp(1rem, 5vw, 3rem);
+  --max-width: 100%;
+  --padding: 0;
 
   /* Transitions */
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -88,9 +88,9 @@ body {
 }
 
 .nav__inner {
-  max-width: var(--max-width);
+  max-width: 100%;
   margin: 0 auto;
-  padding: 1rem var(--padding);
+  padding: 1rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -293,15 +293,16 @@ body {
 
 /* Hero Section */
 .hero {
-  padding: 6rem var(--padding) 4rem;
+  padding: 6rem 0 4rem;
   background: radial-gradient(ellipse at top, rgba(217, 119, 6, 0.1) 0%, transparent 50%);
   position: relative;
   overflow: hidden;
 }
 
 .hero__content {
-  max-width: var(--max-width);
+  max-width: 100%;
   margin: 0 auto;
+  padding: 0 2rem;
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 4rem;
@@ -528,9 +529,9 @@ body {
 }
 
 .feed__container {
-  max-width: var(--max-width);
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 var(--padding);
+  padding: 0 2rem;
   overflow: hidden;
 }
 
@@ -572,13 +573,14 @@ body {
 
 /* Quick Benefits */
 .quick-benefits {
-  padding: 4rem var(--padding);
+  padding: 4rem 0;
   background: var(--bg-secondary);
 }
 
 .container {
-  max-width: var(--max-width);
+  max-width: 100%;
   margin: 0 auto;
+  padding: 0 2rem;
 }
 
 .benefits__grid {
@@ -929,7 +931,7 @@ body {
 
 /* Features Section */
 .features {
-  padding: 6rem var(--padding);
+  padding: 6rem 0;
   background: var(--bg-secondary);
 }
 
@@ -1043,7 +1045,7 @@ body {
 
 /* Pricing Section */
 .pricing {
-  padding: 6rem var(--padding);
+  padding: 6rem 0;
   background: var(--bg-primary);
 }
 
@@ -2135,7 +2137,7 @@ body {
     right: 0;
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
-    padding: 2rem var(--padding);
+    padding: 2rem;
     flex-direction: column;
     gap: 1.5rem;
   }
@@ -2182,7 +2184,7 @@ body {
 
 @media (max-width: 768px) {
   .hero {
-    padding: 4rem var(--padding) 3rem;
+    padding: 4rem 1rem 3rem;
   }
 
   .hero h1 {
@@ -2333,7 +2335,7 @@ body {
 
 @media (max-width: 480px) {
   :root {
-    --padding: 1rem;
+    --padding: 0;
   }
 
   .hero__badge {
