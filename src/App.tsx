@@ -375,11 +375,20 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     }
   };
 
+  const handleProfileSave = async (profileData: any) => {
+    try {
+      await dispatch(updateUserProfile(profileData));
+      // You can add success notification here
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    }
+  };
+
   return (
     <>
       <ProfessionalDashboard
         user={user}
-        signOut={signOut}
+        signOut={signOut || (() => {})}
         activeView={activeView}
         onViewChange={handleViewChange}
       >
@@ -447,9 +456,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
               <Suspense fallback={<LoadingSpinner />}>
                 <SMEProfile
                   user={user}
-                  profile={userState.profile}
-                  onSave={handleProfileSave}
-                  onComplete={() => {
+                  onProfileComplete={(profileData) => {
+                    handleProfileSave(profileData);
                     setProfileCompleted(true);
                     window.scrollTo(0, 0);
                   }}
