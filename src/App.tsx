@@ -22,6 +22,8 @@ import './App.css';
 import './styles/premium-theme.css';
 // Import professional dashboard system
 import './styles/dashboard-system.css';
+// Import mobile optimizations
+import './styles/mobile-optimizations.css';
 
 // Lazy load components for better performance
 const SMEProfile = lazy(() => import('./SMEProfile'));
@@ -45,6 +47,21 @@ import {
   InvestmentReadinessTracker,
   ProfessionalDashboard
 } from './components/dashboard';
+import React from 'react';
+const DashboardKPIs = React.lazy(() => import('./components/dashboard/DashboardKPIs'));
+
+// Import dashboard views
+import {
+  OverviewView,
+  ProfileView,
+  AssessmentView,
+  GrowthView,
+  BootcampView,
+  XRayView,
+  TransactionsView,
+  BillingView,
+  SettingsView
+} from './components/dashboard/DashboardViews';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -398,77 +415,57 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
 
         {/* Main Dashboard Content Based on Active View */}
         {activeView === 'overview' && (
-          <>
-            <div className="dashboard-grid-full">
-              <BusinessOverview />
-            </div>
-
-            <div className="dashboard-grid-full">
-              <GrowthToolsWidget
-                onOpenGrowthAccelerator={() => setShowGrowthAccelerator(true)}
-                onOpenTransactionRecorder={() => setShowTransactionRecorder(true)}
-                onOpenBusinessAnalysis={() => setShowBusinessAnalysis(true)}
-                onOpenBusinessAssessment={() => setShowBusinessAssessment(true)}
-                onOpenSubscriptionManager={() => setShowSubscriptionTierManager(true)}
-              />
-            </div>
-
-            <div className="dashboard-grid-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-              {/* Investment Readiness Tracker */}
-              <InvestmentReadinessTracker />
-
-              {/* Usage Tracker */}
-              {user?.username && (
-                <ErrorBoundary>
-                  <Suspense fallback={<div className="skeleton skeleton-text"></div>}>
-                    <UsageTracker userId={user.username} compact={true} />
-                  </Suspense>
-                </ErrorBoundary>
-              )}
-            </div>
-
-            {/* Professional Footer */}
-            <div className="dashboard-grid-full">
-              <div className="card" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
-                <div className="card-body text-center" style={{ padding: 'var(--space-xl)' }}>
-                  <h4 className="text-lg font-semibold mb-md text-black">
-                    🇬🇭 Bvester - Ghana's Investment Readiness Platform
-                  </h4>
-                  <p className="text-sm text-gray mb-0">
-                    Connecting SMEs with global investment opportunities through professional business development
-                  </p>
-                </div>
-              </div>
-            </div>
-          </>
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <OverviewView />
+          </React.Suspense>
         )}
 
         {activeView === 'profile' && (
-          <div className="dashboard-grid-full">
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingSpinner />}>
-                <SMEProfile
-                  user={user}
-                  onProfileComplete={(profileData) => {
-                    handleProfileSave(profileData);
-                    setProfileCompleted(true);
-                    window.scrollTo(0, 0);
-                  }}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <ProfileView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'assessment' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <AssessmentView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'growth' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <GrowthView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'bootcamp' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <BootcampView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'xray' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <XRayView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'transactions' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <TransactionsView />
+          </React.Suspense>
+        )}
+
+        {activeView === 'billing' && (
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <BillingView />
+          </React.Suspense>
         )}
 
         {activeView === 'settings' && (
-          <div className="dashboard-grid-full">
-            <div className="card">
-              <div className="card-body">
-                <h3>Account Settings</h3>
-                <p>Manage your account preferences and security settings.</p>
-              </div>
-            </div>
-          </div>
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <SettingsView />
+          </React.Suspense>
         )}
       </ProfessionalDashboard>
 

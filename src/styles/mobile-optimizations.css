@@ -1,0 +1,472 @@
+/* Mobile Optimizations */
+
+/* Mobile First Approach - Default styles for mobile */
+@media screen and (max-width: 768px) {
+  /* Global Mobile Adjustments */
+  :root {
+    --space-xs: 0.25rem;
+    --space-sm: 0.375rem;
+    --space-md: 0.5rem;
+    --space-lg: 0.75rem;
+    --space-xl: 1rem;
+    --space-2xl: 1.5rem;
+    --space-3xl: 2rem;
+    
+    --text-xs: 0.75rem;
+    --text-sm: 0.813rem;
+    --text-base: 0.875rem;
+    --text-lg: 1rem;
+    --text-xl: 1.125rem;
+    --text-2xl: 1.25rem;
+    --text-3xl: 1.5rem;
+  }
+
+  /* Mobile Navigation Styles */
+  .professional-dashboard {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-sidebar.mobile-show {
+    left: 0;
+  }
+
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--white-primary);
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .mobile-menu-toggle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .mobile-menu-toggle span {
+    width: 20px;
+    height: 2px;
+    background: var(--gray-700);
+    transition: all 0.3s ease;
+    display: block;
+  }
+
+  .mobile-menu-toggle:active span {
+    background: var(--gold-primary);
+  }
+
+  /* Dashboard Main Content - Mobile */
+  .dashboard-main {
+    margin-left: 0;
+    width: 100%;
+    min-height: calc(100vh - 60px);
+  }
+
+  .dashboard-topbar {
+    display: none; /* Hide desktop topbar on mobile */
+  }
+
+  .dashboard-content {
+    padding: var(--space-md);
+  }
+
+  /* KPI Cards - Mobile */
+  .kpi-cards-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .kpi-card {
+    padding: var(--space-md);
+  }
+
+  .kpi-value {
+    font-size: var(--text-xl);
+  }
+
+  /* Charts - Mobile */
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .chart-card {
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  /* Period Selector - Mobile */
+  .period-selector {
+    width: 100%;
+    overflow-x: auto;
+    padding: var(--space-xs);
+    margin: 0 -var(--space-md) var(--space-lg);
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .period-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  /* Quick Actions - Mobile */
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .action-btn {
+    padding: var(--space-md);
+    font-size: var(--text-sm);
+  }
+
+  /* Profile View - Mobile */
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-lg);
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  /* Assessment View - Mobile */
+  .assessment-card {
+    padding: var(--space-lg);
+  }
+
+  .category-item {
+    flex-wrap: wrap;
+  }
+
+  .category-name {
+    flex: 0 0 100%;
+    margin-bottom: var(--space-xs);
+  }
+
+  .category-progress {
+    flex: 1;
+  }
+
+  .category-score {
+    flex: 0 0 60px;
+  }
+
+  /* Bootcamp View - Mobile */
+  .bootcamp-modules {
+    grid-template-columns: 1fr;
+  }
+
+  /* Billing View - Mobile */
+  .subscription-actions {
+    flex-direction: column;
+  }
+
+  .subscription-actions .btn {
+    width: 100%;
+  }
+
+  /* Settings View - Mobile */
+  .settings-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .settings-item .btn {
+    width: 100%;
+  }
+
+  /* Empty States - Mobile */
+  .empty-state {
+    padding: var(--space-xl) var(--space-md);
+    min-height: 300px;
+  }
+
+  .empty-state-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .empty-state-title {
+    font-size: var(--text-xl);
+  }
+
+  .empty-state-description {
+    font-size: var(--text-sm);
+  }
+
+  /* Buttons - Mobile */
+  .btn {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-sm);
+    min-height: 44px; /* iOS touch target */
+  }
+
+  .btn-lg {
+    width: 100%;
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  /* Forms - Mobile */
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* Modals - Mobile */
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  /* Loading States - Mobile */
+  .skeleton {
+    border-radius: var(--radius-md);
+  }
+
+  /* Tooltips - Mobile */
+  .recharts-tooltip-wrapper {
+    pointer-events: none !important;
+  }
+
+  /* Cards - Mobile */
+  .card {
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-md);
+  }
+
+  .card-body {
+    padding: var(--space-md);
+  }
+
+  /* Text Adjustments - Mobile */
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+  }
+
+  h4 {
+    font-size: var(--text-base);
+  }
+
+  p {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+
+  /* Responsive Tables */
+  table {
+    font-size: var(--text-sm);
+  }
+
+  /* Badge Adjustments */
+  .badge {
+    font-size: var(--text-xs);
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
+
+/* Tablet Styles */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .dashboard-sidebar {
+    width: 240px;
+  }
+
+  .dashboard-main {
+    margin-left: 240px;
+  }
+
+  .kpi-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bootcamp-modules {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large Mobile / Small Tablet (Landscape) */
+@media screen and (min-width: 576px) and (max-width: 768px) {
+  .kpi-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Extra Small Devices */
+@media screen and (max-width: 375px) {
+  :root {
+    --text-base: 0.813rem;
+    --text-sm: 0.75rem;
+  }
+
+  .mobile-header {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .dashboard-content {
+    padding: var(--space-sm);
+  }
+
+  .kpi-card {
+    padding: var(--space-sm);
+  }
+
+  .kpi-value {
+    font-size: var(--text-lg);
+  }
+
+  .chart-card {
+    padding: var(--space-sm);
+  }
+
+  .period-btn {
+    min-width: 60px;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--text-xs);
+  }
+}
+
+/* Touch and Interaction Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .btn:hover,
+  .nav-item:hover,
+  .kpi-card:hover,
+  .chart-card:hover,
+  .module-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Add active states for better feedback */
+  .btn:active,
+  .nav-item:active,
+  .action-btn:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  /* Increase tap targets */
+  button,
+  a,
+  .clickable {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Landscape Orientation Adjustments */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  .mobile-header {
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .dashboard-content {
+    padding: var(--space-sm);
+  }
+
+  .kpi-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .empty-state {
+    min-height: 250px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dashboard-sidebar,
+  .mobile-header,
+  .dashboard-topbar,
+  .mobile-menu-toggle,
+  .period-selector,
+  .action-buttons,
+  button {
+    display: none !important;
+  }
+
+  .dashboard-main {
+    margin: 0;
+    width: 100%;
+  }
+
+  .dashboard-content {
+    padding: 0;
+  }
+
+  .kpi-cards-grid,
+  .charts-grid {
+    break-inside: avoid;
+  }
+}

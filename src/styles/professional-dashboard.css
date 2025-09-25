@@ -1,10 +1,14 @@
 /* PROFESSIONAL DASHBOARD - Black/Gold/White Theme */
 
+/* Import professional theme */
+@import './professional-theme.css';
+@import './loading-states.css';
+
 .professional-dashboard {
   display: flex;
   min-height: 100vh;
-  background: #FAFAFA;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--gray-50);
+  font-family: var(--font-primary);
   position: relative;
 }
 
@@ -82,6 +86,7 @@
 
 .sidebar-toggle:hover {
   background: rgba(212, 175, 55, 0.1);
+  transform: scale(1.1);
 }
 
 /* Navigation */
@@ -122,8 +127,9 @@
 }
 
 .nav-item:hover {
-  background: rgba(212, 175, 55, 0.05);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.05));
   color: #FFFFFF;
+  transform: translateX(2px);
 }
 
 .nav-item.active {
@@ -131,6 +137,8 @@
   color: #FFD700;
   border-left: 3px solid #D4AF37;
   padding-left: calc(1rem - 3px);
+  font-weight: 600;
+  box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.1);
 }
 
 .nav-item.active::before {
@@ -253,9 +261,11 @@
 }
 
 .logout-button:hover {
-  background: #D4AF37;
+  background: linear-gradient(135deg, #D4AF37, #FFD700);
   color: #0A0A0A;
   border-color: #D4AF37;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
 .collapsed .user-info,
@@ -332,9 +342,11 @@
 }
 
 .topbar-button:hover {
-  background: #F0F0F0;
+  background: linear-gradient(135deg, #FAF4E4, #FFF9F5);
   border-color: #D4AF37;
   color: #D4AF37;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.15);
 }
 
 .notification-button {

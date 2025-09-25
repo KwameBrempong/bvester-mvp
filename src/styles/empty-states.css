@@ -1,0 +1,62 @@
+/* Empty States Styles */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3xl) var(--space-lg);
+  min-height: 400px;
+}
+
+.empty-state-icon {
+  width: 120px;
+  height: 120px;
+  background: var(--gold-subtle);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.empty-state-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--gold-subtle);
+  opacity: 0.5;
+  animation: pulse 2s infinite;
+}
+
+.empty-state-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  color: var(--black-primary);
+  margin: 0 0 var(--space-md) 0;
+}
+
+.empty-state-description {
+  font-size: var(--text-base);
+  color: var(--gray-600);
+  max-width: 400px;
+  margin: 0 0 var(--space-xl) 0;
+  line-height: var(--line-relaxed);
+}
+
+/* Type Variations */
+.empty-state-error .empty-state-icon {
+  background: #FFEBEE;
+}
+
+.empty-state-success .empty-state-icon {
+  background: #E8F5E9;
+}
+
+.empty-state-coming-soon .empty-state-icon {
+  background: #FFF3E0;
+}

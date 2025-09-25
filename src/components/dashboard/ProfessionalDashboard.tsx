@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Icon from '../Icons';
 import '../../styles/professional-dashboard.css';
 
 interface ProfessionalDashboardProps {
@@ -35,55 +36,55 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
   const menuItems = [
     {
       id: 'overview',
-      icon: '📊',
+      icon: 'dashboard',
       label: 'Dashboard',
       sublabel: 'Overview & Analytics'
     },
     {
       id: 'profile',
-      icon: '👤',
+      icon: 'profile',
       label: 'Business Profile',
       sublabel: 'Company Information'
     },
     {
       id: 'assessment',
-      icon: '📋',
+      icon: 'assessment',
       label: 'Assessment',
       sublabel: 'Investment Readiness'
     },
     {
       id: 'growth',
-      icon: '📈',
+      icon: 'growth',
       label: 'Growth Tools',
       sublabel: 'Accelerator Program'
     },
     {
       id: 'bootcamp',
-      icon: '🎯',
+      icon: 'bootcamp',
       label: 'Bootcamp',
       sublabel: 'Training & Resources'
     },
     {
       id: 'xray',
-      icon: '🔍',
+      icon: 'xray',
       label: 'Investment X-Ray',
       sublabel: 'Deep Analysis'
     },
     {
       id: 'transactions',
-      icon: '💰',
+      icon: 'transactions',
       label: 'Transactions',
       sublabel: 'Financial Records'
     },
     {
       id: 'billing',
-      icon: '💳',
+      icon: 'billing',
       label: 'Billing',
       sublabel: 'Subscription & Payments'
     },
     {
       id: 'settings',
-      icon: '⚙️',
+      icon: 'settings',
       label: 'Settings',
       sublabel: 'Account Preferences'
     }
@@ -134,7 +135,7 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
               onClick={() => setIsCollapsed(!isCollapsed)}
               aria-label="Toggle sidebar"
             >
-              {isCollapsed ? '→' : '←'}
+              <Icon name={isCollapsed ? 'chevron-right' : 'chevron-left'} size={16} />
             </button>
           )}
         </div>
@@ -147,7 +148,9 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
                 className={`nav-item ${activeView === item.id ? 'active' : ''}`}
                 onClick={() => handleMenuClick(item.id)}
               >
-                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-icon">
+                  <Icon name={item.icon} size={20} />
+                </span>
                 {!isCollapsed && (
                   <div className="nav-content">
                     <span className="nav-label">{item.label}</span>
@@ -167,7 +170,9 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
                 className={`nav-item ${activeView === item.id ? 'active' : ''}`}
                 onClick={() => handleMenuClick(item.id)}
               >
-                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-icon">
+                  <Icon name={item.icon} size={20} />
+                </span>
                 {!isCollapsed && (
                   <div className="nav-content">
                     <span className="nav-label">{item.label}</span>
@@ -193,7 +198,8 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
           </div>
           {!isCollapsed && (
             <button className="logout-button" onClick={signOut}>
-              <span>🚪</span> Sign Out
+              <Icon name="logout" size={18} />
+              <span>Sign Out</span>
             </button>
           )}
         </div>
@@ -213,11 +219,11 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
           </div>
           <div className="topbar-right">
             <button className="topbar-button notification-button">
-              <span>🔔</span>
+              <Icon name="notification" size={20} />
               <span className="notification-badge">3</span>
             </button>
             <button className="topbar-button">
-              <span>❓</span>
+              <Icon name="help" size={20} />
             </button>
             <div className="topbar-user">
               <span className="user-greeting">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'},</span>
