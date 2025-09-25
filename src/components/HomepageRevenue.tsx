@@ -894,56 +894,6 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               </div>
             </div>
 
-            {/* Mentor Showcase */}
-            <div className="mentor-showcase">
-              <h3>Meet Your Mentors</h3>
-              <div className="mentors__grid">
-                <div className="mentor-card">
-                  <div className="mentor__avatar">
-                    <img src="/api/placeholder/80/80" alt="Samuel Ofosu" />
-                  </div>
-                  <div className="mentor__info">
-                    <h4>Samuel Ofosu</h4>
-                    <span className="mentor__title">Former Goldman Sachs VP</span>
-                    <p>15 years investment banking experience. Helped raise over ₵2B for African startups.</p>
-                    <div className="mentor__expertise">
-                      <span>Investment Strategy</span>
-                      <span>Pitch Optimization</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mentor-card">
-                  <div className="mentor__avatar">
-                    <img src="/api/placeholder/80/80" alt="Akosua Darko" />
-                  </div>
-                  <div className="mentor__info">
-                    <h4>Akosua Darko</h4>
-                    <span className="mentor__title">Angel Investor & Former CEO</span>
-                    <p>Built and exited 2 successful startups. Now investing in African tech companies.</p>
-                    <div className="mentor__expertise">
-                      <span>Business Strategy</span>
-                      <span>Market Analysis</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mentor-card">
-                  <div className="mentor__avatar">
-                    <img src="/api/placeholder/80/80" alt="Yaw Mensah" />
-                  </div>
-                  <div className="mentor__info">
-                    <h4>Yaw Mensah</h4>
-                    <span className="mentor__title">VC Partner at Savannah Fund</span>
-                    <p>10+ years in venture capital. Led investments in 50+ African startups.</p>
-                    <div className="mentor__expertise">
-                      <span>Due Diligence</span>
-                      <span>Investor Relations</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* Next Cohort Info */}
             <div className="cohort-info">
