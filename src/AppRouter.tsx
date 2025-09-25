@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+import { getCurrentUser } from 'aws-amplify/auth';
 import '@aws-amplify/ui-react/styles.css';
 import './styles/auth-theme.css';
 import App from './App';
@@ -12,6 +13,28 @@ Amplify.configure(outputs);
 
 const AppRouter: React.FC = () => {
   const [showSignIn, setShowSignIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if user is already authenticated on mount
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          setIsAuthenticated(true);
+          setShowSignIn(true); // Show the Authenticator component which will handle the authenticated state
+        }
+      } catch (error) {
+        // User is not authenticated
+        setIsAuthenticated(false);
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
 
   const handleGetStarted = () => {
     setShowSignIn(true);
@@ -19,9 +42,38 @@ const AppRouter: React.FC = () => {
 
   const handleBackToHome = () => {
     setShowSignIn(false);
+    setIsAuthenticated(false);
   };
 
-  if (showSignIn) {
+  // Show loading state while checking authentication
+  if (checkingAuth) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: '#f5f5f5'
+      }}>
+        <div style={{
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #D4AF37',
+            borderRadius: '50%',
+            margin: '0 auto 1rem',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <p style={{ color: '#666' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (showSignIn || isAuthenticated) {
     return (
       <Authenticator
         formFields={{
