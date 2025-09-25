@@ -738,26 +738,26 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
             <div style={{ padding: 'var(--space-lg)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-lg)', marginBottom: 'var(--space-xl)' }}>
                 <div className="kpi-card">
-                  <h6>Total Income</h6>
+                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Total Income</h6>
                   <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--success-600)' }}>
                     {formatCurrency(analytics.totalIncome)}
                   </div>
                 </div>
                 <div className="kpi-card">
-                  <h6>Total Expenses</h6>
+                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Total Expenses</h6>
                   <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--error-600)' }}>
                     {formatCurrency(analytics.totalExpenses)}
                   </div>
                 </div>
                 <div className="kpi-card">
-                  <h6>Net Income</h6>
+                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Net Income</h6>
                   <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: analytics.netIncome >= 0 ? 'var(--success-600)' : 'var(--error-600)' }}>
                     {formatCurrency(analytics.netIncome)}
                   </div>
                 </div>
                 <div className="kpi-card">
-                  <h6>Transactions</h6>
-                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)' }}>
+                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Transactions</h6>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--black-primary)' }}>
                     {analytics.transactionCount}
                   </div>
                 </div>
@@ -765,10 +765,10 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
 
               {/* Category Breakdown */}
               <div style={{ marginBottom: 'var(--space-xl)' }}>
-                <h5 style={{ marginBottom: 'var(--space-md)' }}>Top Categories</h5>
+                <h5 style={{ marginBottom: 'var(--space-md)', color: 'var(--black-primary)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)' }}>Top Categories</h5>
                 {analytics.categoryBreakdown.slice(0, 5).map((cat) => (
                   <div key={cat.category} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
-                    <span style={{ textTransform: 'capitalize' }}>{cat.category}</span>
+                    <span style={{ textTransform: 'capitalize', color: 'var(--gray-800)', fontWeight: 'var(--font-medium)' }}>{cat.category}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                       <div style={{
                         width: '100px',
@@ -783,7 +783,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
                           backgroundColor: 'var(--gold-primary)'
                         }} />
                       </div>
-                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
+                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--black-primary)' }}>
                         {formatCurrency(cat.amount)}
                       </span>
                     </div>

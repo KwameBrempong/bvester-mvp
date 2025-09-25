@@ -56,7 +56,19 @@ export const ProfileView: React.FC = () => {
             <p className="profile-description">
               Add your business description here to help investors understand your value proposition and market opportunity.
             </p>
-            <button className="btn btn-primary">
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                // Open profile editing modal or navigate to profile page
+                const confirmed = confirm('This will open the profile editor. Would you like to continue?');
+                if (confirmed) {
+                  // For now, show a placeholder message
+                  alert('Profile editing functionality will be implemented soon. You can update your business information, description, and other details here.');
+                  // TODO: Implement actual profile editing logic
+                  // This could open a modal, navigate to a separate page, or enable inline editing
+                }
+              }}
+            >
               <Icon name="edit" size={16} />
               Edit Profile
             </button>

@@ -308,19 +308,71 @@ const DashboardKPIs: React.FC = () => {
       <div className="quick-actions">
         <h4 className="section-title">Quick Actions</h4>
         <div className="action-buttons">
-          <button className="action-btn">
+          <button
+            className="action-btn"
+            onClick={() => {
+              // Open Transaction Hub/Recorder
+              const event = new CustomEvent('openTransactionHub');
+              window.dispatchEvent(event);
+            }}
+          >
             <Icon name="add" size={20} />
             <span>Add Transaction</span>
           </button>
-          <button className="action-btn">
+          <button
+            className="action-btn"
+            onClick={() => {
+              // Open file upload dialog
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+              input.onchange = (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                  alert(`Document "${file.name}" selected. Upload functionality will be implemented soon.`);
+                }
+              };
+              input.click();
+            }}
+          >
             <Icon name="upload" size={20} />
             <span>Upload Document</span>
           </button>
-          <button className="action-btn">
+          <button
+            className="action-btn"
+            onClick={() => {
+              // Scroll to analytics section or show detailed analytics
+              const analyticsSection = document.querySelector('.charts-grid');
+              if (analyticsSection) {
+                analyticsSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
             <Icon name="analytics" size={20} />
             <span>View Analytics</span>
           </button>
-          <button className="action-btn">
+          <button
+            className="action-btn"
+            onClick={() => {
+              // Generate and download sample report
+              const data = {
+                period: selectedPeriod,
+                revenue: kpiData?.revenue || 0,
+                customers: kpiData?.customers || 0,
+                readinessScore: kpiData?.readinessScore || 0,
+                exportedAt: new Date().toISOString()
+              };
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `business-report-${selectedPeriod}-${new Date().toISOString().split('T')[0]}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+          >
             <Icon name="download" size={20} />
             <span>Export Report</span>
           </button>
