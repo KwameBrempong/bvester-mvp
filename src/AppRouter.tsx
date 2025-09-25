@@ -92,7 +92,7 @@ const AppRouter: React.FC = () => {
         {({ signOut, user }) => (
           <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
             {/* Loading state while user profile is being set up */}
-            {user && !user.attributes?.email_verified && (
+            {user && !(user as any).attributes?.email_verified && (
               <div style={{
                 position: 'fixed',
                 top: 0,

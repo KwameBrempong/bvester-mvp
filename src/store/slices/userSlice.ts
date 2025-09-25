@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { userProfileService, UserProfile, profileUtils } from '../../services/dataService';
+import { UserProfile, profileUtils } from '../../services/dataService';
+import { UserService } from '../../services/userService';
 import { rbacService, Permission } from '../../services/rbacService';
 import { logger } from '../../config/environment';
 
@@ -37,7 +38,7 @@ export const fetchUserProfile = createAsyncThunk(
   async (userId: string, { rejectWithValue }) => {
     try {
       logger.info('Fetching user profile', { userId });
-      const profile = await userProfileService.get(userId);
+      const profile = await UserService.getUserProfile(userId);
       return profile;
     } catch (error) {
       logger.error('Failed to fetch user profile', error);
@@ -48,10 +49,16 @@ export const fetchUserProfile = createAsyncThunk(
 
 export const createUserProfile = createAsyncThunk(
   'user/createProfile',
-  async (profileData: Omit<UserProfile, 'id'>, { rejectWithValue }) => {
+  async (profileData: UserProfile, { rejectWithValue }) => {
     try {
       logger.info('Creating user profile', { userId: profileData.userId });
-      const profile = await userProfileService.create(profileData);
+      const profile = await UserService.createUserProfile(profileData);
+      // Initialize user subscription as well
+      try {
+        await UserService.initializeUserSubscription(profileData.userId);
+      } catch (subscriptionError) {
+        logger.warn('Failed to initialize user subscription', subscriptionError);
+      }
       return profile;
     } catch (error) {
       logger.error('Failed to create user profile', error);
@@ -65,7 +72,7 @@ export const updateUserProfile = createAsyncThunk(
   async ({ userId, updates }: { userId: string; updates: Partial<UserProfile> }, { rejectWithValue }) => {
     try {
       logger.info('Updating user profile', { userId });
-      const profile = await userProfileService.update(userId, updates);
+      const profile = await UserService.updateUserProfile(userId, updates);
       return profile;
     } catch (error) {
       logger.error('Failed to update user profile', error);

@@ -1,5 +1,5 @@
 import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../amplify/data/resource';
+import type { Schema } from '../../amplify/data/resource';
 import { UserProfile } from './dataService';
 
 const client = generateClient<Schema>();
