@@ -62,13 +62,8 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Assessment state
-  const [showAssessment, setShowAssessment] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [assessmentScore, setAssessmentScore] = useState<number | null>(null);
+  // User email for notifications
   const [userEmail, setUserEmail] = useState('');
-  const [showResults, setShowResults] = useState(false);
 
   // Pricing state
   const [isAnnualPricing, setIsAnnualPricing] = useState(false);
@@ -112,13 +107,13 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     };
   }, []);
 
-  // Assessment functions
+  // Assessment functions - Redirect to enhanced Business Assessment
   const startAssessment = () => {
-    setShowAssessment(true);
-    setCurrentQuestion(0);
-    setAnswers([]);
-    setAssessmentScore(null);
-    setShowResults(false);
+    // Set flag to indicate user wants to take the assessment after signup/login
+    localStorage.setItem('assessment_intent', 'true');
+    console.log('🎯 Assessment intent set - user will see Business Assessment after profile completion');
+    // Redirect to sign up/login so user can access the enhanced Business Assessment
+    onGetStarted();
   };
 
   const handleAnswer = (score: number) => {
@@ -930,7 +925,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           </div>
         </section>
 
-        {/* Assessment Modal */}
+        {/* OLD Assessment Modal - Now redirects to enhanced Business Assessment
         {showAssessment && (
           <div className="assessment-modal">
             <div className="modal__backdrop" onClick={() => setShowAssessment(false)} />
@@ -1044,7 +1039,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               )}
             </div>
           </div>
-        )}
+        )} */}
       </main>
     </div>
   );

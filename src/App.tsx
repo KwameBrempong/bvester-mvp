@@ -168,7 +168,17 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState('overview');
+  const [shouldShowAssessmentAfterProfile, setShouldShowAssessmentAfterProfile] = useState(false);
   const subscriptionStatus = useSubscription(user?.username);
+
+  // Check if user came from assessment CTA
+  useEffect(() => {
+    // Check localStorage for assessment intent
+    const assessmentIntent = localStorage.getItem('assessment_intent');
+    if (assessmentIntent === 'true') {
+      setShouldShowAssessmentAfterProfile(true);
+    }
+  }, []);
 
   // Authentication state management
   useEffect(() => {
@@ -290,6 +300,15 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       }
     } catch (error) {
       console.warn('Failed to persist profile details to backend', error);
+    }
+
+    // Check if user came from assessment CTA and automatically show assessment
+    if (shouldShowAssessmentAfterProfile) {
+      console.log('🎯 Auto-triggering Business Assessment after profile completion');
+      localStorage.removeItem('assessment_intent'); // Clear the intent flag
+      setShouldShowAssessmentAfterProfile(false);
+      setActiveView('assessment');
+      setShowBusinessAssessment(true);
     }
   };
 
