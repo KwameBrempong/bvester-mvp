@@ -198,10 +198,10 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
         '✗ Priority support'
       ]
     },
-    pro: {
-      name: 'Pro',
-      monthly: 50,
-      annual: 420,
+    growth: {
+      name: 'Growth',
+      monthly: 87,
+      annual: 730,
       description: 'For growing businesses',
       popular: true,
       features: [
@@ -214,13 +214,13 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
         '✗ Investor network access'
       ]
     },
-    business: {
-      name: 'Business',
+    scale: {
+      name: 'Scale',
       monthly: 497,
       annual: 4174,
       description: 'For investment-ready SMEs',
       features: [
-        '✓ Everything in Pro',
+        '✓ Everything in Growth',
         '✓ Investor network access',
         '✓ Dedicated account manager',
         '✓ Custom integrations',
@@ -539,58 +539,58 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                 </button>
               </div>
 
-              {/* Pro Tier */}
+              {/* Growth Tier */}
               <div className="pricing-card pricing-card--popular">
                 <div className="pricing__badge">Most Popular</div>
                 <div className="pricing__header">
-                  <h3>{pricingPlans.pro.name}</h3>
+                  <h3>{pricingPlans.growth.name}</h3>
                   <div className="pricing__price">
-                    <span className="price__amount">₵{getPrice('pro')}</span>
+                    <span className="price__amount">₵{getPrice('growth')}</span>
                     <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
                     {isAnnualPricing && (
                       <div className="price__savings">
-                        Save ₵{getAnnualSavings('pro')} ({getDiscountPercentage('pro')}% off)
+                        Save ₵{getAnnualSavings('growth')} ({getDiscountPercentage('growth')}% off)
                       </div>
                     )}
                   </div>
-                  <p>{pricingPlans.pro.description}</p>
+                  <p>{pricingPlans.growth.description}</p>
                 </div>
 
                 <ul className="pricing__features">
-                  {pricingPlans.pro.features.map((feature, index) => (
+                  {pricingPlans.growth.features.map((feature, index) => (
                     <li key={index}>{feature}</li>
                   ))}
                 </ul>
 
                 <button className="btn btn--primary" onClick={onGetStarted}>
-                  Start Pro Trial
+                  Start Growth Trial
                 </button>
               </div>
 
-              {/* Business Tier */}
+              {/* Scale Tier */}
               <div className="pricing-card">
                 <div className="pricing__header">
-                  <h3>{pricingPlans.business.name}</h3>
+                  <h3>{pricingPlans.scale.name}</h3>
                   <div className="pricing__price">
-                    <span className="price__amount">₵{getPrice('business')}</span>
+                    <span className="price__amount">₵{getPrice('scale')}</span>
                     <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
                     {isAnnualPricing && (
                       <div className="price__savings">
-                        Save ₵{getAnnualSavings('business')} ({getDiscountPercentage('business')}% off)
+                        Save ₵{getAnnualSavings('scale')} ({getDiscountPercentage('scale')}% off)
                       </div>
                     )}
                   </div>
-                  <p>{pricingPlans.business.description}</p>
+                  <p>{pricingPlans.scale.description}</p>
                 </div>
 
                 <ul className="pricing__features">
-                  {pricingPlans.business.features.map((feature, index) => (
+                  {pricingPlans.scale.features.map((feature, index) => (
                     <li key={index}>{feature}</li>
                   ))}
                 </ul>
 
                 <button className="btn btn--gold" onClick={onGetStarted}>
-                  Go Business
+                  Go Scale
                 </button>
               </div>
             </div>
