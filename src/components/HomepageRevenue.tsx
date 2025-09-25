@@ -70,6 +70,9 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const [userEmail, setUserEmail] = useState('');
   const [showResults, setShowResults] = useState(false);
 
+  // Pricing state
+  const [isAnnualPricing, setIsAnnualPricing] = useState(false);
+
   // Animation states
   const [countingScore, setCountingScore] = useState(0);
   const [liveStats, setLiveStats] = useState({
@@ -176,6 +179,74 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  // Pricing data structure
+  const pricingPlans = {
+    free: {
+      name: 'Free',
+      monthly: 0,
+      annual: 0,
+      description: 'Perfect for getting started',
+      features: [
+        '✓ Investment readiness assessment',
+        '✓ Basic dashboard',
+        '✓ 50 transaction records',
+        '✓ Email support',
+        '✗ Advanced analytics',
+        '✗ Investor connections',
+        '✗ Priority support'
+      ]
+    },
+    pro: {
+      name: 'Pro',
+      monthly: 50,
+      annual: 420,
+      description: 'For growing businesses',
+      popular: true,
+      features: [
+        '✓ Everything in Free',
+        '✓ Unlimited transactions',
+        '✓ Advanced analytics',
+        '✓ Custom reports',
+        '✓ Chat-based record keeping',
+        '✓ Priority email support',
+        '✗ Investor network access'
+      ]
+    },
+    business: {
+      name: 'Business',
+      monthly: 497,
+      annual: 4174,
+      description: 'For investment-ready SMEs',
+      features: [
+        '✓ Everything in Pro',
+        '✓ Investor network access',
+        '✓ Dedicated account manager',
+        '✓ Custom integrations',
+        '✓ White-label reports',
+        '✓ Phone & chat support',
+        '✓ API access'
+      ]
+    }
+  };
+
+  const getPrice = (plan: keyof typeof pricingPlans) => {
+    return isAnnualPricing ? pricingPlans[plan].annual : pricingPlans[plan].monthly;
+  };
+
+  const getAnnualSavings = (plan: keyof typeof pricingPlans) => {
+    const monthlyTotal = pricingPlans[plan].monthly * 12;
+    const annualPrice = pricingPlans[plan].annual;
+    return monthlyTotal - annualPrice;
+  };
+
+  const getDiscountPercentage = (plan: keyof typeof pricingPlans) => {
+    if (plan === 'free') return 0;
+    const monthlyTotal = pricingPlans[plan].monthly * 12;
+    const annualPrice = pricingPlans[plan].annual;
+    const savings = monthlyTotal - annualPrice;
+    return Math.round((savings / monthlyTotal) * 100);
   };
 
   return (
@@ -427,26 +498,40 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               <p>Start free, upgrade when you're ready to scale</p>
             </div>
 
+            {/* Pricing Toggle */}
+            <div className="pricing-toggle">
+              <div className="toggle-container">
+                <span className={`toggle-label ${!isAnnualPricing ? 'active' : ''}`}>Monthly</span>
+                <button
+                  className={`pricing-toggle-btn ${isAnnualPricing ? 'annual' : 'monthly'}`}
+                  onClick={() => setIsAnnualPricing(!isAnnualPricing)}
+                  aria-label="Toggle between monthly and annual pricing"
+                >
+                  <div className="toggle-slider" />
+                </button>
+                <span className={`toggle-label ${isAnnualPricing ? 'active' : ''}`}>
+                  Annual
+                  <span className="discount-badge">Save 30%</span>
+                </span>
+              </div>
+            </div>
+
             <div className="pricing__grid">
               {/* Free Tier */}
               <div className="pricing-card">
                 <div className="pricing__header">
-                  <h3>Free</h3>
+                  <h3>{pricingPlans.free.name}</h3>
                   <div className="pricing__price">
-                    <span className="price__amount">₵0</span>
-                    <span className="price__period">/month</span>
+                    <span className="price__amount">₵{getPrice('free')}</span>
+                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
                   </div>
-                  <p>Perfect for getting started</p>
+                  <p>{pricingPlans.free.description}</p>
                 </div>
 
                 <ul className="pricing__features">
-                  <li>✓ Investment readiness assessment</li>
-                  <li>✓ Basic dashboard</li>
-                  <li>✓ 50 transaction records</li>
-                  <li>✓ Email support</li>
-                  <li>✗ Advanced analytics</li>
-                  <li>✗ Investor connections</li>
-                  <li>✗ Priority support</li>
+                  {pricingPlans.free.features.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
                 </ul>
 
                 <button className="btn btn--outline" onClick={onGetStarted}>
@@ -458,22 +543,23 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               <div className="pricing-card pricing-card--popular">
                 <div className="pricing__badge">Most Popular</div>
                 <div className="pricing__header">
-                  <h3>Pro</h3>
+                  <h3>{pricingPlans.pro.name}</h3>
                   <div className="pricing__price">
-                    <span className="price__amount">₵200</span>
-                    <span className="price__period">/month</span>
+                    <span className="price__amount">₵{getPrice('pro')}</span>
+                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
+                    {isAnnualPricing && (
+                      <div className="price__savings">
+                        Save ₵{getAnnualSavings('pro')} ({getDiscountPercentage('pro')}% off)
+                      </div>
+                    )}
                   </div>
-                  <p>For growing businesses</p>
+                  <p>{pricingPlans.pro.description}</p>
                 </div>
 
                 <ul className="pricing__features">
-                  <li>✓ Everything in Free</li>
-                  <li>✓ Unlimited transactions</li>
-                  <li>✓ Advanced analytics</li>
-                  <li>✓ Custom reports</li>
-                  <li>✓ Chat-based record keeping</li>
-                  <li>✓ Priority email support</li>
-                  <li>✗ Investor network access</li>
+                  {pricingPlans.pro.features.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
                 </ul>
 
                 <button className="btn btn--primary" onClick={onGetStarted}>
@@ -484,22 +570,23 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               {/* Business Tier */}
               <div className="pricing-card">
                 <div className="pricing__header">
-                  <h3>Business</h3>
+                  <h3>{pricingPlans.business.name}</h3>
                   <div className="pricing__price">
-                    <span className="price__amount">₵500</span>
-                    <span className="price__period">/month</span>
+                    <span className="price__amount">₵{getPrice('business')}</span>
+                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
+                    {isAnnualPricing && (
+                      <div className="price__savings">
+                        Save ₵{getAnnualSavings('business')} ({getDiscountPercentage('business')}% off)
+                      </div>
+                    )}
                   </div>
-                  <p>For investment-ready SMEs</p>
+                  <p>{pricingPlans.business.description}</p>
                 </div>
 
                 <ul className="pricing__features">
-                  <li>✓ Everything in Pro</li>
-                  <li>✓ Investor network access</li>
-                  <li>✓ Dedicated account manager</li>
-                  <li>✓ Custom integrations</li>
-                  <li>✓ White-label reports</li>
-                  <li>✓ Phone & chat support</li>
-                  <li>✓ API access</li>
+                  {pricingPlans.business.features.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
                 </ul>
 
                 <button className="btn btn--gold" onClick={onGetStarted}>
