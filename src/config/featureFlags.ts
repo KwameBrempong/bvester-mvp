@@ -10,6 +10,7 @@ interface FeatureFlags {
   // Assessment improvements
   useInvestmentXRay: boolean;
   showBlindSpotAnalysis: boolean;
+  useAssessmentV2: boolean;
 
   // Accelerator enhancements
   use30DayBootcamp: boolean;
@@ -36,6 +37,7 @@ const defaultFlags: FeatureFlags = {
   // Assessment features (medium risk - test thoroughly)
   useInvestmentXRay: false,
   showBlindSpotAnalysis: false,
+  useAssessmentV2: true,
 
   // Accelerator features (medium risk)
   use30DayBootcamp: false,

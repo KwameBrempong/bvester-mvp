@@ -31,6 +31,8 @@ const GrowthAccelerator = lazy(() => import('./GrowthAccelerator'));
 const InvestmentBootcamp = lazy(() => import('./components/InvestmentBootcamp'));
 const TransactionHub = lazy(() => import('./components/TransactionHub'));
 const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
+const EnhancedBusinessAssessment = lazy(() => import('./EnhancedBusinessAssessment'));
+const BusinessAssessmentV2 = lazy(() => import('./assessment'));
 const InvestmentXRay = lazy(() => import('./components/InvestmentXRay'));
 const SubscriptionManager = lazy(() => import('./SubscriptionManager'));
 const UsageTracker = lazy(() => import('./components/UsageTracker'));
@@ -484,7 +486,13 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {showBusinessAssessment && (
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              {isFeatureEnabled('useInvestmentXRay') ? (
+              {isFeatureEnabled('useAssessmentV2') ? (
+                <BusinessAssessmentV2
+                  user={user}
+                  userProfile={userState.profile}
+                  onClose={() => setShowBusinessAssessment(false)}
+                />
+              ) : isFeatureEnabled('useInvestmentXRay') ? (
                 <InvestmentXRay
                   user={user}
                   userProfile={userState.profile}
@@ -495,7 +503,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
                   }}
                 />
               ) : (
-                <BusinessAssessment
+                <EnhancedBusinessAssessment
                   user={user}
                   userProfile={userState.profile}
                   onClose={() => setShowBusinessAssessment(false)}
