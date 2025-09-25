@@ -14,7 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import PermissionWrapper from './components/PermissionWrapper';
 import UserProfileHeader from './components/UserProfileHeader';
 import ProfileCompletionWidget from './components/ProfileCompletionWidget';
-import EmailVerificationBanner from './components/EmailVerificationBanner';
+import EmailVerificationHandler from './components/EmailVerificationHandler';
 import { isFeatureEnabled } from './config/featureFlags';
 import { profileUtils, UserProfile } from './services/dataService';
 import './App.css';
@@ -149,8 +149,6 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState('overview');
-  const [dismissedEmailBanner, setDismissedEmailBanner] = useState(false);
-  const [emailVerified, setEmailVerified] = useState(false);
   const subscriptionStatus = useSubscription(user?.username);
 
   // Authentication state management
@@ -219,14 +217,6 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     initializeProfile();
   }, [user?.username, dispatch, userState.profile]);
 
-  // Check email verification status
-  useEffect(() => {
-    if (user?.attributes) {
-      const verified = user.attributes.email_verified === 'true' ||
-                      user.attributes.email_verified === true;
-      setEmailVerified(verified);
-    }
-  }, [user?.attributes]);
 
   // Check if profile is completed based on Redux state
   useEffect(() => {
@@ -403,19 +393,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         activeView={activeView}
         onViewChange={handleViewChange}
       >
-        {/* Email Verification Banner */}
-        {user && !emailVerified && !dismissedEmailBanner && (
-          <EmailVerificationBanner
-            userEmail={user.attributes?.email || user.username}
-            onVerificationSuccess={() => {
-              setEmailVerified(true);
-              setDismissedEmailBanner(true);
-              // Refresh the page to get updated user attributes
-              setTimeout(() => window.location.reload(), 1500);
-            }}
-            onDismiss={() => setDismissedEmailBanner(true)}
-          />
-        )}
+        {/* Email Verification Handler */}
+        <EmailVerificationHandler user={user} />
 
         {/* Main Dashboard Content Based on Active View */}
         {activeView === 'overview' && (

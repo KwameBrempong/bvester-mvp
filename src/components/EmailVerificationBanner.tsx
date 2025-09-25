@@ -62,20 +62,35 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
     setMessage('');
 
     try {
-      await resendSignUpCode({ username: userEmail });
+      // Try with email first, then username
+      const identifier = userEmail.includes('@') ? userEmail : userEmail;
+      await resendSignUpCode({ username: identifier });
       setMessage('✅ Verification code sent! Check your email inbox and spam folder.');
       setShowCodeInput(true);
       setCooldownSeconds(60); // 60 second cooldown
       setAttempts(0); // Reset attempts when new code is sent
     } catch (error: any) {
       console.error('Error resending verification code:', error);
+
+      // Handle specific error cases
       if (error.name === 'LimitExceededException') {
         setError('Too many attempts. Please wait a few minutes before trying again.');
         setCooldownSeconds(180); // 3 minute cooldown for rate limit
       } else if (error.name === 'InvalidParameterException') {
         setError('Invalid email address. Please contact support.');
       } else if (error.name === 'UserNotFoundException') {
-        setError('Email not found. Please check your email or sign up again.');
+        setError('Account not found. Please check your email or contact support.');
+      } else if (error.name === 'NotAuthorizedException') {
+        // User is already confirmed
+        setMessage('✅ Your account is already verified!');
+        setError('');
+        // Check status again and then call success
+        setTimeout(() => {
+          checkVerificationStatus();
+          onVerificationSuccess?.();
+        }, 1500);
+      } else if (error.name === 'AliasExistsException') {
+        setError('This email is already verified with another account.');
       } else {
         setError(error.message || 'Failed to send verification code. Please try again.');
       }
@@ -111,8 +126,10 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
     setMessage('');
 
     try {
+      // Use the same identifier as resend (email or username)
+      const identifier = userEmail.includes('@') ? userEmail : userEmail;
       await confirmSignUp({
-        username: userEmail,
+        username: identifier,
         confirmationCode: verificationCode
       });
       setMessage('🎉 Email verified successfully! Refreshing your account...');
@@ -136,8 +153,10 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
         setError('This code has expired. Please request a new one.');
         setShowCodeInput(false);
       } else if (error.name === 'NotAuthorizedException') {
-        setError('This account has already been verified.');
-        setTimeout(() => onVerificationSuccess?.(), 2000);
+        // Account is already verified
+        setMessage('✅ Your account is already verified!');
+        setError('');
+        setTimeout(() => onVerificationSuccess?.(), 1500);
       } else if (error.name === 'LimitExceededException') {
         setError('Too many attempts. Please wait before trying again.');
         setCooldownSeconds(180);
@@ -158,16 +177,31 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
     if (!userEmail) return;
 
     setIsCheckingStatus(true);
+    setError('');
     try {
       const attributes = await fetchUserAttributes();
       const emailVerified = attributes.email_verified;
+
       // Check if email is verified (can be string 'true' or boolean true)
-      if (emailVerified && String(emailVerified) === 'true') {
+      const isVerified = String(emailVerified).toLowerCase() === 'true';
+
+      if (isVerified) {
         setMessage('✅ Your email is already verified!');
+        setError('');
         setTimeout(() => onVerificationSuccess?.(), 2000);
+      } else {
+        setMessage('');
+        setError('Email is not yet verified. Please enter the verification code sent to your email.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Could not check verification status:', error);
+      if (error.name === 'NotAuthorizedException') {
+        // This means the user is signed in, which typically means they're verified
+        setMessage('✅ Your account is already active!');
+        setTimeout(() => onVerificationSuccess?.(), 2000);
+      } else {
+        setError('Unable to check verification status. Please try again.');
+      }
     } finally {
       setIsCheckingStatus(false);
     }

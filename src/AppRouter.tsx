@@ -289,24 +289,6 @@ const AppRouter: React.FC = () => {
       >
         {({ signOut, user }) => (
           <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-            {/* Loading state while user profile is being set up */}
-            {user && !(user as any).attributes?.email_verified && (
-              <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                background: '#FFF3CD',
-                color: '#856404',
-                padding: '12px',
-                textAlign: 'center',
-                fontSize: '14px',
-                borderBottom: '1px solid #FFEAA7',
-                zIndex: 1000
-              }}>
-                📧 Please verify your email address to complete your account setup
-              </div>
-            )}
             <App user={user} signOut={signOut} />
           </div>
         )}
