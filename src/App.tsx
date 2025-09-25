@@ -217,11 +217,19 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       return;
     }
 
+    console.log('🔥 Profile completion started', { profileData, username: user.username });
+
     const username = user.username;
     const role = profileData.userType === 'investor' ? 'viewer' : 'owner';
+
+    // Get user email from Cognito
+    const userEmail = (user as any).attributes?.email || `${username}@example.com`;
+
     const normalizedProfile = buildUserProfile(username, {
       ...userState.profile,
       businessName: profileData.businessName,
+      ownerName: profileData.businessName, // Use business name as owner name for now
+      email: userEmail,
       businessType: profileData.businessType,
       location: profileData.location,
       region: profileData.region,
@@ -229,6 +237,12 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       employeeCount: profileData.numberOfEmployees,
       businessDescription: profileData.businessDescription,
       role,
+    });
+
+    console.log('🔥 Normalized profile created', {
+      normalizedProfile,
+      completionPercentage: normalizedProfile.profileCompletionPercentage,
+      isComplete: normalizedProfile.profileCompletionPercentage >= 60
     });
 
     localStorage.setItem(`profile_${username}`, JSON.stringify(normalizedProfile));

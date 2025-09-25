@@ -32,6 +32,8 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
     userType: 'sme_owner' // Default to SME owner
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const ghanaRegions = [
     'Greater Accra', 'Ashanti', 'Western', 'Central', 'Eastern',
     'Northern', 'Upper East', 'Upper West', 'Volta', 'Brong-Ahafo',
@@ -51,9 +53,17 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onProfileComplete(formData);
+    setIsSubmitting(true);
+
+    try {
+      await onProfileComplete(formData);
+    } catch (error) {
+      console.error('Profile completion failed:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -223,18 +233,20 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
 
         <button
           type="submit"
+          disabled={isSubmitting}
           style={{
-            background: '#2E8B57',
+            background: isSubmitting ? '#6B8E6B' : '#2E8B57',
             color: 'white',
             padding: '12px 30px',
             border: 'none',
             borderRadius: '5px',
             fontSize: '16px',
-            cursor: 'pointer',
-            width: '100%'
+            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            width: '100%',
+            opacity: isSubmitting ? 0.7 : 1
           }}
         >
-          Complete Profile
+          {isSubmitting ? 'Completing Profile...' : 'Complete Profile'}
         </button>
       </form>
     </div>

@@ -191,26 +191,39 @@ export type PaymentEvent = {
 // Profile completion utilities
 export const profileUtils = {
   calculateCompletionPercentage(profile: Partial<UserProfile>): number {
-    const requiredFields = [
-      'businessName', 'ownerName', 'email', 'phone', 'location',
-      'region', 'businessType', 'registrationNumber', 'tinNumber',
-      'yearEstablished', 'employeeCount', 'businessDescription'
+    // Basic profile fields (required for initial completion)
+    const basicFields = [
+      'businessName', 'email', 'location', 'region', 'businessType', 'businessDescription'
     ];
 
-    const completedFields = requiredFields.filter(field => {
+    // Additional fields for higher completion
+    const additionalFields = [
+      'ownerName', 'phone', 'registrationNumber', 'tinNumber', 'yearEstablished', 'employeeCount'
+    ];
+
+    const completedBasicFields = basicFields.filter(field => {
       const value = profile[field as keyof UserProfile];
       return value && value.toString().trim() !== '';
     });
 
-    const basePercentage = Math.round((completedFields.length / requiredFields.length) * 70);
+    const completedAdditionalFields = additionalFields.filter(field => {
+      const value = profile[field as keyof UserProfile];
+      return value && value.toString().trim() !== '';
+    });
 
-    // Add bonus points for verification
+    // Basic fields account for 70% completion
+    const basicPercentage = Math.round((completedBasicFields.length / basicFields.length) * 70);
+
+    // Additional fields account for 20% completion
+    const additionalPercentage = Math.round((completedAdditionalFields.length / additionalFields.length) * 20);
+
+    // Verification bonus points (10% total)
     let bonusPoints = 0;
-    if (profile.isEmailVerified) bonusPoints += 10;
-    if (profile.isPhoneVerified) bonusPoints += 10;
-    if (profile.isBusinessVerified) bonusPoints += 10;
+    if (profile.isEmailVerified) bonusPoints += 4;
+    if (profile.isPhoneVerified) bonusPoints += 3;
+    if (profile.isBusinessVerified) bonusPoints += 3;
 
-    return Math.min(100, basePercentage + bonusPoints);
+    return Math.min(100, basicPercentage + additionalPercentage + bonusPoints);
   },
 
   getDefaultUserProfile(userId: string, email: string): Partial<UserProfile> {
