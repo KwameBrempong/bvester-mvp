@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { resendSignUpCode, confirmSignUp } from 'aws-amplify/auth';
+import React, { useState, useEffect } from 'react';
+import { resendSignUpCode, confirmSignUp, fetchUserAttributes } from 'aws-amplify/auth';
 
 interface EmailVerificationBannerProps {
   userEmail?: string;
   onVerificationSuccess?: () => void;
+  onDismiss?: () => void;
 }
 
 const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
   userEmail,
-  onVerificationSuccess
+  onVerificationSuccess,
+  onDismiss
 }) => {
   const [isResending, setIsResending] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
@@ -16,46 +18,158 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const MAX_ATTEMPTS = 5;
+
+  // Cooldown timer effect
+  useEffect(() => {
+    if (cooldownSeconds > 0) {
+      const timer = setTimeout(() => setCooldownSeconds(cooldownSeconds - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldownSeconds]);
+
+  // Auto-clear messages
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const handleResendCode = async () => {
-    if (!userEmail) return;
+    if (!userEmail) {
+      setError('Email address is required');
+      return;
+    }
+
+    if (cooldownSeconds > 0) {
+      setError(`Please wait ${cooldownSeconds} seconds before requesting a new code`);
+      return;
+    }
 
     setIsResending(true);
     setError('');
+    setMessage('');
 
     try {
       await resendSignUpCode({ username: userEmail });
-      setMessage('✅ Verification code sent to your email!');
+      setMessage('✅ Verification code sent! Check your email inbox and spam folder.');
       setShowCodeInput(true);
-      setTimeout(() => setMessage(''), 5000);
+      setCooldownSeconds(60); // 60 second cooldown
+      setAttempts(0); // Reset attempts when new code is sent
     } catch (error: any) {
       console.error('Error resending verification code:', error);
-      setError(error.message || 'Failed to resend verification code');
+      if (error.name === 'LimitExceededException') {
+        setError('Too many attempts. Please wait a few minutes before trying again.');
+        setCooldownSeconds(180); // 3 minute cooldown for rate limit
+      } else if (error.name === 'InvalidParameterException') {
+        setError('Invalid email address. Please contact support.');
+      } else if (error.name === 'UserNotFoundException') {
+        setError('Email not found. Please check your email or sign up again.');
+      } else {
+        setError(error.message || 'Failed to send verification code. Please try again.');
+      }
     } finally {
       setIsResending(false);
     }
   };
 
   const handleVerifyCode = async () => {
-    if (!userEmail || !verificationCode) return;
+    if (!userEmail) {
+      setError('Email address is required');
+      return;
+    }
+
+    if (!verificationCode || verificationCode.length !== 6) {
+      setError('Please enter a valid 6-digit verification code');
+      return;
+    }
+
+    // Check if only digits
+    if (!/^\d{6}$/.test(verificationCode)) {
+      setError('Verification code must contain only numbers');
+      return;
+    }
+
+    if (attempts >= MAX_ATTEMPTS) {
+      setError('Too many failed attempts. Please request a new code.');
+      return;
+    }
 
     setIsVerifying(true);
     setError('');
+    setMessage('');
 
     try {
       await confirmSignUp({
         username: userEmail,
         confirmationCode: verificationCode
       });
-      setMessage('🎉 Email verified successfully!');
-      setTimeout(() => {
+      setMessage('🎉 Email verified successfully! Refreshing your account...');
+
+      // Try to fetch updated attributes before reloading
+      setTimeout(async () => {
+        try {
+          await fetchUserAttributes();
+        } catch (e) {
+          console.log('Could not refresh attributes:', e);
+        }
         onVerificationSuccess?.();
-      }, 2000);
+      }, 1500);
     } catch (error: any) {
       console.error('Error verifying email:', error);
-      setError(error.message || 'Invalid verification code');
+      setAttempts(attempts + 1);
+
+      if (error.name === 'CodeMismatchException') {
+        setError(`Incorrect code. ${MAX_ATTEMPTS - attempts - 1} attempts remaining.`);
+      } else if (error.name === 'ExpiredCodeException') {
+        setError('This code has expired. Please request a new one.');
+        setShowCodeInput(false);
+      } else if (error.name === 'NotAuthorizedException') {
+        setError('This account has already been verified.');
+        setTimeout(() => onVerificationSuccess?.(), 2000);
+      } else if (error.name === 'LimitExceededException') {
+        setError('Too many attempts. Please wait before trying again.');
+        setCooldownSeconds(180);
+      } else {
+        setError(error.message || 'Verification failed. Please try again.');
+      }
+
+      // Clear code on error
+      if (error.name === 'ExpiredCodeException' || attempts >= MAX_ATTEMPTS - 1) {
+        setVerificationCode('');
+      }
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const checkVerificationStatus = async () => {
+    if (!userEmail) return;
+
+    setIsCheckingStatus(true);
+    try {
+      const attributes = await fetchUserAttributes();
+      const emailVerified = attributes.email_verified;
+      // Check if email is verified (can be string 'true' or boolean true)
+      if (emailVerified && String(emailVerified) === 'true') {
+        setMessage('✅ Your email is already verified!');
+        setTimeout(() => onVerificationSuccess?.(), 2000);
+      }
+    } catch (error) {
+      console.log('Could not check verification status:', error);
+    } finally {
+      setIsCheckingStatus(false);
     }
   };
 
@@ -111,7 +225,17 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
                   type="text"
                   placeholder="Enter 6-digit code"
                   value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                    if (value.length <= 6) {
+                      setVerificationCode(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && verificationCode.length === 6) {
+                      handleVerifyCode();
+                    }
+                  }}
                   style={{
                     padding: '0.5rem 0.75rem',
                     border: '2px solid #D4AF37',
@@ -146,7 +270,7 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <button
               onClick={handleResendCode}
-              disabled={isResending}
+              disabled={isResending || cooldownSeconds > 0}
               style={{
                 background: 'none',
                 border: '2px solid #D4AF37',
@@ -159,7 +283,7 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
                 transition: 'all 0.3s ease'
               }}
             >
-              {isResending ? '⏳ Sending...' : showCodeInput ? 'Resend Code' : 'Send Verification Code'}
+              {isResending ? '⏳ Sending...' : cooldownSeconds > 0 ? `Resend in ${cooldownSeconds}s` : showCodeInput ? 'Resend Code' : 'Send Verification Code'}
             </button>
 
             {!showCodeInput && (
@@ -175,6 +299,39 @@ const EmailVerificationBanner: React.FC<EmailVerificationBannerProps> = ({
                 }}
               >
                 I have a code
+              </button>
+            )}
+
+            <button
+              onClick={checkVerificationStatus}
+              disabled={isCheckingStatus}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#D4AF37',
+                fontSize: '0.9rem',
+                cursor: isCheckingStatus ? 'not-allowed' : 'pointer',
+                textDecoration: 'underline',
+                opacity: isCheckingStatus ? 0.6 : 1
+              }}
+            >
+              {isCheckingStatus ? '⏳ Checking...' : 'Check Status'}
+            </button>
+
+            {onDismiss && (
+              <button
+                onClick={onDismiss}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#999',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  marginLeft: 'auto'
+                }}
+              >
+                Dismiss
               </button>
             )}
           </div>

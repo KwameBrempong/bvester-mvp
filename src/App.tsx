@@ -149,6 +149,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState('overview');
+  const [dismissedEmailBanner, setDismissedEmailBanner] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
   const subscriptionStatus = useSubscription(user?.username);
 
   // Authentication state management
@@ -216,6 +218,15 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
 
     initializeProfile();
   }, [user?.username, dispatch, userState.profile]);
+
+  // Check email verification status
+  useEffect(() => {
+    if (user?.attributes) {
+      const verified = user.attributes.email_verified === 'true' ||
+                      user.attributes.email_verified === true;
+      setEmailVerified(verified);
+    }
+  }, [user?.attributes]);
 
   // Check if profile is completed based on Redux state
   useEffect(() => {
@@ -393,13 +404,16 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         onViewChange={handleViewChange}
       >
         {/* Email Verification Banner */}
-        {user && !user.attributes?.email_verified && (
+        {user && !emailVerified && !dismissedEmailBanner && (
           <EmailVerificationBanner
-            userEmail={user.attributes?.email}
+            userEmail={user.attributes?.email || user.username}
             onVerificationSuccess={() => {
+              setEmailVerified(true);
+              setDismissedEmailBanner(true);
               // Refresh the page to get updated user attributes
-              window.location.reload();
+              setTimeout(() => window.location.reload(), 1500);
             }}
+            onDismiss={() => setDismissedEmailBanner(true)}
           />
         )}
 
