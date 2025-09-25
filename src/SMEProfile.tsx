@@ -55,12 +55,30 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Debug form validation
+    console.log('🔥 Form submission attempted', { formData });
+
+    // Check if all required fields are filled for SME owners
+    if (formData.userType === 'sme_owner') {
+      const requiredFields = ['businessName', 'businessType', 'region', 'location'];
+      const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
+
+      if (missingFields.length > 0) {
+        console.error('❌ Missing required fields:', missingFields);
+        alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
+      console.log('🚀 Calling onProfileComplete with:', formData);
       await onProfileComplete(formData);
     } catch (error) {
       console.error('Profile completion failed:', error);
+      alert('Profile completion failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -98,19 +116,29 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
                 value={formData.businessName}
                 onChange={handleInputChange}
                 required
-                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: !formData.businessName ? '2px solid #ff6b6b' : '1px solid #ccc'
+                }}
                 placeholder="Enter your business name"
               />
             </div>
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Business Type *</label>
-              <select 
-                name="businessType" 
-                value={formData.businessType} 
+              <select
+                name="businessType"
+                value={formData.businessType}
                 onChange={handleInputChange}
                 required
-                style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  border: !formData.businessType ? '2px solid #ff6b6b' : '1px solid #ccc'
+                }}
               >
                 <option value="">Select business type</option>
                 {businessTypes.map(type => (
@@ -142,7 +170,12 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
                   value={formData.location}
                   onChange={handleInputChange}
                   required
-                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    borderRadius: '4px',
+                    border: !formData.location ? '2px solid #ff6b6b' : '1px solid #ccc'
+                  }}
                   placeholder="e.g., Accra, Kumasi"
                 />
               </div>
