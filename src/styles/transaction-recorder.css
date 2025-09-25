@@ -78,6 +78,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0; /* Important for flex shrinking */
 }
 
 .transaction-tabs {
@@ -532,10 +533,42 @@
     max-width: 100%;
     height: 100vh;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .transaction-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--space-sm);
+  }
+
+  .quick-actions {
+    flex-shrink: 0;
+    margin-bottom: var(--space-sm);
   }
 
   .quick-actions-grid {
     grid-template-columns: 1fr;
+  }
+
+  .input-section {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: var(--white-primary);
+    border-top: 1px solid var(--gray-200);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 5;
   }
 
   .suggestion-modal {

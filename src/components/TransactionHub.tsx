@@ -505,74 +505,76 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
           {/* Add Transaction Tab */}
           {activeTab === 'add' && (
             <>
-              <div className="transaction-list" style={{ maxHeight: '300px' }}>
-                {transactions.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-state-icon">
-                      <Icon name="transactions" size={24} color="var(--gold-primary)" />
+              <div className="tab-content">
+                <div className="transaction-list" style={{ padding: 'var(--space-lg)' }}>
+                  {transactions.length === 0 ? (
+                    <div className="empty-state">
+                      <div className="empty-state-icon">
+                        <Icon name="transactions" size={24} color="var(--gold-primary)" />
+                      </div>
+                      <h4>Start Recording Transactions</h4>
+                      <p>Add your first business transaction using the input below or voice recording.</p>
                     </div>
-                    <h4>Start Recording Transactions</h4>
-                    <p>Add your first business transaction using the input below or voice recording.</p>
-                  </div>
-                ) : (
-                  <div>
-                    <h5 style={{ margin: '0 0 var(--space-md) 0', color: 'var(--gray-600)', fontSize: 'var(--text-sm)' }}>
-                      Recent Transactions
-                    </h5>
-                    {transactions.slice(0, 5).map((transaction) => (
-                      <div key={transaction.id} className="transaction-item">
-                        <div className="transaction-item-header">
-                          <div className="transaction-amount">
-                            <div className="transaction-icon">
-                              <Icon name={getCategoryIcon(transaction.category)} size={16} />
+                  ) : (
+                    <div>
+                      <h5 style={{ margin: '0 0 var(--space-md) 0', color: 'var(--gray-600)', fontSize: 'var(--text-sm)' }}>
+                        Recent Transactions
+                      </h5>
+                      {transactions.slice(0, 5).map((transaction) => (
+                        <div key={transaction.id} className="transaction-item">
+                          <div className="transaction-item-header">
+                            <div className="transaction-amount">
+                              <div className="transaction-icon">
+                                <Icon name={getCategoryIcon(transaction.category)} size={16} />
+                              </div>
+                              <span className={`transaction-amount-text ${transaction.type}`}>
+                                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                              </span>
                             </div>
-                            <span className={`transaction-amount-text ${transaction.type}`}>
-                              {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                            <span className="transaction-time">
+                              {new Date(transaction.timestamp).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
                             </span>
                           </div>
-                          <span className="transaction-time">
-                            {new Date(transaction.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
+                          <div className="transaction-description">"{transaction.description}"</div>
+                          <div className="transaction-meta">
+                            <span className="transaction-category">#{transaction.category}</span>
+                            {transaction.source === 'voice' && (
+                              <span className="ai-assisted">
+                                <Icon name="microphone" size={12} />
+                                Voice
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="transaction-description">"{transaction.description}"</div>
-                        <div className="transaction-meta">
-                          <span className="transaction-category">#{transaction.category}</span>
-                          {transaction.source === 'voice' && (
-                            <span className="ai-assisted">
-                              <Icon name="microphone" size={12} />
-                              Voice
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Actions */}
+                {transactions.length < 3 && (
+                  <div className="quick-actions">
+                    <h5>Quick Actions:</h5>
+                    <div className="quick-actions-grid">
+                      {quickActions.map((action, index) => (
+                        <button
+                          key={index}
+                          className="quick-action-btn"
+                          onClick={() => setInputText(action.text)}
+                        >
+                          <Icon name={action.icon} size={16} />
+                          <span>{action.text}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Quick Actions */}
-              {transactions.length < 3 && (
-                <div className="quick-actions">
-                  <h5>Quick Actions:</h5>
-                  <div className="quick-actions-grid">
-                    {quickActions.map((action, index) => (
-                      <button
-                        key={index}
-                        className="quick-action-btn"
-                        onClick={() => setInputText(action.text)}
-                      >
-                        <Icon name={action.icon} size={16} />
-                        <span>{action.text}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Text Input */}
+              {/* Text Input - Always visible at bottom */}
               <div className="input-section">
                 <div className="input-group">
                   <div className="input-field">
