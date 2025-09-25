@@ -217,12 +217,22 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: usePremiumTheme ? 'rgba(10, 10, 10, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+          background: usePremiumTheme
+            ? 'linear-gradient(180deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.98) 100%)'
+            : 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 255, 0.98) 100%)',
+          backdropFilter: 'blur(20px) saturate(1.5)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.5)', // Safari support
           zIndex: 999,
           padding: '32px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '24px'
+          gap: '20px',
+          borderTop: usePremiumTheme
+            ? '1px solid rgba(212, 175, 55, 0.2)'
+            : '1px solid rgba(102, 126, 234, 0.2)',
+          boxShadow: usePremiumTheme
+            ? '0 -4px 20px rgba(0, 0, 0, 0.3)'
+            : '0 -4px 20px rgba(0, 0, 0, 0.1)'
         }}>
           {['Features', 'How It Works', 'Pricing', 'Testimonials'].map((item) => (
             <button
@@ -242,6 +252,7 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               {item}
             </button>
           ))}
+          {/* Primary Action - Login/Start Trial */}
           <button
             onClick={onGetStarted}
             style={{
@@ -249,15 +260,79 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
                 ? 'linear-gradient(135deg, var(--gold-primary), var(--gold-accent))'
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: usePremiumTheme ? 'var(--black-primary)' : '#ffffff',
-              border: 'none',
-              padding: '16px',
+              border: usePremiumTheme ? '2px solid var(--white-primary)' : '2px solid rgba(255,255,255,0.3)',
+              padding: '18px 24px',
+              borderRadius: '12px',
+              fontSize: '17px',
+              fontWeight: '700',
+              marginTop: '24px',
+              width: '100%',
+              textAlign: 'center',
+              cursor: 'pointer',
+              boxShadow: usePremiumTheme
+                ? '0 8px 25px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+                : '0 8px 25px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+              transition: 'all 0.3s ease',
+              transform: 'translateZ(0)' // Hardware acceleration
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+              e.currentTarget.style.boxShadow = usePremiumTheme
+                ? '0 12px 35px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)'
+                : '0 12px 35px rgba(102, 126, 234, 0.5), inset 0 1px 0 rgba(255,255,255,0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = usePremiumTheme
+                ? '0 8px 25px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+                : '0 8px 25px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)';
+            }}
+          >
+            🚀 Start Free Trial
+          </button>
+
+          {/* Secondary Action - Free Assessment */}
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              scrollToSection('how-it-works');
+            }}
+            style={{
+              background: 'transparent',
+              color: usePremiumTheme ? 'var(--gold-primary)' : '#667eea',
+              border: usePremiumTheme
+                ? '2px solid var(--gold-primary)'
+                : '2px solid #667eea',
+              padding: '16px 24px',
               borderRadius: '12px',
               fontSize: '16px',
               fontWeight: '600',
-              marginTop: '16px'
+              marginTop: '12px',
+              width: '100%',
+              textAlign: 'center',
+              cursor: 'pointer',
+              backdropFilter: 'blur(10px)',
+              background: usePremiumTheme
+                ? 'rgba(212, 175, 55, 0.08)'
+                : 'rgba(102, 126, 234, 0.08)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = usePremiumTheme
+                ? 'var(--gold-primary)'
+                : '#667eea';
+              e.currentTarget.style.color = usePremiumTheme ? 'var(--black-primary)' : '#ffffff';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = usePremiumTheme
+                ? 'rgba(212, 175, 55, 0.08)'
+                : 'rgba(102, 126, 234, 0.08)';
+              e.currentTarget.style.color = usePremiumTheme ? 'var(--gold-primary)' : '#667eea';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            Start Free Trial
+            📊 Free Assessment
           </button>
         </div>
       )}
