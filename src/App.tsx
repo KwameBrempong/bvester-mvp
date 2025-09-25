@@ -42,7 +42,8 @@ import {
   DashboardHeader,
   BusinessOverview,
   GrowthToolsWidget,
-  InvestmentReadinessTracker
+  InvestmentReadinessTracker,
+  ProfessionalDashboard
 } from './components/dashboard';
 
 // Loading component
@@ -147,6 +148,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [showBusinessAnalysis, setShowBusinessAnalysis] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState('overview');
   const subscriptionStatus = useSubscription(user?.username);
 
   // Authentication state management
@@ -341,75 +343,133 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     );
   }
 
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    // Handle view-specific actions
+    switch(view) {
+      case 'assessment':
+        setShowBusinessAssessment(true);
+        break;
+      case 'growth':
+        setShowGrowthAccelerator(true);
+        break;
+      case 'transactions':
+        setShowTransactionRecorder(true);
+        break;
+      case 'billing':
+        setShowBillingManager(true);
+        break;
+      case 'xray':
+        // Handle Investment X-Ray view
+        break;
+      case 'bootcamp':
+        // Handle Bootcamp view
+        break;
+      default:
+        // Close all modals for overview, profile, settings
+        setShowBusinessAssessment(false);
+        setShowGrowthAccelerator(false);
+        setShowTransactionRecorder(false);
+        setShowBillingManager(false);
+        break;
+    }
+  };
+
   return (
     <>
-      <DashboardLayout
-      header={
-        <>
-          {/* Email Verification Banner */}
-          {user && !user.attributes?.email_verified && (
-            <EmailVerificationBanner
-              userEmail={user.attributes?.email}
-              onVerificationSuccess={() => {
-                // Refresh the page to get updated user attributes
-                window.location.reload();
-              }}
-            />
-          )}
-
-          {/* Professional Dashboard Header */}
-          <DashboardHeader
-            user={user}
-            signOut={signOut}
-            onEditProfile={() => setProfileCompleted(false)}
+      <ProfessionalDashboard
+        user={user}
+        signOut={signOut}
+        activeView={activeView}
+        onViewChange={handleViewChange}
+      >
+        {/* Email Verification Banner */}
+        {user && !user.attributes?.email_verified && (
+          <EmailVerificationBanner
+            userEmail={user.attributes?.email}
+            onVerificationSuccess={() => {
+              // Refresh the page to get updated user attributes
+              window.location.reload();
+            }}
           />
-        </>
-      }
-      sidebar={
-        <>
-          {/* Investment Readiness Tracker */}
-          <InvestmentReadinessTracker />
+        )}
 
-          {/* Usage Tracker */}
-          {user?.username && (
+        {/* Main Dashboard Content Based on Active View */}
+        {activeView === 'overview' && (
+          <>
+            <div className="dashboard-grid-full">
+              <BusinessOverview />
+            </div>
+
+            <div className="dashboard-grid-full">
+              <GrowthToolsWidget
+                onOpenGrowthAccelerator={() => setShowGrowthAccelerator(true)}
+                onOpenTransactionRecorder={() => setShowTransactionRecorder(true)}
+                onOpenBusinessAnalysis={() => setShowBusinessAnalysis(true)}
+                onOpenBusinessAssessment={() => setShowBusinessAssessment(true)}
+                onOpenSubscriptionManager={() => setShowSubscriptionTierManager(true)}
+              />
+            </div>
+
+            <div className="dashboard-grid-full" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              {/* Investment Readiness Tracker */}
+              <InvestmentReadinessTracker />
+
+              {/* Usage Tracker */}
+              {user?.username && (
+                <ErrorBoundary>
+                  <Suspense fallback={<div className="skeleton skeleton-text"></div>}>
+                    <UsageTracker userId={user.username} compact={true} />
+                  </Suspense>
+                </ErrorBoundary>
+              )}
+            </div>
+
+            {/* Professional Footer */}
+            <div className="dashboard-grid-full">
+              <div className="card" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
+                <div className="card-body text-center" style={{ padding: 'var(--space-xl)' }}>
+                  <h4 className="text-lg font-semibold mb-md text-black">
+                    🇬🇭 Bvester - Ghana's Investment Readiness Platform
+                  </h4>
+                  <p className="text-sm text-gray mb-0">
+                    Connecting SMEs with global investment opportunities through professional business development
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeView === 'profile' && (
+          <div className="dashboard-grid-full">
             <ErrorBoundary>
-              <Suspense fallback={<div className="skeleton skeleton-text"></div>}>
-                <UsageTracker userId={user.username} compact={true} />
+              <Suspense fallback={<LoadingSpinner />}>
+                <SMEProfile
+                  user={user}
+                  profile={userState.profile}
+                  onSave={handleProfileSave}
+                  onComplete={() => {
+                    setProfileCompleted(true);
+                    window.scrollTo(0, 0);
+                  }}
+                />
               </Suspense>
             </ErrorBoundary>
-          )}
-        </>
-      }
-    >
-      {/* Main Dashboard Content */}
-      <div className="dashboard-grid-full">
-        <BusinessOverview />
-      </div>
-
-      <div className="dashboard-grid-full">
-        <GrowthToolsWidget
-          onOpenGrowthAccelerator={() => setShowGrowthAccelerator(true)}
-          onOpenTransactionRecorder={() => setShowTransactionRecorder(true)}
-          onOpenBusinessAnalysis={() => setShowBusinessAnalysis(true)}
-          onOpenBusinessAssessment={() => setShowBusinessAssessment(true)}
-          onOpenSubscriptionManager={() => setShowSubscriptionTierManager(true)}
-        />
-      </div>
-
-      {/* Professional Footer */}
-      <div className="dashboard-grid-full">
-        <div className="card" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
-          <div className="card-body text-center" style={{ padding: 'var(--space-xl)' }}>
-            <h4 className="text-lg font-semibold mb-md text-black">
-              🇬🇭 Bvester - Ghana's Investment Readiness Platform
-            </h4>
-            <p className="text-sm text-gray mb-0">
-              Connecting SMEs with global investment opportunities through professional business development
-            </p>
           </div>
-        </div>
-      </div>
-    </DashboardLayout>
+        )}
+
+        {activeView === 'settings' && (
+          <div className="dashboard-grid-full">
+            <div className="card">
+              <div className="card-body">
+                <h3>Account Settings</h3>
+                <p>Manage your account preferences and security settings.</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </ProfessionalDashboard>
 
         {/* Lazy-loaded Modals with Error Boundaries - Moved outside for proper z-index */}
         {showTransactionRecorder && (

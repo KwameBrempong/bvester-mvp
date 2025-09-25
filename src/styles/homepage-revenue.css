@@ -78,9 +78,10 @@ body:has(.homepage-revenue) #root {
 .homepage-revenue {
   min-height: 100vh;
   position: relative;
-  width: 100vw;
+  width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* Navigation */
@@ -105,7 +106,7 @@ body:has(.homepage-revenue) #root {
 .nav__inner {
   max-width: 100%;
   margin: 0 auto;
-  padding: 1rem 2rem;
+  padding: 1rem clamp(1rem, 4vw, 3rem);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -212,7 +213,8 @@ body:has(.homepage-revenue) #root {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.875rem 1.5rem;
+  min-height: 44px;
   border: none;
   border-radius: 12px;
   font-weight: 600;
@@ -223,6 +225,8 @@ body:has(.homepage-revenue) #root {
   position: relative;
   overflow: hidden;
   white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn--primary {
@@ -317,10 +321,10 @@ body:has(.homepage-revenue) #root {
 .hero__content {
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 4vw, 3rem);
   display: grid;
   grid-template-columns: 1.2fr 1fr;
-  gap: 4rem;
+  gap: clamp(2rem, 4vw, 4rem);
   align-items: center;
   min-height: 70vh;
 }
@@ -546,7 +550,7 @@ body:has(.homepage-revenue) #root {
 .feed__container {
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 4vw, 3rem);
   overflow: hidden;
 }
 
@@ -595,7 +599,7 @@ body:has(.homepage-revenue) #root {
 .container {
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 4vw, 3rem);
 }
 
 .benefits__grid {
@@ -753,6 +757,7 @@ body:has(.homepage-revenue) #root {
 
 .option__button {
   padding: 1rem 1.5rem;
+  min-height: 56px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -762,6 +767,8 @@ body:has(.homepage-revenue) #root {
   cursor: pointer;
   transition: var(--transition);
   text-align: left;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .option__button:hover {
@@ -923,6 +930,11 @@ body:has(.homepage-revenue) #root {
   border: none;
   cursor: pointer;
   padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav__toggle span {
@@ -2152,9 +2164,11 @@ body:has(.homepage-revenue) #root {
     right: 0;
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
-    padding: 2rem;
+    padding: 2rem clamp(1rem, 4vw, 3rem);
     flex-direction: column;
     gap: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 999;
   }
 
   .nav__links ul {
@@ -2199,7 +2213,7 @@ body:has(.homepage-revenue) #root {
 
 @media (max-width: 768px) {
   .hero {
-    padding: 4rem 1rem 3rem;
+    padding: 5rem 0 3rem;
   }
 
   .hero h1 {
@@ -2212,7 +2226,15 @@ body:has(.homepage-revenue) #root {
 
   .hero__actions {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero__proof {
@@ -2353,17 +2375,48 @@ body:has(.homepage-revenue) #root {
     --padding: 0;
   }
 
+  .hero h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .hero__subtitle {
+    font-size: 1rem;
+  }
+
   .hero__badge {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
   }
 
+  .btn {
+    font-size: 0.95rem;
+    padding: 1rem 1.5rem;
+  }
+
   .btn--large {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9rem;
+    padding: 1rem 1.75rem;
+    font-size: 1rem;
   }
 
   .assessment-preview {
+    padding: 1.5rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .features__grid,
+  .pricing__grid,
+  .benefits__grid {
+    gap: 1.5rem;
+  }
+
+  /* Improve card spacing on mobile */
+  .feature-card,
+  .pricing-card,
+  .story-card {
     padding: 1.5rem;
   }
 }

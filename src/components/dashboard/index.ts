@@ -4,6 +4,7 @@ export { default as DashboardHeader } from './DashboardHeader';
 export { default as BusinessOverview } from './BusinessOverview';
 export { default as GrowthToolsWidget } from './GrowthToolsWidget';
 export { default as InvestmentReadinessTracker } from './InvestmentReadinessTracker';
+export { default as ProfessionalDashboard } from './ProfessionalDashboard';
 
 // Type exports for dashboard components
 export type { default as DashboardLayoutProps } from './DashboardLayout';
