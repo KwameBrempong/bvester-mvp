@@ -291,7 +291,9 @@ const AppRouter: React.FC = () => {
           // Create a custom signOut handler that redirects to homepage
           const handleCustomSignOut = async () => {
             try {
-              await signOut();
+              if (signOut) {
+                await signOut();
+              }
               // Clear all application state
               window.location.reload(); // This will clear all Redux state and restart from homepage
             } catch (error) {
