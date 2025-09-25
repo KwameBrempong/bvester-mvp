@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
+import './styles/auth-theme.css';
 import App from './App';
 import HomepageRevenue from './components/HomepageRevenue';
 import outputs from '../amplify_outputs.json';
@@ -27,38 +28,109 @@ const AppRouter: React.FC = () => {
           signUp: {
             email: {
               order: 1,
-              placeholder: 'Enter your business email',
-              label: 'Business Email *',
+              placeholder: 'your.business@example.com',
+              label: 'Business Email Address',
               isRequired: true
             },
             password: {
               order: 2,
-              placeholder: 'Create a strong password',
-              label: 'Password *'
+              placeholder: 'Must be 8+ characters with symbols',
+              label: 'Create Password',
+              isRequired: true
             },
             confirm_password: {
               order: 3,
-              label: 'Confirm Password *'
+              placeholder: 'Confirm your password',
+              label: 'Confirm Password',
+              isRequired: true
+            }
+          },
+          signIn: {
+            username: {
+              placeholder: 'your.business@example.com',
+              label: 'Email Address'
+            },
+            password: {
+              placeholder: 'Enter your password',
+              label: 'Password'
+            }
+          },
+          confirmSignUp: {
+            confirmation_code: {
+              placeholder: 'Enter 6-digit code',
+              label: 'Verification Code',
+              labelHidden: false
             }
           }
         }}
         components={{
           Header() {
             return (
-              <div style={{ textAlign: 'center', padding: '2rem 1rem 1rem' }}>
+              <div style={{
+                textAlign: 'center',
+                padding: '0 0 2rem 0',
+                position: 'relative'
+              }}>
+                {/* Logo/Brand */}
                 <div style={{
-                  fontSize: '2rem',
-                  fontWeight: 'bold',
+                  fontSize: '2.5rem',
+                  fontWeight: '800',
                   background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.5rem',
+                  letterSpacing: '-0.02em'
                 }}>
-                  Welcome to Bvester
+                  Bvester
                 </div>
-                <p style={{ color: '#666', fontSize: '1rem', margin: 0 }}>
-                  🇬🇭 Join thousands of SMEs accessing growth capital
+
+                {/* Tagline */}
+                <div style={{
+                  color: '#0A0A0A',
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  marginBottom: '0.75rem'
+                }}>
+                  🇬🇭 Ghana's #1 SME Investment Platform
+                </div>
+
+                {/* Description */}
+                <p style={{
+                  color: '#666',
+                  fontSize: '0.95rem',
+                  margin: 0,
+                  lineHeight: '1.5',
+                  maxWidth: '400px',
+                  marginLeft: 'auto',
+                  marginRight: 'auto'
+                }}>
+                  Join <strong>1,200+ SMEs</strong> who have raised over <strong>₵2.1M</strong> in growth capital
                 </p>
+
+                {/* Trust indicators */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '2rem',
+                  marginTop: '1.5rem',
+                  padding: '1rem',
+                  background: 'rgba(212, 175, 55, 0.05)',
+                  borderRadius: '12px',
+                  fontSize: '0.85rem'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 'bold', color: '#D4AF37' }}>⚡ 2-Min</div>
+                    <div style={{ color: '#666' }}>Setup</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 'bold', color: '#D4AF37' }}>🔒 Secure</div>
+                    <div style={{ color: '#666' }}>Bank-level</div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontWeight: 'bold', color: '#D4AF37' }}>📱 Mobile</div>
+                    <div style={{ color: '#666' }}>Optimized</div>
+                  </div>
+                </div>
               </div>
             );
           },
@@ -66,23 +138,97 @@ const AppRouter: React.FC = () => {
             return (
               <div style={{
                 textAlign: 'center',
-                padding: '1rem',
-                borderTop: '1px solid #eee',
-                marginTop: '2rem'
+                padding: '2rem 1rem 1rem',
+                borderTop: '2px solid #F0F0F0',
+                marginTop: '3rem',
+                position: 'relative'
               }}>
+                {/* Security badges */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '2rem',
+                  marginBottom: '1.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(40, 167, 69, 0.1)',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: '#28A745',
+                    fontWeight: '600'
+                  }}>
+                    🔒 256-bit SSL
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(212, 175, 55, 0.1)',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: '#D4AF37',
+                    fontWeight: '600'
+                  }}>
+                    🏦 Bank-level Security
+                  </div>
+                </div>
+
+                {/* Support info */}
+                <div style={{
+                  color: '#666',
+                  fontSize: '0.85rem',
+                  marginBottom: '1rem',
+                  lineHeight: '1.5'
+                }}>
+                  Need help? Contact our support team at{' '}
+                  <a href="mailto:support@bvester.com" style={{ color: '#D4AF37', textDecoration: 'none' }}>
+                    support@bvester.com
+                  </a>
+                </div>
+
+                {/* Back to homepage */}
                 <button
                   onClick={handleBackToHome}
                   style={{
                     background: 'none',
-                    border: 'none',
+                    border: '2px solid #D4AF37',
                     color: '#D4AF37',
                     fontSize: '14px',
                     cursor: 'pointer',
-                    textDecoration: 'underline'
+                    padding: '0.75rem 2rem',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#D4AF37';
+                    e.currentTarget.style.color = '#0A0A0A';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = '#D4AF37';
                   }}
                 >
                   ← Back to Homepage
                 </button>
+
+                {/* Copyright */}
+                <div style={{
+                  marginTop: '1.5rem',
+                  paddingTop: '1rem',
+                  borderTop: '1px solid #E5E5E5',
+                  color: '#999',
+                  fontSize: '0.8rem'
+                }}>
+                  © 2024 Bvester. All rights reserved. | Empowering African SMEs
+                </div>
               </div>
             );
           }

@@ -324,30 +324,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     return (
       <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner />}>
-          <div style={{
-            background: '#FAFAFA',
-            minHeight: '100vh',
-            padding: '2rem 0'
-          }}>
-            {/* Welcome message for new users */}
-            {user?.attributes?.email && (
-              <div style={{
-                background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
-                color: '#0A0A0A',
-                padding: '1rem 2rem',
-                textAlign: 'center',
-                marginBottom: '2rem'
-              }}>
-                <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
-                  🎉 Welcome to Bvester, {user.attributes.email}!
-                </h2>
-                <p style={{ margin: 0, fontSize: '1rem' }}>
-                  Let's set up your business profile to get started
-                </p>
-              </div>
-            )}
-            <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
-          </div>
+          <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
         </Suspense>
       </ErrorBoundary>
     );
