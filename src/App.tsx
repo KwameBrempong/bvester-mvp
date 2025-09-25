@@ -29,7 +29,7 @@ import './styles/mobile-optimizations.css';
 const SMEProfile = lazy(() => import('./SMEProfile'));
 const GrowthAccelerator = lazy(() => import('./GrowthAccelerator'));
 const InvestmentBootcamp = lazy(() => import('./components/InvestmentBootcamp'));
-const ChatTransactionRecorder = lazy(() => import('./components/ChatTransactionRecorder'));
+const TransactionHub = lazy(() => import('./components/TransactionHub'));
 const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
 const InvestmentXRay = lazy(() => import('./components/InvestmentXRay'));
 const SubscriptionManager = lazy(() => import('./SubscriptionManager'));
@@ -473,7 +473,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {showTransactionRecorder && (
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              <ChatTransactionRecorder
+              <TransactionHub
                 user={user}
                 onClose={() => setShowTransactionRecorder(false)}
               />
