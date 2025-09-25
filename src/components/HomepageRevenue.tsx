@@ -14,49 +14,6 @@ const navLinks = [
   { label: 'Bootcamp', href: '#program' },
 ];
 
-// Assessment questions for the interactive calculator
-const assessmentQuestions = [
-  {
-    id: 1,
-    question: "How organized are your financial records?",
-    options: [
-      { text: "Everything is digital and categorized", score: 25 },
-      { text: "Some records, mostly manual tracking", score: 15 },
-      { text: "Basic receipts and bank statements", score: 8 },
-      { text: "Very little record keeping", score: 2 }
-    ]
-  },
-  {
-    id: 2,
-    question: "Do you have clear monthly financial reports?",
-    options: [
-      { text: "Yes, detailed profit & loss monthly", score: 25 },
-      { text: "Basic income/expense tracking", score: 15 },
-      { text: "Quarterly summaries only", score: 8 },
-      { text: "No formal reporting", score: 2 }
-    ]
-  },
-  {
-    id: 3,
-    question: "How predictable is your monthly revenue?",
-    options: [
-      { text: "Very predictable, within 10%", score: 25 },
-      { text: "Somewhat predictable, within 25%", score: 15 },
-      { text: "Varies significantly each month", score: 8 },
-      { text: "Completely unpredictable", score: 2 }
-    ]
-  },
-  {
-    id: 4,
-    question: "Do you have a clear growth strategy?",
-    options: [
-      { text: "Written plan with specific targets", score: 25 },
-      { text: "General growth goals in mind", score: 15 },
-      { text: "Hoping to grow naturally", score: 8 },
-      { text: "No specific strategy", score: 2 }
-    ]
-  }
-];
 
 const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -69,7 +26,6 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const [isAnnualPricing, setIsAnnualPricing] = useState(false);
 
   // Animation states
-  const [countingScore, setCountingScore] = useState(0);
   const [liveStats, setLiveStats] = useState({
     assessments: 1247,
     raised: 2100000,
@@ -116,48 +72,6 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     onGetStarted();
   };
 
-  const handleAnswer = (score: number) => {
-    const newAnswers = [...answers, score];
-    setAnswers(newAnswers);
-
-    if (currentQuestion < assessmentQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      // Calculate final score
-      const totalScore = newAnswers.reduce((sum, score) => sum + score, 0);
-      completeAssessment(totalScore);
-    }
-  };
-
-  const completeAssessment = (finalScore: number) => {
-    setAssessmentScore(finalScore);
-    setShowResults(true);
-
-    // Animate score counting
-    let current = 0;
-    const increment = finalScore / 30;
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= finalScore) {
-        setCountingScore(finalScore);
-        clearInterval(timer);
-      } else {
-        setCountingScore(Math.floor(current));
-      }
-    }, 50);
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score <= 40) return '#ef4444'; // Red
-    if (score <= 70) return '#f59e0b'; // Yellow
-    return '#10b981'; // Green
-  };
-
-  const getScoreLabel = (score: number) => {
-    if (score <= 40) return 'Critical Gaps';
-    if (score <= 70) return 'Has Potential';
-    return 'Investment Ready';
-  };
 
   const handleNavClick = (href: string) => {
     setMenuOpen(false);
