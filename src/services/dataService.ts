@@ -69,6 +69,8 @@ export interface UserProfile {
   yearEstablished?: string;
   employeeCount?: string;
   businessStage?: string;
+  monthlyRevenue?: string;
+  fundingNeeded?: string;
   profileCompletedAt?: string;
   lastUpdated: string;
 

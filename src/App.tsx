@@ -342,7 +342,8 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   }
 
   return (
-    <DashboardLayout
+    <>
+      <DashboardLayout
       header={
         <>
           {/* Email Verification Banner */}
@@ -513,9 +514,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
             </Suspense>
           </ErrorBoundary>
         )}
-
-      </div>
-    </div>
+    </>
   );
 });
 

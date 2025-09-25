@@ -298,7 +298,9 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               scrollToSection('how-it-works');
             }}
             style={{
-              background: 'transparent',
+              background: usePremiumTheme
+                ? 'rgba(212, 175, 55, 0.08)'
+                : 'rgba(102, 126, 234, 0.08)',
               color: usePremiumTheme ? 'var(--gold-primary)' : '#667eea',
               border: usePremiumTheme
                 ? '2px solid var(--gold-primary)'
@@ -312,9 +314,6 @@ const HomepageNew: React.FC<HomepageNewProps> = ({ onGetStarted }) => {
               textAlign: 'center',
               cursor: 'pointer',
               backdropFilter: 'blur(10px)',
-              background: usePremiumTheme
-                ? 'rgba(212, 175, 55, 0.08)'
-                : 'rgba(102, 126, 234, 0.08)',
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
