@@ -64,17 +64,32 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* Override root container styles from App.css */
+body:has(.homepage-revenue) #root {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .homepage-revenue {
   min-height: 100vh;
   position: relative;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
 }
 
 /* Navigation */
 .nav {
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);

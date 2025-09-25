@@ -24,11 +24,18 @@
   --gray-600: #505050;
 }
 
-#root {
+#root:not(:has(.homepage-revenue)) {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+/* For homepage - full width layout */
+#root:has(.homepage-revenue) {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
