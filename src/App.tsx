@@ -20,6 +20,8 @@ import { profileUtils, UserProfile } from './services/dataService';
 import './App.css';
 // Import premium theme - it will only apply when feature is enabled
 import './styles/premium-theme.css';
+// Import professional dashboard system
+import './styles/dashboard-system.css';
 
 // Lazy load components for better performance
 const SMEProfile = lazy(() => import('./SMEProfile'));
@@ -33,6 +35,15 @@ const UsageTracker = lazy(() => import('./components/UsageTracker'));
 const SubscriptionTierManager = lazy(() => import('./components/SubscriptionTierManager'));
 const BillingManager = lazy(() => import('./components/BillingManager'));
 const BusinessAnalysisDashboard = lazy(() => import('./components/BusinessAnalysisDashboard'));
+
+// Import professional dashboard components
+import {
+  DashboardLayout,
+  DashboardHeader,
+  BusinessOverview,
+  GrowthToolsWidget,
+  InvestmentReadinessTracker
+} from './components/dashboard';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -331,330 +342,73 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   }
 
   return (
-    <div style={{
-      width: '100%',
-      minHeight: '100vh',
-      background: '#FAFAFA',
-      padding: '15px 0 0 0'
-    }}>
-      <div className="main-container">
+    <DashboardLayout
+      header={
+        <>
+          {/* Email Verification Banner */}
+          {user && !user.attributes?.email_verified && (
+            <EmailVerificationBanner
+              userEmail={user.attributes?.email}
+              onVerificationSuccess={() => {
+                // Refresh the page to get updated user attributes
+                window.location.reload();
+              }}
+            />
+          )}
 
-        {/* Email Verification Banner */}
-        {user && !user.attributes?.email_verified && (
-          <EmailVerificationBanner
-            userEmail={user.attributes?.email}
-            onVerificationSuccess={() => {
-              // Refresh the page to get updated user attributes
-              window.location.reload();
-            }}
+          {/* Professional Dashboard Header */}
+          <DashboardHeader
+            user={user}
+            signOut={signOut}
+            onEditProfile={() => setProfileCompleted(false)}
           />
-        )}
+        </>
+      }
+      sidebar={
+        <>
+          {/* Investment Readiness Tracker */}
+          <InvestmentReadinessTracker />
 
-        {/* Enhanced User Profile Header */}
-        <UserProfileHeader
-          user={user}
-          signOut={signOut}
-          onEditProfile={() => setProfileCompleted(false)}
-        />
-
-        {/* Dashboard Header */}
-        <div className="dashboard-header" style={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '25px',
-          background: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          border: '1px solid #E5E5E5'
-        }}>
-          <div>
-            <h2 style={{ margin: 0, color: '#0A0A0A', fontSize: '26px', fontWeight: 'bold' }}>Dashboard</h2>
-            <p style={{ color: '#666', margin: '8px 0 0 0', fontSize: '16px' }}>
-              Manage your business funding and growth
-            </p>
-          </div>
-          <div style={{ fontSize: '14px', color: '#666' }}>
-            Role: <strong>{userRole || 'Business Owner'}</strong>
-          </div>
-        </div>
-
-        {/* Usage Tracker */}
-        {user?.username && (
-          <div style={{ marginBottom: '30px' }}>
+          {/* Usage Tracker */}
+          {user?.username && (
             <ErrorBoundary>
-              <Suspense fallback={<LoadingSpinner />}>
+              <Suspense fallback={<div className="skeleton skeleton-text"></div>}>
                 <UsageTracker userId={user.username} compact={true} />
               </Suspense>
             </ErrorBoundary>
-          </div>
-        )}
+          )}
+        </>
+      }
+    >
+      {/* Main Dashboard Content */}
+      <div className="dashboard-grid-full">
+        <BusinessOverview />
+      </div>
 
-        {/* Dashboard Content - Mobile-first responsive */}
-        <div className="dashboard-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: '20px',
-          marginBottom: '20px'
-        }}>
+      <div className="dashboard-grid-full">
+        <GrowthToolsWidget
+          onOpenGrowthAccelerator={() => setShowGrowthAccelerator(true)}
+          onOpenTransactionRecorder={() => setShowTransactionRecorder(true)}
+          onOpenBusinessAnalysis={() => setShowBusinessAnalysis(true)}
+          onOpenBusinessAssessment={() => setShowBusinessAssessment(true)}
+          onOpenSubscriptionManager={() => setShowSubscriptionTierManager(true)}
+        />
+      </div>
 
-          {/* Business Summary */}
-          <div className="dashboard-card" style={{
-            background: 'white',
-            borderRadius: '12px',
-            border: '1px solid #E5E5E5',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Business Overview</h3>
-            <div style={{ display: 'grid', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#666', fontSize: '14px' }}>Business Type</span>
-                <span style={{
-                  color: '#B8960F',
-                  fontWeight: '600',
-                  background: '#FAF4E4',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '13px'
-                }}>
-                  {userState.profile?.businessType || 'SME'}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#666', fontSize: '14px' }}>Team Size</span>
-                <span style={{
-                  color: '#1A1A1A',
-                  fontWeight: '600',
-                  background: '#F0F0F0',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '13px'
-                }}>
-                  👥 {userState.profile?.employeeCount || '1-10'}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#666', fontSize: '14px' }}>Business Stage</span>
-                <span style={{
-                  color: '#D4AF37',
-                  fontWeight: '600',
-                  background: '#FAF4E4',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  fontSize: '13px'
-                }}>
-                  🚀 {userState.profile?.businessStage || 'Existing'}
-                </span>
-              </div>
-
-              {/* Business Setup Progress */}
-              <div style={{ marginTop: '10px', paddingTop: '15px', borderTop: '1px solid #eee' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ color: '#666', fontSize: '14px' }}>Business Setup Progress</span>
-                  <span style={{ color: '#B8960F', fontWeight: 'bold', fontSize: '14px' }}>
-                    {userState.profile?.profileCompletionPercentage || 60}%
-                  </span>
-                </div>
-                <div style={{
-                  background: '#E5E5E5',
-                  borderRadius: '10px',
-                  height: '8px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    background: 'linear-gradient(90deg, #D4AF37, #FFD700)',
-                    height: '100%',
-                    width: `${userState.profile?.profileCompletionPercentage || 60}%`,
-                    borderRadius: '10px',
-                    transition: 'width 0.3s ease'
-                  }}></div>
-                </div>
-                <div style={{
-                  color: '#666',
-                  fontSize: '12px',
-                  marginTop: '4px',
-                  textAlign: 'center'
-                }}>
-                  {(userState.profile?.profileCompletionPercentage || 60) >= 80 ?
-                    '✅ Profile Complete' :
-                    '⚡ Complete your profile to unlock more features'
-                  }
-                </div>
-              </div>
-            </div>
-            {userState.profile?.businessDescription && (
-              <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-                <strong>Description:</strong>
-                <p style={{ marginTop: '8px', color: '#666', lineHeight: '1.5' }}>
-                  {userState.profile.businessDescription}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="dashboard-card" style={{
-            background: 'white',
-            borderRadius: '12px',
-            border: '1px solid #E5E5E5',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Quick Actions</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* PRIMARY ACTION - Most important for MVP */}
-              <button
-                className="action-button"
-                onClick={() => setShowGrowthAccelerator(true)}
-                aria-label={isFeatureEnabled('use30DayBootcamp') ? "Join 30-Day Investment Readiness Bootcamp" : "Start Growth Accelerator program - Primary business development tool"}
-                tabIndex={0}
-                style={{
-                  background: 'linear-gradient(135deg, #D4AF37, #FFD700)',
-                  color: '#0A0A0A',
-                  border: 'none',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
-                  width: '100%',
-                  marginBottom: '10px'
-                }}
-              >
-                {isFeatureEnabled('use30DayBootcamp') ? '🎯 30-Day Investment Bootcamp - START HERE' : '🚀 Growth Accelerator - START HERE'}
-              </button>
-
-              {/* SECONDARY ACTIONS - Core features */}
-              <button
-                className="action-button"
-                onClick={() => setShowTransactionRecorder(true)}
-                aria-label="Open chat-style transaction recorder for quick business record keeping"
-                tabIndex={0}
-                style={{
-                  background: 'linear-gradient(135deg, #0A0A0A, #1A1A1A)',
-                  color: '#D4AF37',
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  boxShadow: '0 3px 12px rgba(10, 10, 10, 0.25)'
-                }}
-              >
-                💬 Quick Record Transactions
-              </button>
-
-              <button
-                className="action-button"
-                onClick={() => setShowBusinessAnalysis(true)}
-                aria-label="View AI-powered business analysis and insights dashboard"
-                tabIndex={0}
-                style={{
-                  background: 'linear-gradient(135deg, #B8960F, #D4AF37)',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  boxShadow: '0 3px 12px rgba(184, 150, 15, 0.25)'
-                }}
-              >
-                📊 Business Analysis
-              </button>
-
-              {/* TERTIARY ACTION - Use Investment X-Ray if enabled */}
-              <button
-                className="action-button"
-                onClick={() => setShowBusinessAssessment(true)}
-                aria-label={isFeatureEnabled('useInvestmentXRay') ? "Take 7-minute Investment X-Ray assessment" : "Take comprehensive business assessment quiz"}
-                tabIndex={0}
-                style={{
-                  background: 'linear-gradient(135deg, #FFFFFF, #F9F9F9)',
-                  color: '#0A0A0A',
-                  border: '2px solid #D4AF37',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)'
-                }}
-              >
-                {isFeatureEnabled('useInvestmentXRay') ? '🎯 Investment X-Ray (7 min)' : '📋 Business Assessment'}
-              </button>
-
-              {/* SUBSCRIPTION MANAGEMENT */}
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '15px', marginTop: '15px' }}>
-                <button
-                  className="action-button"
-                  onClick={() => setShowSubscriptionTierManager(true)}
-                  style={{
-                    background: subscriptionTier !== 'free' ?
-                      'linear-gradient(135deg, #D4AF37, #FFD700)' :
-                      'linear-gradient(135deg, #0A0A0A, #1A1A1A)',
-                    color: subscriptionTier !== 'free' ? '#0A0A0A' : '#D4AF37',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    boxShadow: subscriptionTier !== 'free' ?
-                      '0 2px 8px rgba(212, 175, 55, 0.2)' :
-                      '0 2px 8px rgba(10, 10, 10, 0.2)'
-                  }}
-                >
-                  {subscriptionTier !== 'free' ? '⚙️ Manage Subscription' : '⬆️ Upgrade to Pro'}
-                </button>
-
-                {subscriptionTier !== 'free' && (
-                  <button
-                    className="action-button"
-                    onClick={() => setShowBillingManager(true)}
-                    style={{
-                      background: 'linear-gradient(135deg, #1A1A1A, #2A2A2A)',
-                      color: '#D4AF37',
-                      border: 'none',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontWeight: '500',
-                      boxShadow: '0 2px 8px rgba(26, 26, 26, 0.2)',
-                      marginTop: '8px'
-                    }}
-                  >
-                    💳 Billing & Invoices
-                  </button>
-                )}
-              </div>
-            </div>
+      {/* Professional Footer */}
+      <div className="dashboard-grid-full">
+        <div className="card" style={{ background: 'var(--gray-50)', border: '1px solid var(--gray-200)' }}>
+          <div className="card-body text-center" style={{ padding: 'var(--space-xl)' }}>
+            <h4 className="text-lg font-semibold mb-md text-black">
+              🇬🇭 Bvester - Ghana's Investment Readiness Platform
+            </h4>
+            <p className="text-sm text-gray mb-0">
+              Connecting SMEs with global investment opportunities through professional business development
+            </p>
           </div>
         </div>
-
-        {/* Funding Progress */}
-        <div style={{ 
-          background: 'white', 
-          padding: '30px', 
-          borderRadius: '12px',
-          border: '1px solid #E5E5E5',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-          marginBottom: '30px'
-        }}>
-          <h3 style={{ color: '#0A0A0A', marginBottom: '20px', fontSize: '20px' }}>Funding Progress</h3>
-          <div style={{ background: '#E5E5E5', borderRadius: '10px', height: '12px', marginBottom: '15px' }}>
-            <div style={{ background: 'linear-gradient(90deg, #D4AF37, #FFD700)', height: '100%', width: '0%', borderRadius: '10px' }}></div>
-          </div>
-          <p style={{ color: '#666', textAlign: 'center', fontSize: '16px' }}>
-            No active campaigns yet. Create your first funding campaign to start raising investment!
-          </p>
-        </div>
-
-        {/* Footer */}
-        <div style={{ 
-          padding: '25px', 
-          background: '#F9F9F9', 
-          borderRadius: '12px', 
-          textAlign: 'center',
-          border: '1px solid #E5E5E5'
-        }}>
-          <p style={{ color: '#666', margin: 0, fontSize: '16px' }}>
-            Bvester - Connecting Ghana SMEs with Global Investment Opportunities
-          </p>
-          <p style={{ color: '#999', margin: '5px 0 0 0', fontSize: '14px' }}>
-            Empowering African businesses through technology and investment
-          </p>
-        </div>
+      </div>
+    </DashboardLayout>
 
         {/* Lazy-loaded Modals with Error Boundaries - Moved outside for proper z-index */}
         {showTransactionRecorder && (

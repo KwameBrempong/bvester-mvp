@@ -45,7 +45,11 @@
       "Bash(aws amplify delete-domain-association:*)",
       "Bash(nslookup:*)",
       "Bash(aws cloudfront list-distributions:*)",
-      "Bash(aws amplify get-app:*)"
+      "Bash(aws amplify get-app:*)",
+      "Bash(start http://localhost:5176)",
+      "Bash(start http://localhost:5177)",
+      "Bash(del test-userservice.js)",
+      "Bash(aws lambda list-functions:*)"
     ],
     "deny": [],
     "ask": []
