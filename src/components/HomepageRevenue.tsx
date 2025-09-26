@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../styles/homepage-revenue.css';
 import '../styles/homepage-fixes.css';
 import '../styles/homepage-enhanced.css';
@@ -20,7 +19,6 @@ const navLinks = [
 
 
 const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
-  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
