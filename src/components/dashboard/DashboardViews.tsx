@@ -5,6 +5,7 @@ import Icon from '../Icons';
 import { useUser, useAppDispatch } from '../../store/hooks';
 import { updateUserProfile } from '../../store/slices/userSlice';
 import { notify } from '../../utils/notifications';
+import { UserProfile } from '../../services/dataService';
 import '../../styles/dashboard-views.css';
 
 // Overview Dashboard (Default view with KPIs)
@@ -18,7 +19,7 @@ export const ProfileView: React.FC = () => {
   const dispatch = useAppDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [editedProfile, setEditedProfile] = useState(userState.profile || {});
+  const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>(userState.profile || {});
   const [showDocuments, setShowDocuments] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);

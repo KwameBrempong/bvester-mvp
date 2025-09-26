@@ -81,6 +81,35 @@ export interface UserProfile {
   isPhoneVerified: boolean;
   isBusinessVerified: boolean;
 
+  // Enhanced Investment Information Fields
+  investmentStage?: string;
+  equityOffered?: string;
+  useOfFunds?: string;
+  fundingStage?: string;
+  fundingAmount?: string;
+  investorType?: string;
+
+  // Enhanced Business Metrics Fields
+  annualRevenue?: string;
+  revenueGrowthRate?: string;
+  customerBase?: string;
+  customerCount?: string;
+  marketSize?: string;
+  competitiveAdvantage?: string;
+  monthlyGrowth?: string;
+
+  // Enhanced Team & Leadership Fields
+  founderName?: string;
+  founderExperience?: string;
+  ceoName?: string;
+  keyTeamMembers?: string;
+  hasAdvisoryBoard?: string;
+  teamBackground?: string;
+
+  // Enhanced Verification Fields
+  businessRegistration?: string;
+  taxId?: string;
+
   // Payment-related fields for Phase 2
   stripeCustomerId?: string;
   verificationDocuments?: {
