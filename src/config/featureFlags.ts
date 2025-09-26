@@ -42,10 +42,10 @@ const defaultFlags: FeatureFlags = {
   useAssessmentV2: true,
 
   // Investment Accelerator features (medium risk)
-  showPricingTiers: false,
-  enableCrowdfundingTrack: false,
-  enableTieredFundingPathway: false,
-  showFundingPathwaySelector: false,
+  showPricingTiers: true,
+  enableCrowdfundingTrack: true,
+  enableTieredFundingPathway: true,
+  showFundingPathwaySelector: true,
 
   // Homepage (high impact - enable last)
   useOptimizedHomepage: false,
