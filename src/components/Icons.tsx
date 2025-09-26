@@ -63,7 +63,6 @@ import {
   HiOutlineTrash,
   HiOutlinePencil,
   HiOutlineStop,
-  HiOutlineExclamationTriangle,
   HiOutlineCheck,
   HiOutlineViewList
 } from 'react-icons/hi';
@@ -199,7 +198,7 @@ const Icon: React.FC<IconProps> = ({ name, size = 20, color, className = '' }) =
     'check': <HiOutlineCheck {...iconProps} />,
     'x': <HiOutlineX {...iconProps} />,
     'stop': <HiOutlineStop {...iconProps} />,
-    'warning': <HiOutlineExclamationTriangle {...iconProps} />,
+    'warning': <HiOutlineExclamationCircle {...iconProps} />,
   };
 
   return iconMap[name] || <HiOutlineQuestionMarkCircle {...iconProps} />;
