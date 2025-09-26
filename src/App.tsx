@@ -18,6 +18,7 @@ import { profileUtils, UserProfile } from './services/dataService';
 import './App.css';
 // Import premium theme - it will only apply when feature is enabled
 import './styles/premium-theme.css';
+import './styles/mobile-business-profile.css';
 // Import professional dashboard system
 import './styles/dashboard-system.css';
 // Import mobile optimizations

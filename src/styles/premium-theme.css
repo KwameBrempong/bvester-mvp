@@ -44,6 +44,9 @@
   --error-700: #B91C1C;
   --info: #3B82F6;
   --info-light: #DBEAFE;
+  --blue-50: #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
   --blue-500: #3B82F6;
   --blue-600: #2563EB;
   --blue-700: #1D4ED8;
@@ -53,6 +56,7 @@
   --red-400: #F87171;
   --red-500: #EF4444;
   --red-600: #DC2626;
+  --gray-900: #111827;
 
   /* ==================== Typography ==================== */
   --font-premium: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

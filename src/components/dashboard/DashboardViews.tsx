@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DashboardKPIs from './DashboardKPIs';
+import MobileBusinessProfile from './MobileBusinessProfile';
 import { ComingSoonState, NoTransactionsState, EmptyState } from '../EmptyStates';
 import Icon from '../Icons';
 import { useUser, useAppDispatch } from '../../store/hooks';
@@ -23,12 +24,22 @@ export const ProfileView: React.FC = () => {
   const [showDocuments, setShowDocuments] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     if (userState.profile) {
       setEditedProfile(userState.profile);
     }
   }, [userState.profile]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const profile = userState.profile;
 
@@ -247,6 +258,11 @@ export const ProfileView: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  // Use mobile-optimized component for mobile devices
+  if (isMobile) {
+    return <MobileBusinessProfile className="mobile-profile-view" />;
   }
 
   return (
