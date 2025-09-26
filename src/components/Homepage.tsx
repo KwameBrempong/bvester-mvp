@@ -51,7 +51,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
         <div className="nav__inner">
           <a href="#home" className="nav__logo" onClick={() => handleNavClick('#home')}>
-            <span className="nav__logo-mark">BV</span>
+            <img src="/bvester-logo.png" alt="Bvester" className="nav__logo-img" />
             <span className="nav__logo-text">Bvester</span>
           </a>
 
@@ -399,7 +399,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
         <div className="footer__inner">
           <div className="footer__brand">
             <div className="nav__logo">
-              <span className="nav__logo-mark">BV</span>
+              <img src="/bvester-logo.png" alt="Bvester" className="nav__logo-img" />
               <span className="nav__logo-text">Bvester</span>
             </div>
             <p>Connecting African SMEs with diaspora capital, accountability, and growth guidance.</p>

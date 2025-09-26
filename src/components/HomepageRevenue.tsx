@@ -164,7 +164,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
         <div className="nav__inner">
           <a href="#home" className="nav__logo" onClick={() => handleNavClick('#home')}>
-            <span className="nav__logo-mark">BV</span>
+            <img src="/bvester-logo.png" alt="Bvester" className="nav__logo-img" />
             <span className="nav__logo-text">Bvester</span>
             <span className="nav__badge">SEC Pending</span>
           </a>

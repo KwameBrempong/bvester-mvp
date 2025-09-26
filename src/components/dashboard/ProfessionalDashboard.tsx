@@ -121,7 +121,7 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
             <span></span>
           </button>
           <div className="mobile-logo">
-            <span className="logo-icon">BV</span>
+            <img src="/bvester-logo.png" alt="Bvester" className="logo-img" />
             <span className="logo-text">Bvester</span>
           </div>
           <button className="mobile-user-menu">
@@ -134,7 +134,7 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
       <aside className={`dashboard-sidebar ${isCollapsed ? 'collapsed' : ''} ${showMobileMenu ? 'mobile-show' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <span className="logo-icon">BV</span>
+            <img src="/bvester-logo.png" alt="Bvester" className="logo-img" />
             {!isCollapsed && <span className="logo-text">Bvester</span>}
           </div>
           {!isMobile && (

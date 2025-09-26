@@ -84,6 +84,13 @@ body {
   font-size: 0.95rem;
 }
 
+.nav__logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+}
+
 .nav__logo-text {
   font-family: var(--font-heading);
   font-size: 1.3rem;

@@ -74,6 +74,14 @@
   flex-shrink: 0;
 }
 
+.logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
@@ -469,6 +477,11 @@
   width: 32px;
   height: 32px;
   font-size: 14px;
+}
+
+.mobile-logo .logo-img {
+  width: 32px;
+  height: 32px;
 }
 
 .mobile-logo .logo-text {
