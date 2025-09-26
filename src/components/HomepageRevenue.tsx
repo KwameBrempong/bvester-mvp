@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/homepage-revenue.css';
+import '../styles/homepage-fixes.css';
 
 interface HomepageProps {
   onGetStarted: () => void;

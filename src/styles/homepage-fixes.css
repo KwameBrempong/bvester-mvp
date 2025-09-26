@@ -1,0 +1,322 @@
+/* Homepage UI/UX Comprehensive Fixes */
+
+/* ============================================
+   1. LOGO FIXES
+   ============================================ */
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.nav__logo:hover {
+  transform: translateY(-1px);
+}
+
+.nav__logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  transition: filter 0.2s ease;
+}
+
+.nav__logo:hover .nav__logo-img {
+  filter: drop-shadow(0 4px 8px rgba(212,175,55,0.3));
+}
+
+/* ============================================
+   2. NAVIGATION Z-INDEX FIXES
+   ============================================ */
+.nav {
+  z-index: 1000 !important;
+}
+
+.nav__links--open {
+  z-index: 999 !important;
+}
+
+.mobile-menu-overlay {
+  z-index: 998 !important;
+}
+
+/* ============================================
+   3. MOBILE HERO OPTIMIZATION
+   ============================================ */
+@media (max-width: 768px) {
+  .hero__content h1 {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hero__content p {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hero__content {
+    padding: 2rem 1rem !important;
+    text-align: center !important;
+  }
+
+  .hero__cta {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    width: 100% !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100% !important;
+    padding: 1rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* ============================================
+   4. TABLET RESPONSIVE (768px - 1024px)
+   ============================================ */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .hero__content h1 {
+    font-size: 2.5rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero__content p {
+    font-size: 1.125rem !important;
+  }
+
+  .features__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 2rem !important;
+  }
+
+  .pricing__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    max-width: 700px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ============================================
+   5. FEATURE CARDS STACKING
+   ============================================ */
+.features__grid {
+  display: grid;
+  gap: 1.5rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+@media (max-width: 767px) {
+  .features__grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .features__grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .features__grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+.feature__card {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* ============================================
+   6. CTA BUTTON ENHANCEMENTS
+   ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+  color: #000;
+  font-weight: 600;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(212,175,55,0.5);
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(212,175,55,0.1);
+  border-color: #D4AF37;
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   7. PRICING CARDS ALIGNMENT
+   ============================================ */
+.pricing__grid {
+  display: grid;
+  gap: 2rem;
+  margin: 3rem auto;
+  max-width: 1100px;
+  align-items: stretch;
+}
+
+.pricing__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 450px;
+  padding: 2rem;
+  border-radius: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing__card.recommended {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(212,175,55,0.2);
+  border: 2px solid #D4AF37;
+}
+
+@media (max-width: 768px) {
+  .pricing__grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pricing__card.recommended {
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   8. TEXT OVERFLOW FIXES
+   ============================================ */
+.nav__links a,
+.feature__title,
+.pricing__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feature__description,
+.pricing__description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* ============================================
+   9. VISUAL HIERARCHY IMPROVEMENTS
+   ============================================ */
+.hero {
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+  z-index: 1;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================
+   10. PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  loading: lazy;
+}
+
+.nav__logo-img,
+.feature__icon,
+.pricing__icon {
+  will-change: transform;
+}
+
+/* ============================================
+   11. ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+.btn-primary:focus,
+.btn-secondary:focus,
+.nav__links a:focus {
+  outline: 3px solid #D4AF37;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   12. DARK MODE SUPPORT
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .nav__logo-img {
+    filter: brightness(1.1) drop-shadow(0 2px 4px rgba(255,255,255,0.1));
+  }
+}

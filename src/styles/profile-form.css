@@ -42,8 +42,8 @@
 
 .profile-welcome-header h2 {
   margin: 0 0 1rem 0;
-  fontSize: 2rem;
-  fontWeight: 800;
+  font-size: 2rem;
+  font-weight: 800;
   position: relative;
   z-index: 2;
   letter-spacing: -0.02em;
@@ -51,8 +51,8 @@
 
 .profile-welcome-header p {
   margin: 0;
-  fontSize: 1.1rem;
-  fontWeight: 500;
+  font-size: 1.1rem;
+  font-weight: 500;
   opacity: 0.9;
   position: relative;
   z-index: 2;
