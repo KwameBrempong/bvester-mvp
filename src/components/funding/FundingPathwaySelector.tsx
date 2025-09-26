@@ -280,16 +280,16 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
           <h3>🏆 Proven Results</h3>
           <div className="proof-stats">
             <div className="stat">
-              <span className="stat-number">156</span>
-              <span className="stat-label">SMEs Funded</span>
+              <span className="stat-number">✓</span>
+              <span className="stat-label">SMEs Supported</span>
             </div>
             <div className="stat">
-              <span className="stat-number">₵2.1M</span>
-              <span className="stat-label">Total Raised</span>
+              <span className="stat-number">💰</span>
+              <span className="stat-label">Capital Raised</span>
             </div>
             <div className="stat">
-              <span className="stat-number">87%</span>
-              <span className="stat-label">Success Rate</span>
+              <span className="stat-number">🎯</span>
+              <span className="stat-label">Proven Results</span>
             </div>
           </div>
         </div>
@@ -322,7 +322,7 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
         }
 
         .selector-header {
-          background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+          background: linear-gradient(135deg, #1e3a8a, #3730a3);
           color: white;
           padding: 2rem;
           border-radius: 16px 16px 0 0;
@@ -695,7 +695,7 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
         }
 
         .success-proof {
-          background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+          background: linear-gradient(135deg, #1e3a8a, #3730a3);
           color: white;
           padding: 2rem;
           border-radius: 0 0 16px 16px;

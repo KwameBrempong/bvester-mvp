@@ -89,9 +89,9 @@ export const FUNDING_PATHWAYS: FundingPathway[] = [
       ]
     },
     successMetrics: {
-      primaryGoal: 'Successful crowdfunding campaign (₵10K-₵100K raised)',
-      successRate: 78,
-      averageOutcome: '₵45K raised per campaign',
+      primaryGoal: 'Launch successful crowdfunding campaign',
+      successRate: 0, // Will be populated with real data
+      averageOutcome: 'Varies by business and campaign',
       timeToResult: '8-12 weeks from start to campaign launch'
     },
     nextStep: 'growth_capital',
@@ -146,8 +146,8 @@ export const FUNDING_PATHWAYS: FundingPathway[] = [
     },
     successMetrics: {
       primaryGoal: 'Business scaling & growth capital readiness',
-      successRate: 85,
-      averageOutcome: '2.3x revenue growth within 12 months',
+      successRate: 0, // Will be populated with real data
+      averageOutcome: 'Sustainable business growth',
       timeToResult: '10-16 weeks to see measurable scaling results'
     },
     discountFromPrevious: 50, // ₵50 discount for completing crowdfunding starter
@@ -203,9 +203,9 @@ export const FUNDING_PATHWAYS: FundingPathway[] = [
       ]
     },
     successMetrics: {
-      primaryGoal: 'Secure major investment funding (₵1M+)',
-      successRate: 92,
-      averageOutcome: '₵2.8M average funding secured',
+      primaryGoal: 'Secure major investment funding',
+      successRate: 0, // Will be populated with real data
+      averageOutcome: 'Investment funding secured',
       timeToResult: '12-24 weeks from program completion to funding'
     },
     discountFromPrevious: 20, // ₵500 discount for completing growth capital

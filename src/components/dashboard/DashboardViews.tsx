@@ -106,10 +106,10 @@ export const AssessmentView: React.FC = () => {
                 transform="rotate(-90 60 60)"
               />
             </svg>
-            <div className="score-value">72%</div>
+            <div className="score-value">--</div>
           </div>
-          <h3>Good Progress</h3>
-          <p>Your business shows strong potential for investment</p>
+          <h3>Take Assessment</h3>
+          <p>Complete your business assessment to see your investment readiness score</p>
         </div>
         
         <div className="assessment-categories">
@@ -200,16 +200,16 @@ export const GrowthView: React.FC = () => {
 
         <div className="success-metrics">
           <div className="metric">
-            <div className="metric-value">90%</div>
-            <div className="metric-label">Investment Readiness Rate</div>
+            <div className="metric-value">✓</div>
+            <div className="metric-label">Investment Ready</div>
           </div>
           <div className="metric">
-            <div className="metric-value">₵2.1M</div>
-            <div className="metric-label">Total Funding Raised</div>
+            <div className="metric-value">💰</div>
+            <div className="metric-label">Capital Access</div>
           </div>
           <div className="metric">
-            <div className="metric-value">156</div>
-            <div className="metric-label">SMEs Successfully Funded</div>
+            <div className="metric-value">🎯</div>
+            <div className="metric-label">SMEs Supported</div>
           </div>
         </div>
 

@@ -156,7 +156,7 @@ const AppRouter: React.FC = () => {
                   marginLeft: 'auto',
                   marginRight: 'auto'
                 }}>
-                  Join <strong>1,200+ SMEs</strong> who have raised over <strong>₵2.1M</strong> in growth capital
+                  Join <strong>Ghana's ambitious SMEs</strong> building <strong>investment-ready</strong> businesses
                 </p>
 
                 {/* Trust indicators */}
@@ -294,15 +294,25 @@ const AppRouter: React.FC = () => {
               if (signOut) {
                 await signOut();
               }
-              // Clear all application state
-              window.location.reload(); // This will clear all Redux state and restart from homepage
+              // Clear application state and redirect to homepage
+              setShowSignIn(false);
+              setIsAuthenticated(false);
+              setCheckingAuth(false);
+
+              // Clear localStorage data
+              Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('profile_') || key.startsWith('assessment_') || key.includes('aws') || key.includes('amplify')) {
+                  localStorage.removeItem(key);
+                }
+              });
+
+              console.log('✅ Successfully signed out and redirected to homepage');
             } catch (error) {
               console.error('Sign out error:', error);
               // Still reset state even if there's an error
               setShowSignIn(false);
               setIsAuthenticated(false);
-              // Force reload to clear any cached state
-              window.location.reload();
+              setCheckingAuth(false);
             }
           };
 

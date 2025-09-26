@@ -328,10 +328,10 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
       <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black p-6 text-white relative">
+        <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 p-6 text-white relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-300 hover:text-white text-2xl font-bold"
+            className="absolute top-4 right-4 text-blue-200 hover:text-white text-2xl font-bold"
           >
             ×
           </button>
@@ -341,7 +341,7 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
               <h1 className="text-3xl font-bold mb-2">
                 🚀 Investment Accelerator Program
               </h1>
-              <p className="text-gray-300 text-lg">
+              <p className="text-blue-100 text-lg">
                 Transform from struggling SME to investment-ready business in 90 days
               </p>
               <div className="mt-3 flex items-center gap-6 text-sm">
@@ -355,13 +355,13 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
                 </span>
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  90% Success Rate
+                  Proven Success
                 </span>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-bold text-yellow-400">90%</div>
-              <div className="text-sm text-gray-300">Investment Readiness Guaranteed</div>
+              <div className="text-4xl font-bold text-yellow-300">✓</div>
+              <div className="text-sm text-blue-100">Investment Ready</div>
             </div>
           </div>
         </div>
