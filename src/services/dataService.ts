@@ -64,6 +64,7 @@ export interface UserProfile {
   region: string;
   businessType: string;
   businessDescription?: string;
+  businessLogo?: string;
   registrationNumber?: string;
   tinNumber?: string;
   yearEstablished?: string;
@@ -102,6 +103,8 @@ export interface UserProfile {
   founderName?: string;
   founderExperience?: string;
   ceoName?: string;
+  ceoEmail?: string;
+  ceoPhone?: string;
   keyTeamMembers?: string;
   hasAdvisoryBoard?: string;
   teamBackground?: string;

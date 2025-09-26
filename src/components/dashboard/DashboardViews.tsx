@@ -658,7 +658,7 @@ export const ProfileView: React.FC = () => {
                   <label>Business Logo URL</label>
                   <input
                     type="text"
-                    value={(editedProfile as any).businessLogo || ''}
+                    value={editedProfile.businessLogo || ''}
                     onChange={(e) => handleInputChange('businessLogo', e.target.value)}
                     placeholder="https://example.com/logo.png"
                   />
@@ -671,7 +671,7 @@ export const ProfileView: React.FC = () => {
                   <label>CEO/Founder Name</label>
                   <input
                     type="text"
-                    value={(editedProfile as any).ceoName || ''}
+                    value={editedProfile.ceoName || ''}
                     onChange={(e) => handleInputChange('ceoName', e.target.value)}
                     placeholder="John Doe"
                   />
@@ -681,7 +681,7 @@ export const ProfileView: React.FC = () => {
                   <label>CEO/Founder Email</label>
                   <input
                     type="email"
-                    value={(editedProfile as any).ceoEmail || ''}
+                    value={editedProfile.ceoEmail || ''}
                     onChange={(e) => handleInputChange('ceoEmail', e.target.value)}
                     placeholder="ceo@example.com"
                   />
@@ -691,7 +691,7 @@ export const ProfileView: React.FC = () => {
                   <label>CEO/Founder Phone</label>
                   <input
                     type="tel"
-                    value={(editedProfile as any).ceoPhone || ''}
+                    value={editedProfile.ceoPhone || ''}
                     onChange={(e) => handleInputChange('ceoPhone', e.target.value)}
                     placeholder="+233 XX XXX XXXX"
                   />
