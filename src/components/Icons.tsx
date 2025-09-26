@@ -50,7 +50,10 @@ import {
   HiOutlineKey,
   HiOutlineFingerPrint,
   HiOutlineGlobe,
-  HiOutlineFlag
+  HiOutlineFlag,
+  HiOutlineTruck,
+  HiOutlineSpeakerphone,
+  HiOutlineShoppingBag
 } from 'react-icons/hi';
 
 import {
@@ -64,7 +67,9 @@ import {
   HiBanknotes,
   HiMiniChartBar,
   HiMiniUserGroup,
-  HiMiniBuildingOffice
+  HiMiniBuildingOffice,
+  HiCake,
+  HiCube
 } from 'react-icons/hi2';
 
 // Icon component wrapper for consistent styling
@@ -160,6 +165,12 @@ const Icon: React.FC<IconProps> = ({ name, size = 20, color, className = '' }) =
     // Chart Icons
     'chart-bar': <HiMiniChartBar {...iconProps} />,
     'chart-square': <HiChartBarSquare {...iconProps} />,
+
+    // Transaction Hub Icons
+    'car': <HiOutlineTruck {...iconProps} />,
+    'food': <HiCake {...iconProps} />,
+    'megaphone': <HiOutlineSpeakerphone {...iconProps} />,
+    'package': <HiCube {...iconProps} />,
   };
 
   return iconMap[name] || <HiOutlineQuestionMarkCircle {...iconProps} />;

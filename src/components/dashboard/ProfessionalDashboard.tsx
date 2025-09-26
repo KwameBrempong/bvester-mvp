@@ -4,6 +4,11 @@ import '../../styles/professional-dashboard.css';
 
 interface ProfessionalDashboardProps {
   user: any;
+  userProfile?: {
+    businessName?: string;
+    ownerName?: string;
+    email?: string;
+  };
   signOut: () => void;
   children?: React.ReactNode;
   activeView?: string;
@@ -12,6 +17,7 @@ interface ProfessionalDashboardProps {
 
 const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
   user,
+  userProfile,
   signOut,
   children,
   activeView = 'overview',
@@ -20,6 +26,20 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  // Professional name display logic
+  const getDisplayName = () => {
+    return userProfile?.businessName || userProfile?.ownerName || user?.username || 'Business Owner';
+  };
+
+  const getDisplayInitials = () => {
+    const name = getDisplayName();
+    if (userProfile?.businessName) {
+      // Use business name initials (e.g., "Acme Corp" -> "AC")
+      return userProfile.businessName.split(' ').map(word => word.charAt(0).toUpperCase()).slice(0, 2).join('');
+    }
+    return name.charAt(0).toUpperCase();
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -41,12 +61,6 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
       sublabel: 'Overview & Analytics'
     },
     {
-      id: 'profile',
-      icon: 'profile',
-      label: 'Business Profile',
-      sublabel: 'Company Information'
-    },
-    {
       id: 'assessment',
       icon: 'assessment',
       label: 'Assessment',
@@ -59,12 +73,6 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
       sublabel: 'Transform Your Business'
     },
     {
-      id: 'xray',
-      icon: 'xray',
-      label: 'Investment X-Ray',
-      sublabel: 'Deep Analysis'
-    },
-    {
       id: 'transactions',
       icon: 'transactions',
       label: 'Transactions',
@@ -75,6 +83,12 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
       icon: 'billing',
       label: 'Billing',
       sublabel: 'Subscription & Payments'
+    },
+    {
+      id: 'profile',
+      icon: 'profile',
+      label: 'Business Profile',
+      sublabel: 'Company Information'
     },
     {
       id: 'settings',
@@ -111,7 +125,7 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
             <span className="logo-text">Bvester</span>
           </div>
           <button className="mobile-user-menu">
-            <span className="user-avatar">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
+            <span className="user-avatar">{getDisplayInitials()}</span>
           </button>
         </div>
       )}
@@ -181,11 +195,11 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
         <div className="sidebar-footer">
           <div className="user-profile">
             <div className="user-avatar">
-              {user?.username?.charAt(0).toUpperCase() || 'U'}
+              {getDisplayInitials()}
             </div>
             {!isCollapsed && (
               <div className="user-info">
-                <span className="user-name">{user?.username || 'User'}</span>
+                <span className="user-name">{getDisplayName()}</span>
                 <span className="user-role">Business Owner</span>
               </div>
             )}
@@ -221,7 +235,7 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
             </button>
             <div className="topbar-user">
               <span className="user-greeting">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'},</span>
-              <span className="user-name">{user?.username || 'User'}</span>
+              <span className="user-name">{getDisplayName()}</span>
             </div>
           </div>
         </header>

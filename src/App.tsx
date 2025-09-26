@@ -43,7 +43,6 @@ import {
   ProfileView,
   AssessmentView,
   GrowthView,
-  XRayView,
   TransactionsView,
   BillingView,
   SettingsView
@@ -418,6 +417,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     <>
       <ProfessionalDashboard
         user={user}
+        userProfile={userState.profile ? {
+          businessName: userState.profile.businessName,
+          ownerName: userState.profile.ownerName,
+          email: userState.profile.email
+        } : undefined}
         signOut={signOut || (() => {})}
         activeView={activeView}
         onViewChange={handleViewChange}
@@ -451,11 +455,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         )}
 
 
-        {activeView === 'xray' && (
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <XRayView />
-          </React.Suspense>
-        )}
+        {/* Investment X-Ray removed as requested */}
 
         {activeView === 'transactions' && (
           <React.Suspense fallback={<LoadingSpinner />}>
