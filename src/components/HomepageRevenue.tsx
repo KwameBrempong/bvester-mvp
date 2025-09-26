@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/homepage-revenue.css';
 import '../styles/homepage-fixes.css';
+import '../styles/homepage-enhanced.css';
+import '../styles/homepage-animations.css';
 
 interface HomepageProps {
   onGetStarted: () => void;
@@ -17,6 +20,7 @@ const navLinks = [
 
 
 const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -53,6 +57,25 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       }));
     }, 5000);
 
+    // Scroll animations - reveal elements on scroll
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    // Observe all elements with animation classes
+    const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-left, .animate-right, .animate-scale');
+    animatedElements.forEach(el => observer.observe(el));
+
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
     handleResize();
@@ -61,6 +84,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
       clearInterval(interval);
+      animatedElements.forEach(el => observer.unobserve(el));
     };
   }, []);
 
@@ -208,22 +232,23 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
         <section className="hero" id="home">
           <div className="hero__content">
             <div className="hero__copy">
-              <div className="hero__badge">
-                🚨 Most SMEs fail investor meetings because of ONE missing piece
+              <div className="hero__badge animate-on-scroll">
+                🚀 Exclusive Launch: First 1,000 Founding Members
               </div>
 
-              <h1>
-                <span style={{ color: 'white', fontWeight: 'bold' }}>Is Your Business</span> <br />
-                <span className="gradient-text" style={{ color: '#D4AF37', fontWeight: 'bold' }}>Investment Ready?</span>
+              <h1 className="hero__headline">
+                <span className="headline-line1">Your Business Is Worth Millions.</span>
+                <span className="headline-line2">You Just Can't Prove It... Yet.</span>
               </h1>
 
-              <p className="hero__subheading">
-                Bridge the funding gap. Scale your business.
+              <p className="hero__subtitle">
+                Discover exactly what's blocking your funding and transform
+                into an investment-ready business in 90 days.
               </p>
 
-              <p className="hero__subtitle">
-                Take our 5-minute assessment and discover the blind spots costing you millions.
-                Join {liveStats.assessments.toLocaleString()}+ SMEs who found their hidden potential.
+              <p className="hero__authority">
+                Built by former investment bankers who've evaluated
+                billions in funding applications across Africa.
               </p>
 
               <div className="hero__actions">
@@ -231,29 +256,32 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                   className="btn btn--primary btn--large pulse"
                   onClick={startAssessment}
                 >
-                  🎯 Start Free Assessment
-                  <span className="btn__subtitle">Takes 5 minutes • Instant results</span>
+                  Get My Free Business Assessment →
+                  <span className="btn__subtitle">Takes 5 minutes • No credit card • Instant results</span>
                 </button>
                 <button
-                  className="btn btn--ghost"
-                  onClick={() => handleNavClick('#program')}
+                  className="btn btn--secondary"
+                  onClick={() => handleNavClick('#how-it-works')}
                 >
-                  JOIN GROWTH ACCELERATOR
+                  See How It Works
                 </button>
               </div>
 
-              <div className="hero__proof">
-                <div className="proof__item">
-                  <div className="proof__number">{liveStats.assessments.toLocaleString()}+</div>
-                  <div className="proof__label">Assessments Completed</div>
-                </div>
-                <div className="proof__item">
-                  <div className="proof__number">{formatCurrency(liveStats.raised)}</div>
-                  <div className="proof__label">Capital Raised</div>
-                </div>
-                <div className="proof__item">
-                  <div className="proof__number">{liveStats.investors}+</div>
-                  <div className="proof__label">Active Investors</div>
+              <div className="hero__trust-indicators">
+                <span className="trust-item">🔒 Bank-Level Security</span>
+                <span className="trust-divider">|</span>
+                <span className="trust-item">🏛️ SEC Registered</span>
+                <span className="trust-divider">|</span>
+                <span className="trust-item">⚡ No Credit Card</span>
+              </div>
+
+              <div className="founding-member-counter">
+                <div className="counter-label">🔥 Founding Member Spots:</div>
+                <div className="counter-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: '36.7%' }}></div>
+                  </div>
+                  <span className="progress-text">367/1,000 claimed</span>
                 </div>
               </div>
             </div>
@@ -316,6 +344,173 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
             >
               🎯 Start Assessment
             </button>
+          </div>
+        </section>
+
+        {/* Problem Recognition Section */}
+        <section className="problem-section" id="problem">
+          <div className="container">
+            <div className="problem__content animate-on-scroll">
+              <h2 className="section__title">Why Do Banks Keep Saying No?</h2>
+              <p className="section__subtitle">
+                It's not your business. It's your presentation.
+              </p>
+
+              <div className="problems__grid">
+                <div className="problem__item animate-left">
+                  <span className="problem__icon">❌</span>
+                  <p>Your financials are scattered across Excel sheets</p>
+                </div>
+                <div className="problem__item animate-right">
+                  <span className="problem__icon">❌</span>
+                  <p>You don't know your actual business valuation</p>
+                </div>
+                <div className="problem__item animate-left">
+                  <span className="problem__icon">❌</span>
+                  <p>Your records don't meet investor standards</p>
+                </div>
+                <div className="problem__item animate-right">
+                  <span className="problem__icon">❌</span>
+                  <p>You're missing critical documents investors need</p>
+                </div>
+              </div>
+
+              <div className="problem__conclusion">
+                <p className="highlight-text">
+                  One missing piece = automatic rejection.<br/>
+                  <strong>We help you fix every single gap.</strong>
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="how-it-works" id="how-it-works">
+          <div className="container">
+            <h2 className="section__title animate-on-scroll">
+              Your Path from Struggling to Funded
+            </h2>
+
+            <div className="steps__container">
+              <div className="step animate-scale">
+                <div className="step__number">1</div>
+                <div className="step__icon">📊</div>
+                <h3 className="step__title">ASSESS</h3>
+                <h4 className="step__subtitle">Take 5-Minute Assessment</h4>
+                <p className="step__description">
+                  Instantly discover what's blocking your funding<br/>
+                  Get your Investment Readiness Score (0-100)
+                </p>
+              </div>
+
+              <div className="step__connector"></div>
+
+              <div className="step animate-scale">
+                <div className="step__number">2</div>
+                <div className="step__icon">📈</div>
+                <h3 className="step__title">BUILD</h3>
+                <h4 className="step__subtitle">Follow Your Custom Roadmap</h4>
+                <p className="step__description">
+                  Track finances the investor way<br/>
+                  Build missing documentation<br/>
+                  Watch your score rise weekly
+                </p>
+              </div>
+
+              <div className="step__connector"></div>
+
+              <div className="step animate-scale">
+                <div className="step__number">3</div>
+                <div className="step__icon">🤝</div>
+                <h3 className="step__title">CONNECT</h3>
+                <h4 className="step__subtitle">Get Matched with Investors</h4>
+                <p className="step__description">
+                  Submit to verified funders<br/>
+                  Skip the cold emails<br/>
+                  Start real conversations
+                </p>
+              </div>
+            </div>
+
+            <div className="steps__cta">
+              <button className="btn btn--primary btn--large" onClick={startAssessment}>
+                Start Your Journey Today →
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Transformation Timeline Section */}
+        <section className="transformation-timeline" id="transformation">
+          <div className="container">
+            <h2 className="section__title animate-on-scroll">
+              Your First 90 Days with Bvester
+            </h2>
+
+            <div className="timeline__container">
+              <div className="timeline__item animate-left">
+                <div className="timeline__marker">Day 1</div>
+                <div className="timeline__content">
+                  <h4>Immediate Clarity</h4>
+                  <ul>
+                    <li>✓ Complete assessment</li>
+                    <li>✓ Get your score & gaps</li>
+                    <li>✓ Receive 90-day roadmap</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="timeline__item animate-right">
+                <div className="timeline__marker">Week 1</div>
+                <div className="timeline__content">
+                  <h4>Foundation Building</h4>
+                  <ul>
+                    <li>✓ Financial system setup</li>
+                    <li>✓ Start professional tracking</li>
+                    <li>✓ First weekly progress report</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="timeline__item animate-left">
+                <div className="timeline__marker">Month 1</div>
+                <div className="timeline__content">
+                  <h4>Visible Progress</h4>
+                  <ul>
+                    <li>✓ Clean financial statements</li>
+                    <li>✓ Business valuation ready</li>
+                    <li>✓ +15 point score increase</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="timeline__item animate-right">
+                <div className="timeline__marker">Month 3</div>
+                <div className="timeline__content">
+                  <h4>Investment Ready</h4>
+                  <ul>
+                    <li>✓ Investment-ready status</li>
+                    <li>✓ Investor matches available</li>
+                    <li>✓ Funding conversations begin</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="transformation__promise">
+              <div className="promise__box">
+                <div className="promise__from">
+                  <span className="label">FROM:</span>
+                  <span className="text">Confused & Rejected</span>
+                </div>
+                <div className="promise__arrow">→</div>
+                <div className="promise__to">
+                  <span className="label">TO:</span>
+                  <span className="text">Clear, Confident & Funded</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -399,13 +594,79 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           </div>
         </section>
 
+        {/* Authority Building Section */}
+        <section className="authority-section" id="authority">
+          <div className="container">
+            <h2 className="section__title animate-on-scroll">
+              Built by People Who've Been on Both Sides
+            </h2>
+
+            <div className="authority__content">
+              <div className="founders__story animate-left">
+                <h3>Our Story</h3>
+                <p>
+                  Our team includes former investment bankers from:
+                </p>
+                <div className="banks__logos">
+                  <span className="bank-name">Standard Bank</span>
+                  <span className="divider">|</span>
+                  <span className="bank-name">Stanbic</span>
+                  <span className="divider">|</span>
+                  <span className="bank-name">Ecobank</span>
+                  <span className="divider">|</span>
+                  <span className="bank-name">AfDB</span>
+                </div>
+                <p className="highlight-stat">
+                  Combined, we've reviewed <strong>10,000+ loan applications</strong>.<br/>
+                  We know exactly why 95% get rejected.<br/>
+                  And exactly how to be in the 5% that succeed.
+                </p>
+              </div>
+
+              <div className="platform__credentials animate-right">
+                <h3>Platform Credentials</h3>
+                <ul className="credentials__list">
+                  <li>
+                    <span className="icon">🧠</span>
+                    Smart analysis engine trained on successful funding patterns
+                  </li>
+                  <li>
+                    <span className="icon">📊</span>
+                    Based on real criteria from 500+ African investors
+                  </li>
+                  <li>
+                    <span className="icon">🔬</span>
+                    Proprietary scoring algorithm from banking data
+                  </li>
+                  <li>
+                    <span className="icon">✅</span>
+                    Proven improvement methodology
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="guarantee__box animate-scale">
+              <div className="guarantee__icon">📋</div>
+              <h3>Our Promise</h3>
+              <p>
+                Improve your Investment Readiness Score by <strong>30 points in 90 days</strong>,
+                or we work with you <strong>FREE</strong> until you do.
+              </p>
+              <p className="guarantee__note">
+                That's how confident we are in our system.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section className="pricing" id="pricing">
           <div className="container">
             <div className="section-header">
-              <div className="section__badge">Simple Pricing</div>
-              <h2>Choose Your Growth Path</h2>
-              <p>Start free, upgrade when you're ready to scale</p>
+              <div className="section__badge">🔥 Founding Member Pricing</div>
+              <h2>Choose Your Growth Speed</h2>
+              <p>Lock in 50% lifetime discount - Only for first 1,000 members</p>
             </div>
 
             {/* Pricing Toggle */}
@@ -836,6 +1097,35 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                   Complete assessment first, then join at the discounted rate of ₵1,000
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA Section */}
+        <section className="final-cta-section">
+          <div className="container">
+            <div className="cta__content">
+              <h2>Two Types of Businesses in Africa Today:</h2>
+              <div className="business-types">
+                <div className="type type--struggling">
+                  <div className="type__icon">😔</div>
+                  <h3>Type 1</h3>
+                  <p>Still wondering why banks keep saying no.</p>
+                  <p>Still using Excel. Still hoping things change.</p>
+                </div>
+                <div className="type__arrow">→</div>
+                <div className="type type--winning">
+                  <div className="type__icon">🚀</div>
+                  <h3>Type 2</h3>
+                  <p>Building investor-ready businesses with Bvester.</p>
+                  <p>Clear roadmap. Real progress. Funding conversations.</p>
+                </div>
+              </div>
+              <h3 className="cta__question">Which one will you be?</h3>
+              <button className="btn btn--gold btn--extra-large pulse" onClick={startAssessment}>
+                Join 367 Smart Business Owners Today →
+              </button>
+              <p className="cta__subtext">Free to start • No credit card • Cancel anytime</p>
             </div>
           </div>
         </section>

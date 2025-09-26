@@ -1,0 +1,515 @@
+/* ============================================
+   BVESTER HOMEPAGE ANIMATIONS
+   Professional, Subtle, High-Converting
+   ============================================ */
+
+/* ============================================
+   1. KEYFRAME DEFINITIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.6);
+  }
+}
+
+/* ============================================
+   2. HERO SECTION ANIMATIONS
+   ============================================ */
+
+.hero__content h1 {
+  animation: fadeInUp 0.8s ease-out;
+  animation-fill-mode: both;
+}
+
+.hero__content .hero__subtitle {
+  animation: fadeInUp 0.8s ease-out 0.2s;
+  animation-fill-mode: both;
+}
+
+.hero__content .hero__warning {
+  animation: fadeInUp 0.8s ease-out 0.4s;
+  animation-fill-mode: both;
+}
+
+.hero__cta {
+  animation: fadeInUp 0.8s ease-out 0.6s;
+  animation-fill-mode: both;
+}
+
+.hero__trust-indicators {
+  animation: fadeInUp 0.8s ease-out 0.8s;
+  animation-fill-mode: both;
+}
+
+/* CTA Button Pulse */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  animation: pulse 0.5s ease-in-out;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* ============================================
+   3. SCROLL-TRIGGERED ANIMATIONS
+   ============================================ */
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.animate-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.animate-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.8s ease-out;
+}
+
+.animate-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.animate-scale {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.8s ease-out;
+}
+
+.animate-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ============================================
+   4. STATS COUNTER ANIMATION
+   ============================================ */
+
+.stat-number {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+}
+
+.stat-number.counting {
+  animation: countUp 0.5s ease-out;
+}
+
+/* ============================================
+   5. TESTIMONIAL ANIMATIONS
+   ============================================ */
+
+.testimonial-card {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.testimonial-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   6. FEATURE CARD ANIMATIONS
+   ============================================ */
+
+.feature__card {
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.feature__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent, rgba(212, 175, 55, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+}
+
+.feature__card:hover::before {
+  opacity: 1;
+}
+
+.feature__card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+}
+
+.feature__icon {
+  transition: transform 0.4s ease;
+}
+
+.feature__card:hover .feature__icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+/* ============================================
+   7. PRICING CARD ANIMATIONS
+   ============================================ */
+
+.pricing__card {
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.pricing__card.recommended {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.pricing__card:hover {
+  transform: translateY(-10px);
+}
+
+.pricing__badge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: var(--gold-primary);
+  color: var(--black-primary);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+/* ============================================
+   8. COUNTDOWN TIMER ANIMATION
+   ============================================ */
+
+.countdown-timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--red-primary);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.countdown-digit {
+  display: inline-block;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+/* ============================================
+   9. LOADING SKELETON ANIMATION
+   ============================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--gray-200) 25%,
+    var(--gray-100) 50%,
+    var(--gray-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================================
+   10. NOTIFICATION ANIMATIONS
+   ============================================ */
+
+.notification {
+  animation: fadeInRight 0.5s ease-out;
+}
+
+.notification.success {
+  border-left: 4px solid var(--green-primary);
+}
+
+.notification.error {
+  border-left: 4px solid var(--red-primary);
+}
+
+/* ============================================
+   11. MICRO-INTERACTIONS
+   ============================================ */
+
+.interactive-element {
+  transition: all 0.2s ease;
+}
+
+.interactive-element:hover {
+  transform: scale(1.05);
+}
+
+.interactive-element:active {
+  transform: scale(0.95);
+}
+
+/* Links hover underline animation */
+a.animated-link {
+  position: relative;
+  text-decoration: none;
+}
+
+a.animated-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gold-primary);
+  transition: width 0.3s ease;
+}
+
+a.animated-link:hover::after {
+  width: 100%;
+}
+
+/* ============================================
+   12. SCROLL INDICATOR
+   ============================================ */
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: float 2s ease-in-out infinite;
+}
+
+.scroll-indicator::after {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 30px;
+  border: 2px solid var(--white-primary);
+  border-radius: 15px;
+  position: relative;
+}
+
+.scroll-indicator::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 8px;
+  background: var(--white-primary);
+  border-radius: 2px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: float 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   13. PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* Reduce animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hardware acceleration for smooth animations */
+.animate-on-scroll,
+.feature__card,
+.pricing__card,
+.testimonial-card {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ============================================
+   14. RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Reduce animation distances on mobile */
+  @keyframes fadeInUp {
+    from {
+      transform: translateY(20px);
+    }
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      transform: translateX(-20px);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      transform: translateX(20px);
+    }
+  }
+
+  /* Disable hover animations on touch devices */
+  .feature__card:hover,
+  .pricing__card:hover {
+    transform: none;
+  }
+}

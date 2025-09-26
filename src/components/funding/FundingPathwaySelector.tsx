@@ -201,8 +201,70 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
   return (
     <div className="funding-pathway-selector-overlay">
       <div className="funding-pathway-selector">
-        <div className="selector-header">
-          <button className="close-button" onClick={onClose}>
+        {/* SEC License Pending Overlay */}
+        <div className="sec-pending-overlay" style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 100,
+          backgroundColor: 'white',
+          padding: '3rem',
+          borderRadius: '16px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
+          textAlign: 'center',
+          maxWidth: '500px'
+        }}>
+          <div className="sec-pending-badge" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            backgroundColor: '#fff4cd',
+            padding: '0.5rem 1rem',
+            borderRadius: '20px',
+            marginBottom: '1.5rem'
+          }}>
+            <span className="badge-icon" style={{ fontSize: '1.5rem' }}>⚖️</span>
+            <span className="badge-text" style={{ fontWeight: 'bold', color: '#D4AF37' }}>SEC License Pending</span>
+          </div>
+          <h2 style={{ marginBottom: '1rem', fontSize: '2rem' }}>Coming Soon!</h2>
+          <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+            Our Investment Journey feature will be available once our Securities and Exchange Commission license is approved.
+          </p>
+          <div className="expected-timeline" style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            marginBottom: '2rem',
+            color: '#D4AF37',
+            fontWeight: 'bold'
+          }}>
+            <span className="timeline-icon">📅</span>
+            <span>Expected: Q1 2025 (45 days)</span>
+          </div>
+          <button className="btn btn--gold" onClick={onClose} style={{
+            padding: '0.75rem 2rem',
+            backgroundColor: '#D4AF37',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}>
+            Notify Me When Available
+          </button>
+        </div>
+
+        <div className="selector-header" style={{ opacity: 0.3, pointerEvents: 'none' }}>
+          <button className="close-button" onClick={onClose} style={{
+            pointerEvents: 'auto',
+            opacity: 1,
+            position: 'absolute',
+            right: '1rem',
+            top: '1rem',
+            zIndex: 101
+          }}>
             ×
           </button>
           <div className="header-content">
@@ -211,7 +273,7 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
           </div>
         </div>
 
-        <div className="business-context">
+        <div className="business-context" style={{ opacity: 0.3, pointerEvents: 'none' }}>
           <div className="context-item">
             <span className="context-label">Your Business:</span>
             <span className="context-value">
@@ -224,7 +286,7 @@ const FundingPathwaySelector: React.FC<FundingPathwaySelectorProps> = ({
           </div>
         </div>
 
-        <div className="pathways-grid">
+        <div className="pathways-grid" style={{ opacity: 0.3, pointerEvents: 'none' }}>
           {FUNDING_PATHWAYS.map((pathway) => (
             <PathwayCard
               key={pathway.id}
