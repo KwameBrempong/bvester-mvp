@@ -189,7 +189,6 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           <a href="#home" className="nav__logo" onClick={() => handleNavClick('#home')}>
             <img src="/bvester-logo.png" alt="Bvester" className="nav__logo-img" />
             <span className="nav__logo-text">Bvester</span>
-            <span className="nav__badge">SEC Pending</span>
           </a>
 
           <nav className={`nav__links ${menuOpen ? 'nav__links--open' : ''}`}>
@@ -268,9 +267,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
               <div className="hero__trust-indicators">
                 <span className="trust-item">🔒 Bank-Level Security</span>
                 <span className="trust-divider">|</span>
-                <span className="trust-item">🏛️ SEC Registered</span>
-                <span className="trust-divider">|</span>
-                <span className="trust-item">⚡ No Credit Card</span>
+                <span className="trust-item">⚡ No Credit Card Required</span>
               </div>
 
               <div className="founding-member-counter">
