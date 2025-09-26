@@ -14,6 +14,9 @@ interface FeatureFlags {
 
   // Investment Accelerator (unified program)
   showPricingTiers: boolean;
+  enableCrowdfundingTrack: boolean;
+  enableTieredFundingPathway: boolean;
+  showFundingPathwaySelector: boolean;
 
   // Homepage improvements
   useOptimizedHomepage: boolean;
@@ -40,6 +43,9 @@ const defaultFlags: FeatureFlags = {
 
   // Investment Accelerator features (medium risk)
   showPricingTiers: false,
+  enableCrowdfundingTrack: false,
+  enableTieredFundingPathway: false,
+  showFundingPathwaySelector: false,
 
   // Homepage (high impact - enable last)
   useOptimizedHomepage: false,

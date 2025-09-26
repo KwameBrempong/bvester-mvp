@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { isFeatureEnabled } from '../config/featureFlags';
+import { FundingPathway } from '../types/funding.types';
+import { FUNDING_PATHWAYS, getPathwayById, getRecommendedPathway } from '../config/fundingPathways';
+import FundingPathwaySelector from './funding/FundingPathwaySelector';
 import '../styles/premium-theme.css';
 
 interface AcceleratorModule {
@@ -225,6 +228,40 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [showEnrollment, setShowEnrollment] = useState(false);
 
+  // New funding pathway state
+  const [showPathwaySelector, setShowPathwaySelector] = useState(false);
+  const [selectedFundingPathway, setSelectedFundingPathway] = useState<string | null>(null);
+  const [currentPathwayData, setCurrentPathwayData] = useState<FundingPathway | null>(null);
+
+  // Check if funding pathways are enabled
+  const pathwaysEnabled = isFeatureEnabled('enableTieredFundingPathway') || isFeatureEnabled('showFundingPathwaySelector');
+
+  useEffect(() => {
+    // Show pathway selector on component mount if feature is enabled
+    if (pathwaysEnabled && !selectedFundingPathway) {
+      setShowPathwaySelector(true);
+    } else if (!pathwaysEnabled) {
+      // Default to traditional investment accelerator for backward compatibility
+      setSelectedFundingPathway('investment_readiness');
+    }
+  }, [pathwaysEnabled]);
+
+  useEffect(() => {
+    // Update pathway data when selection changes
+    if (selectedFundingPathway) {
+      const pathwayData = getPathwayById(selectedFundingPathway);
+      setCurrentPathwayData(pathwayData || null);
+    }
+  }, [selectedFundingPathway]);
+
+  const handlePathwaySelect = (pathwayId: string) => {
+    setSelectedFundingPathway(pathwayId);
+    setShowPathwaySelector(false);
+
+    // Reset to overview tab when pathway changes
+    setActiveTab('overview');
+  };
+
   // Calculate program metrics
   const totalLessons = acceleratorModules.reduce((sum, module) => sum + module.lessons, 0);
   const completedLessons = acceleratorModules
@@ -270,8 +307,26 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
   const getCurrentModule = () => acceleratorModules.find(m => m.id === currentModule);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl">
+    <>
+      {/* Funding Pathway Selector - shown when feature is enabled and no pathway selected */}
+      {showPathwaySelector && (
+        <FundingPathwaySelector
+          userProfile={userProfile}
+          assessmentResult={{ overallScore: enrollmentScore }}
+          onPathwaySelect={handlePathwaySelect}
+          onClose={() => {
+            setShowPathwaySelector(false);
+            // If user closes without selecting, default to investment readiness for backward compatibility
+            if (!selectedFundingPathway) {
+              setSelectedFundingPathway('investment_readiness');
+            }
+          }}
+        />
+      )}
+
+      {/* Main Investment Accelerator Component */}
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-black p-6 text-white relative">
           <button
@@ -678,5 +733,6 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
         </div>
       </div>
     </div>
+    </>
   );
 }
