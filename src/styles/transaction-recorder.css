@@ -275,6 +275,7 @@
 .transaction-amount-text {
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .transaction-amount-text.income {
@@ -656,6 +657,8 @@
 /* Analytics Panel Styles */
 .analytics-panel {
   padding: var(--space-lg);
+  overflow-y: auto;
+  max-height: calc(90vh - 200px);
 }
 
 .kpi-grid {
@@ -703,6 +706,33 @@
 
 .count-value {
   color: var(--black-primary);
+}
+
+/* New Analytics Color Classes */
+.total-value-blue {
+  color: var(--blue-600);
+  font-weight: var(--font-bold);
+}
+
+.total-expenses-value-red {
+  color: var(--red-600);
+  font-weight: var(--font-bold);
+}
+
+.net-income-value-green {
+  color: var(--green-600);
+  font-weight: var(--font-bold);
+}
+
+/* Recent Transactions Color Classes */
+.recent-income {
+  color: var(--blue-600);
+  font-weight: var(--font-bold);
+}
+
+.recent-expense {
+  color: var(--red-400);
+  font-weight: var(--font-bold);
 }
 
 .income-card {

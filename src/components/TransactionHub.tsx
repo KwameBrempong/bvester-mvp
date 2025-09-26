@@ -544,7 +544,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
                               <div className="transaction-icon">
                                 <Icon name={getCategoryIcon(transaction.category)} size={16} />
                               </div>
-                              <span className={`transaction-amount-text ${transaction.type}`}>
+                              <span className={`transaction-amount-text ${transaction.type === 'income' ? 'recent-income' : 'recent-expense'}`}>
                                 {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                               </span>
                             </div>
@@ -770,19 +770,19 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
               <div className="kpi-grid">
                 <div className="kpi-card income-card">
                   <h6 className="kpi-label">Total Income</h6>
-                  <div className="kpi-value income-value">
+                  <div className="kpi-value total-value-blue">
                     {formatCurrency(analytics.totalIncome)}
                   </div>
                 </div>
                 <div className="kpi-card expense-card">
                   <h6 className="kpi-label">Total Expenses</h6>
-                  <div className="kpi-value expense-value">
+                  <div className="kpi-value total-expenses-value-red">
                     {formatCurrency(analytics.totalExpenses)}
                   </div>
                 </div>
                 <div className="kpi-card net-income-card">
                   <h6 className="kpi-label">Net Income</h6>
-                  <div className={`kpi-value ${analytics.netIncome >= 0 ? 'income-value' : 'expense-value'}`}>
+                  <div className="kpi-value net-income-value-green">
                     {formatCurrency(analytics.netIncome)}
                   </div>
                 </div>

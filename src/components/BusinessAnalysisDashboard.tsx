@@ -346,7 +346,7 @@ const BusinessAnalysisDashboard: React.FC<BusinessAnalysisDashboardProps> = ({ u
               borderRadius: '12px',
               border: '1px solid #e0e0e0'
             }}>
-              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2E8B57', marginBottom: '4px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2563EB', marginBottom: '4px' }}>
                 {formatCurrency(analysis.totalRevenue)}
               </div>
               <div style={{ fontSize: '12px', color: '#666' }}>Total Revenue</div>
@@ -373,7 +373,7 @@ const BusinessAnalysisDashboard: React.FC<BusinessAnalysisDashboardProps> = ({ u
               <div style={{
                 fontSize: '18px',
                 fontWeight: 'bold',
-                color: analysis.netProfit >= 0 ? '#2E8B57' : '#e74c3c',
+                color: '#059669',
                 marginBottom: '4px'
               }}>
                 {formatCurrency(analysis.netProfit)}
