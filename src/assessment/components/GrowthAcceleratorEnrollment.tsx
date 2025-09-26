@@ -23,43 +23,43 @@ interface GrowthAcceleratorEnrollmentProps {
 
 const MODULE_DETAILS = {
   financial_mastery: {
-    title: 'Financial Mastery Track',
-    price: 'GHS 2,500',
-    duration: '8 weeks',
-    startDate: 'Next Monday',
-    spots: '12 remaining',
+    title: 'Investment Accelerator Program',
+    price: 'GHS 800 - 2,500',
+    duration: '90 days',
+    startDate: 'Choose Your Track',
+    spots: '12 remaining in Elite Cohort',
     urgency: 'critical'
   },
   operational_excellence: {
-    title: 'Operational Excellence Program',
-    price: 'GHS 2,200',
-    duration: '6 weeks',
-    startDate: 'Next Wednesday',
-    spots: '8 remaining',
+    title: 'Investment Accelerator Program',
+    price: 'GHS 800 - 2,500',
+    duration: '90 days',
+    startDate: 'Choose Your Track',
+    spots: '12 remaining in Elite Cohort',
     urgency: 'high'
   },
   market_domination: {
-    title: 'Market Domination Strategy',
-    price: 'GHS 3,000',
-    duration: '10 weeks',
-    startDate: 'Next Friday',
-    spots: '15 remaining',
+    title: 'Investment Accelerator Program',
+    price: 'GHS 800 - 2,500',
+    duration: '90 days',
+    startDate: 'Choose Your Track',
+    spots: '12 remaining in Elite Cohort',
     urgency: 'medium'
   },
   compliance_shield: {
-    title: 'Compliance & Risk Shield',
-    price: 'GHS 1,800',
-    duration: '4 weeks',
-    startDate: 'Immediate',
-    spots: '5 remaining',
+    title: 'Investment Accelerator Program',
+    price: 'GHS 800 - 2,500',
+    duration: '90 days',
+    startDate: 'Choose Your Track',
+    spots: '12 remaining in Elite Cohort',
     urgency: 'critical'
   },
   growth_rocket: {
-    title: 'Growth Rocket Accelerator',
-    price: 'GHS 4,500',
-    duration: '12 weeks',
-    startDate: 'Next Month',
-    spots: '20 remaining',
+    title: 'Investment Accelerator Program',
+    price: 'GHS 800 - 2,500',
+    duration: '90 days',
+    startDate: 'Choose Your Track',
+    spots: '12 remaining in Elite Cohort',
     urgency: 'low'
   }
 };

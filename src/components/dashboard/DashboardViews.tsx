@@ -151,67 +151,94 @@ export const AssessmentView: React.FC = () => {
   );
 };
 
-// Growth Tools View
+// Growth Tools View - Investment Accelerator Program
 export const GrowthView: React.FC = () => {
   return (
     <div className="view-container animate-fadeIn">
-      <ComingSoonState feature="Growth Tools" />
-    </div>
-  );
-};
+      <div className="accelerator-overview">
+        <div className="accelerator-header">
+          <Icon name="growth" size={48} color="var(--gold-primary)" />
+          <h2>Investment Accelerator Program</h2>
+          <p>Transform from struggling SME to investment-ready business in 90 days</p>
+        </div>
 
-// Bootcamp View
-export const BootcampView: React.FC = () => {
-  return (
-    <div className="view-container animate-fadeIn">
-      <div className="bootcamp-container">
-        <div className="bootcamp-header">
-          <h2>Business Bootcamp</h2>
-          <p>Accelerate your business growth with expert-led training</p>
-        </div>
-        
-        <div className="bootcamp-modules">
-          <div className="module-card">
-            <div className="module-icon">
-              <Icon name="book" size={32} color="var(--gold-primary)" />
+        <div className="accelerator-tracks">
+          <div className="track-card">
+            <div className="track-icon">
+              <Icon name="book" size={32} color="var(--blue-500)" />
             </div>
-            <h3>Foundation Module</h3>
-            <p>Business fundamentals and strategy</p>
-            <div className="module-progress">
-              <div className="progress-bar" style={{ width: '30%' }} />
-            </div>
-            <span className="module-status">3 of 10 lessons completed</span>
+            <h3>Self-Paced Track</h3>
+            <div className="track-price">₵800</div>
+            <p>Complete the comprehensive curriculum at your own speed with community support</p>
+            <ul className="track-features">
+              <li>6 months access to all content</li>
+              <li>Community support & Q&A forums</li>
+              <li>Email mentor support</li>
+              <li>All templates and resources</li>
+            </ul>
+            <button className="btn btn-secondary">Learn More</button>
           </div>
-          
-          <div className="module-card">
-            <div className="module-icon">
-              <Icon name="finance" size={32} color="var(--gold-primary)" />
+
+          <div className="track-card featured">
+            <div className="track-badge">🏆 Most Popular</div>
+            <div className="track-icon">
+              <Icon name="users" size={32} color="var(--gold-primary)" />
             </div>
-            <h3>Financial Management</h3>
-            <p>Master your business finances</p>
-            <div className="module-progress">
-              <div className="progress-bar" style={{ width: '0%' }} />
-            </div>
-            <span className="module-status">Not started</span>
-          </div>
-          
-          <div className="module-card locked">
-            <div className="module-icon">
-              <Icon name="lock" size={32} color="var(--gray-400)" />
-            </div>
-            <h3>Advanced Growth</h3>
-            <p>Scaling and expansion strategies</p>
-            <span className="module-status">Unlock after completing Financial Management</span>
+            <h3>Elite Cohort Track</h3>
+            <div className="track-price">₵2,500 <span className="original-price">₵3,500</span></div>
+            <p>Intensive 90-day program with personal mentorship and live group sessions</p>
+            <ul className="track-features">
+              <li>Personal mentor for 90 days</li>
+              <li>Live weekly group sessions</li>
+              <li>1-on-1 coaching calls</li>
+              <li>Direct investor introductions</li>
+              <li>90% investment readiness guarantee</li>
+            </ul>
+            <button className="btn btn-primary">Join Elite Cohort</button>
           </div>
         </div>
-        
-        <button className="btn btn-primary">
-          Continue Learning
-        </button>
+
+        <div className="success-metrics">
+          <div className="metric">
+            <div className="metric-value">90%</div>
+            <div className="metric-label">Investment Readiness Rate</div>
+          </div>
+          <div className="metric">
+            <div className="metric-value">₵2.1M</div>
+            <div className="metric-label">Total Funding Raised</div>
+          </div>
+          <div className="metric">
+            <div className="metric-value">156</div>
+            <div className="metric-label">SMEs Successfully Funded</div>
+          </div>
+        </div>
+
+        <div className="program-highlight">
+          <h3>🎯 Why SMEs Choose Our Investment Accelerator</h3>
+          <div className="highlight-grid">
+            <div className="highlight-item">
+              <Icon name="check" size={20} color="var(--green-500)" />
+              <span>Ghana-specific business solutions</span>
+            </div>
+            <div className="highlight-item">
+              <Icon name="check" size={20} color="var(--green-500)" />
+              <span>Real investor feedback & connections</span>
+            </div>
+            <div className="highlight-item">
+              <Icon name="check" size={20} color="var(--green-500)" />
+              <span>Proven frameworks & templates</span>
+            </div>
+            <div className="highlight-item">
+              <Icon name="check" size={20} color="var(--green-500)" />
+              <span>Personal mentorship from successful entrepreneurs</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
+
 
 // Investment X-Ray View
 export const XRayView: React.FC = () => {

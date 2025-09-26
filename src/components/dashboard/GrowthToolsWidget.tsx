@@ -33,10 +33,10 @@ const GrowthToolsWidget: React.FC<GrowthToolsWidgetProps> = ({
 
   const growthTools: GrowthTool[] = [
     {
-      id: 'bootcamp',
-      title: isFeatureEnabled('use30DayBootcamp') ? '30-Day Investment Bootcamp' : 'Growth Accelerator',
-      description: 'Build investment readiness through structured business development',
-      icon: '🎯',
+      id: 'investment_accelerator',
+      title: 'Investment Accelerator Program',
+      description: 'Transform from struggling SME to investment-ready business in 90 days',
+      icon: '🚀',
       category: 'primary',
       isPremium: false,
       isComingSoon: false,

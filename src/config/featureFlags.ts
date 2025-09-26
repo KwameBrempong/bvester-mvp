@@ -12,8 +12,7 @@ interface FeatureFlags {
   showBlindSpotAnalysis: boolean;
   useAssessmentV2: boolean;
 
-  // Accelerator enhancements
-  use30DayBootcamp: boolean;
+  // Investment Accelerator (unified program)
   showPricingTiers: boolean;
 
   // Homepage improvements
@@ -39,8 +38,7 @@ const defaultFlags: FeatureFlags = {
   showBlindSpotAnalysis: false,
   useAssessmentV2: true,
 
-  // Accelerator features (medium risk)
-  use30DayBootcamp: false,
+  // Investment Accelerator features (medium risk)
   showPricingTiers: false,
 
   // Homepage (high impact - enable last)

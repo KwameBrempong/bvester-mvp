@@ -55,14 +55,8 @@ const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({
     {
       id: 'growth',
       icon: 'growth',
-      label: 'Growth Tools',
-      sublabel: 'Accelerator Program'
-    },
-    {
-      id: 'bootcamp',
-      icon: 'bootcamp',
-      label: 'Bootcamp',
-      sublabel: 'Training & Resources'
+      label: 'Investment Accelerator',
+      sublabel: 'Transform Your Business'
     },
     {
       id: 'xray',

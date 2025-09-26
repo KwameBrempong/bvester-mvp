@@ -27,8 +27,7 @@ import './styles/mobile-optimizations.css';
 
 // Lazy load components for better performance
 const SMEProfile = lazy(() => import('./SMEProfile'));
-const GrowthAccelerator = lazy(() => import('./GrowthAccelerator'));
-const InvestmentBootcamp = lazy(() => import('./components/InvestmentBootcamp'));
+const InvestmentAccelerator = lazy(() => import('./components/InvestmentAccelerator'));
 const TransactionHub = lazy(() => import('./components/TransactionHub'));
 const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
 const EnhancedBusinessAssessment = lazy(() => import('./EnhancedBusinessAssessment'));
@@ -58,7 +57,6 @@ import {
   ProfileView,
   AssessmentView,
   GrowthView,
-  BootcampView,
   XRayView,
   TransactionsView,
   BillingView,
@@ -459,11 +457,6 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           </React.Suspense>
         )}
 
-        {activeView === 'bootcamp' && (
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <BootcampView />
-          </React.Suspense>
-        )}
 
         {activeView === 'xray' && (
           <React.Suspense fallback={<LoadingSpinner />}>
@@ -535,19 +528,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         {showGrowthAccelerator && (
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
-              {isFeatureEnabled('use30DayBootcamp') ? (
-                <InvestmentBootcamp
-                  user={user}
-                  userProfile={userState.profile}
-                  onClose={() => setShowGrowthAccelerator(false)}
-                />
-              ) : (
-                <GrowthAccelerator
-                  user={user}
-                  userProfile={userState.profile}
-                  onClose={() => setShowGrowthAccelerator(false)}
-                />
-              )}
+              <InvestmentAccelerator
+                user={user}
+                userProfile={userState.profile}
+                onClose={() => setShowGrowthAccelerator(false)}
+              />
             </Suspense>
           </ErrorBoundary>
         )}
