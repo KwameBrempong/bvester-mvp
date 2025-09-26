@@ -653,6 +653,49 @@ export const ProfileView: React.FC = () => {
                     A compelling description helps attract the right investors and partners.
                   </div>
                 </div>
+
+                <div className="form-group">
+                  <label>Business Logo URL</label>
+                  <input
+                    type="text"
+                    value={(editedProfile as any).businessLogo || ''}
+                    onChange={(e) => handleInputChange('businessLogo', e.target.value)}
+                    placeholder="https://example.com/logo.png"
+                  />
+                  <div className="form-help">
+                    Provide a URL to your business logo image.
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>CEO/Founder Name</label>
+                  <input
+                    type="text"
+                    value={(editedProfile as any).ceoName || ''}
+                    onChange={(e) => handleInputChange('ceoName', e.target.value)}
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>CEO/Founder Email</label>
+                  <input
+                    type="email"
+                    value={(editedProfile as any).ceoEmail || ''}
+                    onChange={(e) => handleInputChange('ceoEmail', e.target.value)}
+                    placeholder="ceo@example.com"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>CEO/Founder Phone</label>
+                  <input
+                    type="tel"
+                    value={(editedProfile as any).ceoPhone || ''}
+                    onChange={(e) => handleInputChange('ceoPhone', e.target.value)}
+                    placeholder="+233 XX XXX XXXX"
+                  />
+                </div>
               </div>
             ) : (
               <div className="description-content">

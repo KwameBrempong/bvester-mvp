@@ -88,6 +88,34 @@
               "isRequired": true,
               "attributes": []
             },
+            "businessLogo": {
+              "name": "businessLogo",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ceoName": {
+              "name": "ceoName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ceoEmail": {
+              "name": "ceoEmail",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ceoPhone": {
+              "name": "ceoPhone",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "region": {
               "name": "region",
               "isArray": false,

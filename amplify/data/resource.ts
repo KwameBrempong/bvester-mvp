@@ -14,6 +14,11 @@ const schema = a.schema({
       email: a.string().required(),
       phone: a.string(),
       location: a.string().required(),
+      // Business branding and leadership
+      businessLogo: a.string(),
+      ceoName: a.string(),
+      ceoEmail: a.string(),
+      ceoPhone: a.string(),
       region: a.string().required(),
       businessType: a.string().required(),
       businessDescription: a.string(),

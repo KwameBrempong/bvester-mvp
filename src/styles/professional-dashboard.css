@@ -531,10 +531,16 @@
   .dashboard-sidebar {
     transform: translateX(-100%);
     width: 280px !important;
+    z-index: 1000 !important;
   }
 
   .dashboard-sidebar.mobile-show {
     transform: translateX(0);
+    z-index: 1000 !important;
+  }
+
+  .mobile-menu-overlay {
+    z-index: 999 !important;
   }
 
   .sidebar-toggle {
@@ -544,6 +550,8 @@
   .dashboard-main {
     margin-left: 0 !important;
     padding-top: 60px;
+    position: relative;
+    z-index: 1;
   }
 
   .dashboard-topbar {
