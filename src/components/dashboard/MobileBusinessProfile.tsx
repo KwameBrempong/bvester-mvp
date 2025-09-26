@@ -66,19 +66,26 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
   };
 
   const handleSaveProfile = async () => {
-    if (!profile?.userId) return;
+    if (!profile?.userId) {
+      notify.error('User ID not found. Please try logging in again.', 'Error');
+      return;
+    }
 
+    console.log('Mobile: Saving profile with data:', { userId: profile.userId, updates: editedProfile });
     setIsSaving(true);
     try {
-      await dispatch(updateUserProfile({
+      const result = await dispatch(updateUserProfile({
         userId: profile.userId,
         updates: editedProfile
       })).unwrap();
 
+      console.log('Mobile: Profile save successful:', result);
       notify.success('Profile updated successfully!', 'Success');
       setIsEditing(false);
     } catch (error) {
-      notify.error('Failed to update profile. Please try again.', 'Error');
+      console.error('Mobile: Profile save failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+      notify.error(errorMessage, 'Error');
     } finally {
       setIsSaving(false);
     }

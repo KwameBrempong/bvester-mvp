@@ -174,19 +174,26 @@ export const ProfileView: React.FC = () => {
 
   // Handle profile save
   const handleSaveProfile = async () => {
-    if (!profile?.userId) return;
+    if (!profile?.userId) {
+      notify.error('User ID not found. Please try logging in again.', 'Error');
+      return;
+    }
 
+    console.log('Saving profile with data:', { userId: profile.userId, updates: editedProfile });
     setIsSaving(true);
     try {
-      await dispatch(updateUserProfile({
+      const result = await dispatch(updateUserProfile({
         userId: profile.userId,
         updates: editedProfile
       })).unwrap();
 
+      console.log('Profile save successful:', result);
       notify.success('Profile updated successfully!', 'Profile Saved');
       setIsEditing(false);
     } catch (error) {
-      notify.error('Failed to update profile. Please try again.', 'Update Failed');
+      console.error('Profile save failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile. Please try again.';
+      notify.error(errorMessage, 'Update Failed');
     } finally {
       setIsSaving(false);
     }

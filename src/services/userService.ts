@@ -118,11 +118,19 @@ export class UserService {
    */
   static async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile | null> {
     try {
+      console.log('🔄 Starting profile update for userId:', userId);
+      console.log('📝 Updates to apply:', updates);
+
       // First fetch the existing profile
       const existingProfile = await this.getUserProfile(userId);
       if (!existingProfile) {
         throw new Error('Profile not found');
       }
+
+      console.log('📋 Existing profile found:', {
+        id: existingProfile.userId,
+        businessName: existingProfile.businessName
+      });
 
       // Find the profile record to update
       const result = await client.models.UserProfile.list({
@@ -130,44 +138,57 @@ export class UserService {
       });
 
       if (!result.data || result.data.length === 0) {
-        throw new Error('Profile record not found');
+        throw new Error('Profile record not found in database');
       }
 
       const profileId = result.data[0].id;
+      console.log('🔍 Found profile record with ID:', profileId);
 
-      // Update the profile
-      const updateResult = await client.models.UserProfile.update({
+      // Prepare update payload
+      const updatePayload = {
         id: profileId,
-        businessName: updates.businessName || existingProfile.businessName,
-        ownerName: updates.ownerName || existingProfile.ownerName,
-        email: updates.email || existingProfile.email,
+        businessName: updates.businessName !== undefined ? updates.businessName : existingProfile.businessName,
+        ownerName: updates.ownerName !== undefined ? updates.ownerName : existingProfile.ownerName,
+        email: updates.email !== undefined ? updates.email : existingProfile.email,
         phone: updates.phone !== undefined ? updates.phone : existingProfile.phone,
-        location: updates.location || existingProfile.location,
-        region: updates.region || existingProfile.region,
-        businessType: updates.businessType || existingProfile.businessType,
+        location: updates.location !== undefined ? updates.location : existingProfile.location,
+        region: updates.region !== undefined ? updates.region : existingProfile.region,
+        businessType: updates.businessType !== undefined ? updates.businessType : existingProfile.businessType,
         businessDescription: updates.businessDescription !== undefined ? updates.businessDescription : existingProfile.businessDescription,
         registrationNumber: updates.registrationNumber !== undefined ? updates.registrationNumber : existingProfile.registrationNumber,
         tinNumber: updates.tinNumber !== undefined ? updates.tinNumber : existingProfile.tinNumber,
         yearEstablished: updates.yearEstablished !== undefined ? updates.yearEstablished : existingProfile.yearEstablished,
         employeeCount: updates.employeeCount !== undefined ? updates.employeeCount : existingProfile.employeeCount,
         businessStage: updates.businessStage !== undefined ? updates.businessStage : existingProfile.businessStage,
-        role: updates.role || existingProfile.role,
+        role: updates.role !== undefined ? updates.role : existingProfile.role,
         profileCompletionPercentage: updates.profileCompletionPercentage !== undefined ? updates.profileCompletionPercentage : existingProfile.profileCompletionPercentage,
         isEmailVerified: updates.isEmailVerified !== undefined ? updates.isEmailVerified : existingProfile.isEmailVerified,
         isPhoneVerified: updates.isPhoneVerified !== undefined ? updates.isPhoneVerified : existingProfile.isPhoneVerified,
         isBusinessVerified: updates.isBusinessVerified !== undefined ? updates.isBusinessVerified : existingProfile.isBusinessVerified,
         profileCompletedAt: updates.profileCompletedAt !== undefined ? updates.profileCompletedAt : existingProfile.profileCompletedAt,
         lastUpdated: new Date().toISOString()
-      });
+      };
+
+      console.log('📤 Sending update to database:', updatePayload);
+
+      // Update the profile
+      const updateResult = await client.models.UserProfile.update(updatePayload);
 
       if (updateResult.errors && updateResult.errors.length > 0) {
+        console.error('❌ Database update failed:', updateResult.errors);
         throw new Error(`Failed to update user profile: ${updateResult.errors[0].message}`);
       }
+
+      console.log('✅ Database update successful');
+
+      // Also update localStorage for immediate UI feedback
+      const updatedProfile = { ...existingProfile, ...updates, lastUpdated: new Date().toISOString() };
+      localStorage.setItem(`profile_${userId}`, JSON.stringify(updatedProfile));
 
       // Return updated profile
       return await this.getUserProfile(userId);
     } catch (error) {
-      // Error updating user profile
+      console.error('💥 Error updating user profile:', error);
       throw error;
     }
   }
