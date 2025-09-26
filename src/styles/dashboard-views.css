@@ -73,6 +73,29 @@
   position: relative;
 }
 
+/* Business Name Container with Edit Button */
+.profile-name-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.edit-business-name-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  opacity: 0.7;
+}
+
+.edit-business-name-btn:hover {
+  opacity: 1;
+  background: var(--gold-subtle);
+  transform: scale(1.1);
+}
+
 .profile-avatar {
   width: 100px;
   height: 100px;

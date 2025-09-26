@@ -44,6 +44,46 @@
   min-width: 0;
 }
 
+/* Business Name Container with Edit Button */
+.business-name-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+
+.business-name-container h1 {
+  margin: 0;
+  flex: 1;
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--black-primary);
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+
+.edit-business-name-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  opacity: 0.8;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.edit-business-name-btn:hover {
+  opacity: 1;
+  background: var(--gold-subtle);
+  transform: scale(1.1);
+}
+
 .business-info h1 {
   font-size: var(--text-xl);
   font-weight: var(--font-bold);

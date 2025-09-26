@@ -377,9 +377,18 @@ export const ProfileView: React.FC = () => {
             <span className="avatar-initials">{getBusinessInitials()}</span>
           </div>
           <div className="profile-info">
-            <h2 className="profile-name">
-              {profile.businessName || 'Business Name Not Set'}
-            </h2>
+            <div className="profile-name-container">
+              <h2 className="profile-name">
+                {profile.businessName || 'Business Name Not Set'}
+              </h2>
+              <button
+                className="edit-business-name-btn"
+                onClick={() => setIsEditing(true)}
+                title="Edit business name"
+              >
+                <Icon name="edit" size={16} color="var(--gold-primary)" />
+              </button>
+            </div>
             <p className="profile-industry">
               {profile.businessType || 'Business Type Not Specified'}
             </p>
@@ -1310,14 +1319,30 @@ export const ProfileView: React.FC = () => {
                     <div className="action-item">
                       <Icon name="building" size={16} />
                       <span>Add business registration number</span>
-                      <button className="btn btn-sm btn-outline">Add Now</button>
+                      <button
+                        className="btn btn-sm btn-outline"
+                        onClick={() => {
+                          setIsEditing(true);
+                          notify.info('Please add business registration in the edit form', 'Info');
+                        }}
+                      >
+                        Add Now
+                      </button>
                     </div>
                   )}
                   {!profile.taxId && (
                     <div className="action-item">
                       <Icon name="file-text" size={16} />
                       <span>Provide tax identification number</span>
-                      <button className="btn btn-sm btn-outline">Add Now</button>
+                      <button
+                        className="btn btn-sm btn-outline"
+                        onClick={() => {
+                          setIsEditing(true);
+                          notify.info('Please add tax ID in the edit form', 'Info');
+                        }}
+                      >
+                        Add Now
+                      </button>
                     </div>
                   )}
                   {documents.length === 0 && (
@@ -1335,7 +1360,14 @@ export const ProfileView: React.FC = () => {
                   <div className="action-item">
                     <Icon name="phone" size={16} />
                     <span>Verify phone number via SMS</span>
-                    <button className="btn btn-sm btn-primary">Verify Now</button>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => {
+                        notify.info('Phone verification feature coming soon!', 'Verification');
+                      }}
+                    >
+                      Verify Now
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1836,7 +1868,12 @@ export const ProfileView: React.FC = () => {
                         <p>Add an extra layer of security to your account</p>
                       </div>
                     </div>
-                    <button className="btn btn-outline">
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => {
+                        notify.info('Two-factor authentication setup coming soon!', 'Security');
+                      }}
+                    >
                       Enable 2FA
                     </button>
                   </div>
@@ -1849,7 +1886,12 @@ export const ProfileView: React.FC = () => {
                         <p>Verify your phone number for account security</p>
                       </div>
                     </div>
-                    <button className="btn btn-primary">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        notify.info('Phone verification feature coming soon!', 'Security');
+                      }}
+                    >
                       Verify Phone
                     </button>
                   </div>
@@ -1875,7 +1917,12 @@ export const ProfileView: React.FC = () => {
                         <p>Download a copy of all your business data</p>
                       </div>
                     </div>
-                    <button className="btn btn-outline">
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => {
+                        notify.info('Data export feature coming soon!', 'Data Export');
+                      }}
+                    >
                       Export Data
                     </button>
                   </div>
@@ -1888,7 +1935,14 @@ export const ProfileView: React.FC = () => {
                         <p>Permanently delete your account and all data</p>
                       </div>
                     </div>
-                    <button className="btn btn-danger">
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                          notify.error('Account deletion feature coming soon!', 'Account Deletion');
+                        }
+                      }}
+                    >
                       Delete Account
                     </button>
                   </div>
@@ -1944,7 +1998,12 @@ export const ProfileView: React.FC = () => {
                   </div>
                 </div>
 
-                <button className="btn btn-outline view-all-activity">
+                <button
+                  className="btn btn-outline view-all-activity"
+                  onClick={() => {
+                    notify.info('Detailed activity log coming soon!', 'Activity Log');
+                  }}
+                >
                   View All Activity
                 </button>
               </div>

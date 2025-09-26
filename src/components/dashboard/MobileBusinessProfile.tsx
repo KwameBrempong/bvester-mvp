@@ -120,7 +120,20 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
             <Icon name="building" size={24} color="var(--gold-primary)" />
           </div>
           <div className="business-info">
-            <h1>{profile.businessName || 'Your Business'}</h1>
+            <div className="business-name-container">
+              <h1>{profile.businessName || 'Your Business'}</h1>
+              <button
+                className="edit-business-name-btn"
+                onClick={() => {
+                  setIsEditing(true);
+                  setActiveTab('details');
+                  setExpandedSections(['basic']);
+                }}
+                title="Edit business name"
+              >
+                <Icon name="edit" size={14} color="var(--gold-primary)" />
+              </button>
+            </div>
             <p className="business-type">{profile.businessType || 'Business Type'}</p>
             <div className="business-location">
               <Icon name="map-pin" size={14} />
@@ -226,7 +239,11 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
               {!profile.businessDescription && (
                 <button
                   className="add-description-btn"
-                  onClick={() => {setIsEditing(true); setActiveTab('details');}}
+                  onClick={() => {
+                    setIsEditing(true);
+                    setActiveTab('details');
+                    setExpandedSections(['basic']);
+                  }}
                 >
                   <Icon name="add" size={16} />
                   Add Description
@@ -257,7 +274,11 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
                 </div>
                 <button
                   className="complete-btn"
-                  onClick={() => {setIsEditing(true); setActiveTab('details');}}
+                  onClick={() => {
+                    setIsEditing(true);
+                    setActiveTab('details');
+                    setExpandedSections(['basic', 'contact']);
+                  }}
                 >
                   Complete Now
                 </button>
@@ -541,7 +562,12 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
               <Icon name="chart-bar" size={48} color="var(--gray-400)" />
               <h3>Business Metrics</h3>
               <p>Advanced metrics and analytics will be available here.</p>
-              <button className="btn btn-outline">
+              <button
+                className="btn btn-outline"
+                onClick={() => {
+                  notify.info('Business metrics feature coming soon!', 'Metrics');
+                }}
+              >
                 <Icon name="plus" size={16} />
                 Add Metrics
               </button>
@@ -556,7 +582,12 @@ export const MobileBusinessProfile: React.FC<MobileBusinessProfileProps> = ({ cl
               <Icon name="folder" size={48} color="var(--gray-400)" />
               <h3>Document Management</h3>
               <p>Upload and manage your business documents.</p>
-              <button className="btn btn-outline">
+              <button
+                className="btn btn-outline"
+                onClick={() => {
+                  notify.info('Document upload feature coming soon!', 'Documents');
+                }}
+              >
                 <Icon name="upload" size={16} />
                 Upload Documents
               </button>
