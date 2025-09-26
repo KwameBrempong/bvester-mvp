@@ -62,7 +62,7 @@ export const NoTransactionsState: React.FC = () => (
     title="No Transactions Yet"
     description="Start recording your business transactions to track your financial performance and generate insights."
     actionLabel="Add First Transaction"
-    onAction={() => console.log('Add transaction')}
+    onAction={() => {/* Add transaction functionality */}}
   />
 );
 

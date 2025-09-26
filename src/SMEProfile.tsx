@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { notify } from './utils/notifications';
 import './styles/profile-form.css';
 
 interface ProfileData {
@@ -57,8 +58,7 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Debug form validation
-    console.log('🔥 Form submission attempted', { formData });
+    // Form validation
 
     // Check if all required fields are filled for SME owners
     if (formData.userType === 'sme_owner') {
@@ -66,8 +66,8 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
       const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData]);
 
       if (missingFields.length > 0) {
-        console.error('❌ Missing required fields:', missingFields);
-        alert(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+        // Show validation error to user
+        notify.warning(`Please fill in the following required fields: ${missingFields.join(', ')}`, 'Required Fields Missing');
         return;
       }
     }
@@ -75,11 +75,11 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
     setIsSubmitting(true);
 
     try {
-      console.log('🚀 Calling onProfileComplete with:', formData);
+      // Calling profile completion
       await onProfileComplete(formData);
     } catch (error) {
-      console.error('Profile completion failed:', error);
-      alert('Profile completion failed. Please try again.');
+      // Profile completion failed
+      notify.error('Profile completion failed. Please try again.', 'Profile Error');
     } finally {
       setIsSubmitting(false);
     }

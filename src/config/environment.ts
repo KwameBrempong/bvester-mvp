@@ -1,6 +1,14 @@
 // Environment configuration for secure handling of sensitive data
 
 interface EnvironmentConfig {
+  aws: {
+    region: string;
+    appsyncUrl: string;
+    apiKey: string;
+    userPoolId: string;
+    userPoolClientId: string;
+    identityPoolId: string;
+  };
   stripe: {
     publishableKey: string;
     apiBaseUrl: string;
@@ -13,6 +21,9 @@ interface EnvironmentConfig {
     enableAnalytics: boolean;
     enableLogging: boolean;
     enableDataMigration: boolean;
+  };
+  security: {
+    encryptionKey: string;
   };
 }
 
@@ -29,6 +40,13 @@ const getEnvVar = (key: string, fallback?: string): string => {
 // Validate required environment variables
 const validateEnvironment = () => {
   const required = [
+    'VITE_AWS_REGION',
+    'VITE_AWS_APPSYNC_GRAPHQL_URL',
+    'VITE_AWS_APPSYNC_API_KEY',
+    'VITE_AWS_USER_POOL_ID',
+    'VITE_AWS_USER_POOL_CLIENT_ID',
+    'VITE_AWS_IDENTITY_POOL_ID',
+    'VITE_ENCRYPTION_KEY',
     'VITE_STRIPE_PUBLISHABLE_KEY',
     'VITE_STRIPE_API_BASE_URL',
   ];
@@ -46,18 +64,29 @@ const validateEnvironment = () => {
 
 // Environment configuration
 export const environment: EnvironmentConfig = {
+  aws: {
+    region: getEnvVar('VITE_AWS_REGION', 'eu-west-2'),
+    appsyncUrl: getEnvVar('VITE_AWS_APPSYNC_GRAPHQL_URL', ''),
+    apiKey: getEnvVar('VITE_AWS_APPSYNC_API_KEY', ''),
+    userPoolId: getEnvVar('VITE_AWS_USER_POOL_ID', ''),
+    userPoolClientId: getEnvVar('VITE_AWS_USER_POOL_CLIENT_ID', ''),
+    identityPoolId: getEnvVar('VITE_AWS_IDENTITY_POOL_ID', ''),
+  },
   stripe: {
     publishableKey: getEnvVar('VITE_STRIPE_PUBLISHABLE_KEY', ''),
     apiBaseUrl: getEnvVar('VITE_STRIPE_API_BASE_URL', 'https://y3ouaxtpf8.execute-api.eu-west-2.amazonaws.com/prod'),
   },
   app: {
     baseUrl: getEnvVar('VITE_APP_BASE_URL', window.location.origin),
-    environment: (getEnvVar('VITE_NODE_ENV', 'development') as any) || 'development',
+    environment: (getEnvVar('VITE_APP_ENV', 'development') as any) || 'development',
   },
   features: {
     enableAnalytics: getEnvVar('VITE_ENABLE_ANALYTICS', 'false') === 'true',
     enableLogging: getEnvVar('VITE_ENABLE_LOGGING', 'true') === 'true',
     enableDataMigration: getEnvVar('VITE_ENABLE_DATA_MIGRATION', 'true') === 'true',
+  },
+  security: {
+    encryptionKey: getEnvVar('VITE_ENCRYPTION_KEY', 'dev-key-not-secure'),
   },
 };
 

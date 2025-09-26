@@ -67,7 +67,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const startAssessment = () => {
     // Set flag to indicate user wants to take the assessment after signup/login
     localStorage.setItem('assessment_intent', 'true');
-    console.log('🎯 Assessment intent set - user will see Business Assessment after profile completion');
+    // Assessment intent set - user will see Business Assessment after profile completion
     // Redirect to sign up/login so user can access the enhanced Business Assessment
     onGetStarted();
   };

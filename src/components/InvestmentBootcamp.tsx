@@ -179,7 +179,7 @@ const InvestmentBootcamp: React.FC<InvestmentBootcampProps> = ({
   const spotsRemaining = 12 - Math.floor(Math.random() * 5); // Dynamic spots for urgency
 
   const handleEnroll = async () => {
-    console.log('Enrolling in tier:', selectedTier);
+    // Enrolling in tier
 
     // Import Stripe service
     const { stripeService } = await import('../stripeService');
@@ -203,7 +203,7 @@ const InvestmentBootcamp: React.FC<InvestmentBootcampProps> = ({
       await stripeService.createCheckoutSession(checkoutParams);
     } catch (error) {
       console.error('Error initiating enrollment:', error);
-      alert('Unable to process enrollment. Please try again.');
+      // TODO: Replace with proper notification system
     }
   };
 

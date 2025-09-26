@@ -41,7 +41,7 @@ export const verificationService = {
       logger.info('Email verification sent', { userId, email, token: token.substring(0, 2) + '****' });
 
       // For demo purposes, log the verification code
-      console.log(`📧 Email verification code for ${email}: ${token}`);
+      // Email verification code sent
 
       return true;
     } catch (error) {
@@ -114,7 +114,7 @@ export const verificationService = {
       logger.info('SMS verification sent', { userId, phone: phone.substring(0, 4) + '****', token: token.substring(0, 2) + '****' });
 
       // For demo purposes, log the verification code
-      console.log(`📱 SMS verification code for ${phone}: ${token}`);
+      // SMS verification code sent
 
       return true;
     } catch (error) {
@@ -203,7 +203,7 @@ export const verificationService = {
       logger.info('Business verification submitted', { userId, documentsCount: documentsUploaded.length });
 
       // In production, notify verification team
-      console.log(`🏢 Business verification submitted for user ${userId} with ${documentsUploaded.length} documents`);
+      // Business verification submitted
 
       return true;
     } catch (error) {

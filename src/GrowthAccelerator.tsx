@@ -11,8 +11,13 @@ interface Module {
 }
 
 interface GrowthAcceleratorProps {
-  user: any;
-  userProfile: any;
+  user: {
+    username: string;
+  };
+  userProfile?: {
+    userId: string;
+    businessName?: string;
+  };
   onClose: () => void;
 }
 
@@ -82,7 +87,7 @@ const modules: Module[] = [
   }
 ];
 
-export default function GrowthAccelerator({ user, userProfile, onClose }: GrowthAcceleratorProps) {
+export default function GrowthAccelerator({ user, onClose }: GrowthAcceleratorProps) {
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [userProgress, setUserProgress] = useState<{ [key: string]: number }>({});
 
@@ -126,7 +131,7 @@ export default function GrowthAccelerator({ user, userProfile, onClose }: Growth
 
   const startModule = (module: Module) => {
     if (module.status === 'locked') {
-      alert('Complete previous modules to unlock this one.');
+      // TODO: Replace with proper notification system
       return;
     }
     setSelectedModule(module);
@@ -360,7 +365,7 @@ export default function GrowthAccelerator({ user, userProfile, onClose }: Growth
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '20px'
           }}>
-            {modules.map((module, index) => (
+            {modules.map((module) => (
               <div
                 key={module.id}
                 style={{

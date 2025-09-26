@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { stripeService } from './stripeService';
 import { subscriptionService, migrationService } from './services/dataService';
+import { notify } from './utils/notifications';
 import { logger } from './config/environment';
 
 interface UserSubscription {
@@ -280,7 +281,7 @@ export const useSubscription = (username?: string) => {
         }
       } catch (error) {
         console.error('Failed to open customer portal:', error);
-        alert('Unable to open billing portal. Please contact support.');
+        notify.error('Unable to open billing portal. Please contact support.', 'Portal Error');
       }
     }
   };

@@ -75,7 +75,7 @@ const EnhancedResultsDashboard: React.FC<EnhancedResultsDashboardProps> = ({
       ...enrollmentData
     });
     // This would integrate with your backend to process enrollment
-    alert('🎉 Enrollment successful! You will receive a confirmation email shortly.');
+    // TODO: Replace with proper notification system
     setShowEnrollmentFlow(false);
     setShowGrowthAccelerator(false);
   };

@@ -53,7 +53,8 @@
       "Bash(start http://localhost:5178)",
       "Bash(start http://localhost:5179)",
       "Bash(npm run typecheck:*)",
-      "Bash(start http://localhost:5180)"
+      "Bash(start http://localhost:5180)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []

@@ -414,7 +414,7 @@ class DashboardDataService {
   // Add transaction data
   addTransaction(transaction: { date: string; amount: number; type: string; description: string }) {
     // This would integrate with your existing transaction service
-    console.log('Adding transaction:', transaction);
+    // Adding transaction
     // Update KPIs based on new transaction
     if (this.data) {
       const currentMonth = new Date().toLocaleDateString('en-US', { month: 'short' });

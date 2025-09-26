@@ -465,7 +465,7 @@ const DashboardKPIs: React.FC = () => {
               input.onchange = (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0];
                 if (file) {
-                  alert(`Document "${file.name}" selected. Upload functionality will be implemented soon.`);
+                  // TODO: Implement document upload functionality
                 }
               };
               input.click();

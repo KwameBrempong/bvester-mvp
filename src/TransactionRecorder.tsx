@@ -1,7 +1,7 @@
-import { useSubscription } from './useSubscription';
-import { useUsageLimits } from './hooks/useUsageLimits';
+// Removed unused import for production cleanup
+import { useUsageLimits, UsageLimitResult } from './hooks/useUsageLimits';
 import React, { useState, useEffect } from 'react';
-import { transactionService, Transaction as PersistedTransaction } from './services/dataService';
+import { transactionService } from './services/dataService';
 
 interface Transaction {
   id: string;
@@ -20,10 +20,10 @@ interface TransactionRecorderProps {
 export default function TransactionRecorder({ user, onClose }: TransactionRecorderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [newTransaction, setNewTransaction] = useState('');
-  const [usageLimitResult, setUsageLimitResult] = useState<any>(null);
+  const [usageLimitResult, setUsageLimitResult] = useState<UsageLimitResult | null>(null);
 
   const { checkUsageLimit, consumeUsage, getUsageWarningComponent } = useUsageLimits();
-  const subscriptionStatus = useSubscription(user?.username);
+  // Removed unused subscriptionStatus for production cleanup
 
   useEffect(() => {
     // Load existing transactions

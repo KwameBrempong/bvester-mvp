@@ -4,7 +4,7 @@
     "aws_region": "eu-west-2",
     "user_pool_client_id": "2vqqkrjt2ihlhnl4bdrhjke3es",
     "identity_pool_id": "eu-west-2:6e1ccf20-e314-4f2a-8675-fa36c7034198",
-    "mfa_methods": [],
+    "mfa_methods": ["SMS", "TOTP"],
     "standard_required_attributes": [
       "email"
     ],
@@ -14,7 +14,7 @@
     "user_verification_types": [
       "email"
     ],
-    "mfa_configuration": "NONE",
+    "mfa_configuration": "OPTIONAL",
     "password_policy": {
       "min_length": 8,
       "require_lowercase": true,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSubscription } from './useSubscription';
+// Removed unused import for production cleanup
 import { assessmentService } from './services/dataService';
 
 interface Question {
@@ -19,8 +19,13 @@ interface Assessment {
 }
 
 interface BusinessAssessmentProps {
-  user: any;
-  userProfile: any;
+  user: {
+    username: string;
+  };
+  userProfile?: {
+    userId: string;
+    businessName?: string;
+  };
   onClose: () => void;
 }
 
@@ -153,12 +158,12 @@ const questions: Question[] = [
   }
 ];
 
-function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentProps) {
+function BusinessAssessment({ user, onClose }: BusinessAssessmentProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<{ [key: string]: any }>({});
+  const [answers, setAnswers] = useState<{ [key: string]: string | number | boolean }>({});
   const [showResults, setShowResults] = useState(false);
   const [assessment, setAssessment] = useState<Assessment | null>(null);
-  const subscriptionStatus = useSubscription(user?.username);
+  // Removed unused subscriptionStatus for production cleanup
 
   // Prevent background scroll when modal is open
   useEffect(() => {
@@ -173,7 +178,7 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
     };
   }, []);
 
-  const handleAnswer = (value: any) => {
+  const handleAnswer = (value: string | number | boolean) => {
     const newAnswers = { ...answers, [questions[currentQuestion].id]: value };
     setAnswers(newAnswers);
 
@@ -184,7 +189,7 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
     }
   };
 
-  const generateAssessment = async (finalAnswers: { [key: string]: any }) => {
+  const generateAssessment = async (finalAnswers: { [key: string]: string | number | boolean }) => {
     let totalScore = 0;
     let maxScore = 0;
     const categoryTotals: Record<string, number> = {};
@@ -196,10 +201,10 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
 
       let questionScore = 0;
       if (question.type === 'multiple' && question.options) {
-        const selectedIndex = question.options.indexOf(answer);
+        const selectedIndex = question.options.indexOf(String(answer));
         questionScore = ((question.options.length - selectedIndex) / question.options.length) * question.weight * 100;
       } else if (question.type === 'scale') {
-        questionScore = (answer / 5) * question.weight * 100;
+        questionScore = (Number(answer) / 5) * question.weight * 100;
       } else if (question.type === 'yes_no') {
         questionScore = answer === 'Yes' ? question.weight * 100 : 0;
       }
@@ -261,7 +266,7 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
     }
   };
 
-  const generateRecommendations = (answers: { [key: string]: any }, score: number): string[] => {
+  const generateRecommendations = (answers: { [key: string]: string | number | boolean }, score: number): string[] => {
     const recommendations: string[] = [];
 
     // Financial recommendations
@@ -488,12 +493,12 @@ function BusinessAssessment({ user, userProfile, onClose }: BusinessAssessmentPr
             <div style={{ 
               margin: '20px 30px',
               padding: '15px',
-              background: subscriptionStatus.hasDetailedReports() ? '#e8f5e8' : '#fff3cd',
-              border: `1px solid ${subscriptionStatus.hasDetailedReports() ? '#d4edda' : '#ffeaa7'}`,
+              background: '#fff3cd',
+              border: '1px solid #ffeaa7',
               borderRadius: '8px',
               textAlign: 'center'
             }}>
-              {subscriptionStatus.hasDetailedReports() ? (
+              {/* Premium features temporarily disabled */ false ? (
                 <>
                   <h4 style={{ margin: '0 0 8px 0', color: '#2E8B57' }}>Premium Report Available</h4>
                   <p style={{ margin: '0 0 10px 0', color: '#2E8B57', fontSize: '14px' }}>

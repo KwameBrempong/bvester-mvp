@@ -687,7 +687,7 @@ export const paymentEventService = {
     try {
       // This would need to be implemented with a more specific query
       // For now, we'll keep it simple
-      console.log('Marking event as processed:', eventId);
+      // Marking event as processed
       return true;
     } catch (error) {
       console.error('Error marking event as processed:', error);
@@ -700,7 +700,7 @@ export const paymentEventService = {
 export const migrationService = {
   async migrateUserData(userId: string): Promise<void> {
     try {
-      console.log('Starting data migration for user:', userId);
+      // Starting data migration
 
       // Migrate user profile
       const savedProfile = localStorage.getItem(`profile_${userId}`);
@@ -713,7 +713,7 @@ export const migrationService = {
             userId,
             ...profileData,
           });
-          console.log('Migrated user profile to database');
+          // Migrated user profile to database
         }
       }
 
@@ -730,7 +730,7 @@ export const migrationService = {
               ...transaction,
             });
           }
-          console.log('Migrated transactions to database');
+          // Migrated transactions to database
         }
       }
 
@@ -745,7 +745,7 @@ export const migrationService = {
             userId,
             ...subscriptionData,
           });
-          console.log('Migrated subscription to database');
+          // Migrated subscription to database
         }
       }
 
@@ -762,11 +762,11 @@ export const migrationService = {
               ...assessment,
             });
           }
-          console.log('Migrated assessments to database');
+          // Migrated assessments to database
         }
       }
 
-      console.log('Data migration completed for user:', userId);
+      // Data migration completed
     } catch (error) {
       console.error('Error during data migration:', error);
       // Don't throw error to avoid breaking the app

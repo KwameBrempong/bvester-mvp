@@ -40,7 +40,7 @@ export class UserService {
 
       return profile;
     } catch (error) {
-      console.error('Error creating user profile:', error);
+      // Error creating user profile
       throw error;
     }
   }
@@ -108,7 +108,7 @@ export class UserService {
 
       return profile;
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      // Error fetching user profile
       return null;
     }
   }
@@ -167,7 +167,7 @@ export class UserService {
       // Return updated profile
       return await this.getUserProfile(userId);
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      // Error updating user profile
       throw error;
     }
   }
@@ -180,7 +180,7 @@ export class UserService {
       const profile = await this.getUserProfile(userId);
       return profile !== null;
     } catch (error) {
-      console.error('Error checking user existence:', error);
+      // Error checking user existence
       return false;
     }
   }
@@ -200,10 +200,10 @@ export class UserService {
       });
 
       if (result.errors && result.errors.length > 0) {
-        console.warn('Failed to create subscription record:', result.errors[0].message);
+        // Failed to create subscription record
       }
     } catch (error) {
-      console.error('Error initializing user subscription:', error);
+      // Error initializing user subscription
       // Don't throw - subscription is not critical for basic functionality
     }
   }

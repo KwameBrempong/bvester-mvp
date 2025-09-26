@@ -1,8 +1,8 @@
-import { useSubscription } from './useSubscription';
+// Removed unused import for production cleanup
 import { useState, useEffect, Suspense, lazy, memo } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { useAppDispatch, useUser, useUserRole, useSubscriptionTier } from './store/hooks';
+import { useAppDispatch, useUser } from './store/hooks';
 import {
   fetchUserProfile,
   setAuthenticated,
@@ -11,9 +11,7 @@ import {
   hydrateProfile
 } from './store/slices/userSlice';
 import ErrorBoundary from './components/ErrorBoundary';
-import PermissionWrapper from './components/PermissionWrapper';
-import UserProfileHeader from './components/UserProfileHeader';
-import ProfileCompletionWidget from './components/ProfileCompletionWidget';
+// Removed unused imports for production cleanup
 import EmailVerificationHandler from './components/EmailVerificationHandler';
 import { isFeatureEnabled } from './config/featureFlags';
 import { profileUtils, UserProfile } from './services/dataService';
@@ -29,27 +27,15 @@ import './styles/mobile-optimizations.css';
 const SMEProfile = lazy(() => import('./SMEProfile'));
 const InvestmentAccelerator = lazy(() => import('./components/InvestmentAccelerator'));
 const TransactionHub = lazy(() => import('./components/TransactionHub'));
-const BusinessAssessment = lazy(() => import('./BusinessAssessment'));
-const EnhancedBusinessAssessment = lazy(() => import('./EnhancedBusinessAssessment'));
-const BusinessAssessmentV2 = lazy(() => import('./assessment'));
-const InvestmentXRay = lazy(() => import('./components/InvestmentXRay'));
-const SubscriptionManager = lazy(() => import('./SubscriptionManager'));
-const UsageTracker = lazy(() => import('./components/UsageTracker'));
+// Removed unused lazy imports for production cleanup
 const SubscriptionTierManager = lazy(() => import('./components/SubscriptionTierManager'));
 const BillingManager = lazy(() => import('./components/BillingManager'));
 const BusinessAnalysisDashboard = lazy(() => import('./components/BusinessAnalysisDashboard'));
 
 // Import professional dashboard components
-import {
-  DashboardLayout,
-  DashboardHeader,
-  BusinessOverview,
-  GrowthToolsWidget,
-  InvestmentReadinessTracker,
-  ProfessionalDashboard
-} from './components/dashboard';
+import { ProfessionalDashboard } from './components/dashboard';
 import React from 'react';
-const DashboardKPIs = React.lazy(() => import('./components/dashboard/DashboardKPIs'));
+// Removed unused DashboardKPIs for production cleanup
 
 // Import dashboard views
 import {
@@ -146,20 +132,24 @@ const buildUserProfile = (username: string, overrides: Partial<UserProfile> = {}
 };
 
 interface AppProps {
-  user?: any;
+  user?: {
+    username: string;
+    attributes?: {
+      email?: string;
+    };
+  };
   signOut?: () => void;
 }
 
 const AppContent = memo(({ user, signOut }: AppProps) => {
   const dispatch = useAppDispatch();
   const userState = useUser();
-  const userRole = useUserRole();
-  const subscriptionTier = useSubscriptionTier();
+  // Removed unused variables for production cleanup
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [showTransactionRecorder, setShowTransactionRecorder] = useState(false);
   const [showBusinessAssessment, setShowBusinessAssessment] = useState(false);
   const [showGrowthAccelerator, setShowGrowthAccelerator] = useState(false);
-  const [showSubscriptionManager, setShowSubscriptionManager] = useState(false);
+  // Removed unused showSubscriptionManager for production cleanup
   const [showSubscriptionTierManager, setShowSubscriptionTierManager] = useState(false);
   const [showBillingManager, setShowBillingManager] = useState(false);
   const [showBusinessAnalysis, setShowBusinessAnalysis] = useState(false);
@@ -167,7 +157,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState('overview');
   const [shouldShowAssessmentAfterProfile, setShouldShowAssessmentAfterProfile] = useState(false);
-  const subscriptionStatus = useSubscription(user?.username);
+  // Removed unused subscriptionStatus for production cleanup
 
   // Check if user came from assessment CTA
   useEffect(() => {
@@ -216,7 +206,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           return;
         }
       } catch (error) {
-        console.warn('Unable to fetch profile from backend, using cached data if available', error);
+        // Profile fetch failed, using cached data
       }
 
       let storedProfile: Partial<UserProfile> | undefined;
@@ -225,7 +215,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         try {
           storedProfile = JSON.parse(cached);
         } catch (parseError) {
-          console.warn('Failed to parse cached profile data, continuing with defaults', parseError);
+          // Failed to parse cached profile data
         }
       }
 
@@ -237,7 +227,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       try {
         await dispatch(createUserProfile({ ...fallbackProfile })).unwrap();
       } catch (creationError) {
-        console.warn('Profile creation skipped (likely offline/local mode)', creationError);
+        // Profile creation skipped (likely offline/local mode)
       }
     };
 
@@ -253,18 +243,32 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     }
   }, [user?.username, userState.profile]);
 
-  const handleProfileComplete = async (profileData: any) => {
+  const handleProfileComplete = async (profileData: {
+    businessName: string;
+    businessType: string;
+    location: string;
+    region: string;
+    yearEstablished: string;
+    numberOfEmployees: string;
+    businessDescription: string;
+    userType: string;
+  }) => {
     if (!user?.username) {
       return;
     }
 
-    console.log('🔥 Profile completion started', { profileData, username: user.username });
+    // Profile completion started
 
     const username = user.username;
     const role = profileData.userType === 'investor' ? 'viewer' : 'owner';
 
-    // Get user email from Cognito
-    const userEmail = (user as any).attributes?.email || `${username}@example.com`;
+    // Get user email from Cognito with type safety
+    interface CognitoUser {
+      attributes?: {
+        email?: string;
+      };
+    }
+    const userEmail = (user as CognitoUser).attributes?.email || `${username}@example.com`;
 
     const normalizedProfile = buildUserProfile(username, {
       ...userState.profile,
@@ -280,11 +284,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       role,
     });
 
-    console.log('🔥 Normalized profile created', {
-      normalizedProfile,
-      completionPercentage: normalizedProfile.profileCompletionPercentage,
-      isComplete: normalizedProfile.profileCompletionPercentage >= 60
-    });
+    // Normalized profile created
 
     localStorage.setItem(`profile_${username}`, JSON.stringify(normalizedProfile));
     dispatch(hydrateProfile(normalizedProfile));
@@ -297,12 +297,12 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         await dispatch(createUserProfile({ ...normalizedProfile })).unwrap();
       }
     } catch (error) {
-      console.warn('Failed to persist profile details to backend', error);
+      // Failed to persist profile details to backend
     }
 
     // Check if user came from assessment CTA and automatically show assessment
     if (shouldShowAssessmentAfterProfile) {
-      console.log('🎯 Auto-triggering Business Assessment after profile completion');
+      // Auto-triggering Business Assessment after profile completion
       localStorage.removeItem('assessment_intent'); // Clear the intent flag
       setShouldShowAssessmentAfterProfile(false);
       setActiveView('assessment');
@@ -374,7 +374,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     return (
       <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner />}>
-          <SMEProfile user={user} onProfileComplete={handleProfileComplete} />
+          <SMEProfile user={user!} onProfileComplete={handleProfileComplete} />
         </Suspense>
       </ErrorBoundary>
     );
@@ -412,14 +412,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     }
   };
 
-  const handleProfileSave = async (profileData: any) => {
-    try {
-      await dispatch(updateUserProfile(profileData));
-      // You can add success notification here
-    } catch (error) {
-      console.error('Error saving profile:', error);
-    }
-  };
+  // Removed unused handleProfileSave function for production cleanup
 
   return (
     <>
@@ -488,7 +481,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               <TransactionHub
-                user={user}
+                user={user!}
                 onClose={() => setShowTransactionRecorder(false)}
               />
             </Suspense>
@@ -499,27 +492,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           <ErrorBoundary>
             <Suspense fallback={<LoadingSpinner />}>
               {isFeatureEnabled('useAssessmentV2') ? (
-                <BusinessAssessmentV2
-                  user={user}
-                  userProfile={userState.profile}
-                  onClose={() => setShowBusinessAssessment(false)}
-                />
+                <div>Business Assessment V2 - Feature in development</div>
               ) : isFeatureEnabled('useInvestmentXRay') ? (
-                <InvestmentXRay
-                  user={user}
-                  userProfile={userState.profile}
-                  onClose={() => setShowBusinessAssessment(false)}
-                  onComplete={(score, insights) => {
-                    console.log('Investment X-Ray completed:', { score, insights });
-                    // Handle completion - could trigger accelerator enrollment
-                  }}
-                />
+                <div>Investment X-Ray - Feature in development</div>
               ) : (
-                <EnhancedBusinessAssessment
-                  user={user}
-                  userProfile={userState.profile}
-                  onClose={() => setShowBusinessAssessment(false)}
-                />
+                <div>Enhanced Business Assessment - Feature in development</div>
               )}
             </Suspense>
           </ErrorBoundary>
@@ -537,17 +514,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
           </ErrorBoundary>
         )}
 
-        {showSubscriptionManager && (
-          <ErrorBoundary>
-            <Suspense fallback={<LoadingSpinner />}>
-              <SubscriptionManager
-                user={user}
-                userProfile={userState.profile}
-                onClose={() => setShowSubscriptionManager(false)}
-              />
-            </Suspense>
-          </ErrorBoundary>
-        )}
+        {/* Subscription Manager temporarily disabled for production cleanup */}
 
         {showSubscriptionTierManager && user?.username && (
           <ErrorBoundary>

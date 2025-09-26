@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
-import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+import { Authenticator } from '@aws-amplify/ui-react';
 import { getCurrentUser } from 'aws-amplify/auth';
 import '@aws-amplify/ui-react/styles.css';
 import './styles/auth-theme.css';
@@ -306,9 +306,9 @@ const AppRouter: React.FC = () => {
                 }
               });
 
-              console.log('✅ Successfully signed out and redirected to homepage');
+              // Successfully signed out and redirected to homepage
             } catch (error) {
-              console.error('Sign out error:', error);
+              // Sign out error occurred
               // Still reset state even if there's an error
               setShowSignIn(false);
               setIsAuthenticated(false);

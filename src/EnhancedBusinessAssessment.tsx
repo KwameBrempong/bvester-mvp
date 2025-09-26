@@ -4,29 +4,31 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useSubscription } from './useSubscription';
+// Removed unused import for production cleanup
 import {
   GhanaAssessmentService,
   ghanaAssessmentQuestions,
-  CriticalQuestion,
   AssessmentResult
 } from './services/ghanaAssessmentService';
+import { notify } from './utils/notifications';
 import './styles/enhanced-assessment.css';
 
 interface EnhancedBusinessAssessmentProps {
   user: { username: string };
-  userProfile: any;
+  userProfile?: {
+    userId: string;
+    businessName?: string;
+  };
   onClose: () => void;
 }
 
 const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
   user,
-  userProfile,
   onClose
 }) => {
   // Assessment state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string | number | boolean>>({});
   const [showResults, setShowResults] = useState(false);
   const [assessmentResult, setAssessmentResult] = useState<AssessmentResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -34,9 +36,9 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
   // UI state
   const [showInsight, setShowInsight] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [startTime] = useState(Date.now());
+  // Removed unused startTime variable for production cleanup
 
-  const subscriptionStatus = useSubscription(user?.username);
+  // Removed unused subscriptionStatus for production cleanup
   const currentQuestion = ghanaAssessmentQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / ghanaAssessmentQuestions.length) * 100;
 
@@ -77,12 +79,12 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
           }
         }
       } catch (error) {
-        console.warn('Failed to restore assessment progress:', error);
+        // Failed to restore assessment progress
       }
     }
   }, [user?.username]);
 
-  const handleAnswer = (value: any) => {
+  const handleAnswer = (value: string | number | boolean) => {
     const newAnswers = { ...answers, [currentQuestion.id]: value };
     setAnswers(newAnswers);
 
@@ -103,7 +105,7 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
     }, showInsight ? 3500 : 500);
   };
 
-  const processAssessment = async (finalAnswers: Record<string, any>) => {
+  const processAssessment = async (finalAnswers: Record<string, string | number | boolean>) => {
     setIsProcessing(true);
 
     try {
@@ -119,8 +121,8 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
       setAssessmentResult(result);
       setShowResults(true);
     } catch (error) {
-      console.error('Failed to process assessment:', error);
-      alert('There was an error processing your assessment. Please try again.');
+      // Failed to process assessment
+      notify.error('There was an error processing your assessment. Please try again.', 'Assessment Error');
     } finally {
       setIsProcessing(false);
     }
@@ -733,11 +735,11 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
             {/* Premium Report Call-to-Action */}
             <div style={{
               padding: '25px 30px',
-              background: subscriptionStatus.hasDetailedReports() ? '#e8f5e8' : '#fff3cd',
-              border: `1px solid ${subscriptionStatus.hasDetailedReports() ? '#d4edda' : '#ffeaa7'}`,
+              background: '#fff3cd',
+              border: '1px solid #ffeaa7',
               textAlign: 'center'
             }}>
-              {subscriptionStatus.hasDetailedReports() ? (
+              {/* Premium features temporarily disabled */ false ? (
                 <>
                   <h4 style={{ margin: '0 0 15px 0', color: '#2E8B57' }}>
                     📊 Get Your Detailed PDF Report
@@ -749,7 +751,7 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
                   <button
                     onClick={() => {
                       // This will be implemented in Phase 3
-                      alert('PDF report generation will be implemented in Phase 3');
+                      // TODO: Implement PDF report generation
                     }}
                     style={{
                       background: '#2E8B57',
@@ -779,7 +781,7 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
                     <button
                       onClick={() => {
                         // This will be implemented in Phase 4 - integrate with Growth Accelerator
-                        alert('Growth Accelerator enrollment will be implemented in Phase 4');
+                        // TODO: Implement Growth Accelerator enrollment
                       }}
                       style={{
                         background: '#2E8B57',
@@ -797,7 +799,7 @@ const EnhancedBusinessAssessment: React.FC<EnhancedBusinessAssessmentProps> = ({
                     <button
                       onClick={() => {
                         // This will link to subscription upgrade
-                        alert('Subscription upgrade will be implemented in Phase 4');
+                        // TODO: Implement subscription upgrade
                       }}
                       style={{
                         background: 'transparent',

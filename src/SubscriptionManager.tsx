@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
 import { stripeService } from './stripeService';
+import { notify } from './utils/notifications';
 
 interface SubscriptionManagerProps {
-  user: any;
-  userProfile: any;
+  user: {
+    username?: string;
+    userId?: string;
+    signInDetails?: {
+      loginId?: string;
+    };
+  };
+  userProfile?: {
+    email?: string;
+    businessName?: string;
+  };
   onClose: () => void;
 }
 
@@ -34,8 +44,8 @@ const SubscriptionManager: React.FC<SubscriptionManagerProps> = ({ user, userPro
         }
       });
     } catch (error) {
-      console.error('Subscription error:', error);
-      alert('Sorry, there was an error processing your subscription. Please try again.');
+      // Subscription error occurred
+      notify.error('Sorry, there was an error processing your subscription. Please try again.', 'Subscription Error');
     } finally {
       setLoading(null);
     }
@@ -62,8 +72,8 @@ const SubscriptionManager: React.FC<SubscriptionManagerProps> = ({ user, userPro
         }
       });
     } catch (error) {
-      console.error('Accelerator enrollment error:', error);
-      alert('Sorry, there was an error processing your enrollment. Please try again.');
+      // Accelerator enrollment error occurred
+      notify.error('Sorry, there was an error processing your enrollment. Please try again.', 'Enrollment Error');
     } finally {
       setLoading(null);
     }

@@ -274,7 +274,7 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
     if (!track) return;
 
     setIsEnrolling(true);
-    console.log(`🚀 Enrolling in ${track.name} - ₵${track.price}`);
+    // Enrolling in track
 
     try {
       // TODO: Integrate with Stripe for payment processing
@@ -283,12 +283,12 @@ export default function InvestmentAccelerator({ user, userProfile, onClose, enro
       // For now, simulate enrollment success
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      console.log('✅ Enrollment successful!');
+      // Enrollment successful
       // Close modal and redirect to program dashboard
       onClose();
 
     } catch (error) {
-      console.error('❌ Enrollment failed:', error);
+      // Enrollment failed
     } finally {
       setIsEnrolling(false);
     }

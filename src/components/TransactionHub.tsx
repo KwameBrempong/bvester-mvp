@@ -103,7 +103,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
       }
 
     } catch (error) {
-      console.error('Failed to initialize transaction data:', error);
+      // Failed to initialize transaction data
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
       }
 
     } catch (error) {
-      console.error('Voice recording failed:', error);
+      // Voice recording failed
     } finally {
       setIsRecording(false);
       if (recordingInterval.current) {
@@ -285,7 +285,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
       setTranscription('');
 
     } catch (error) {
-      console.error('Failed to process transaction:', error);
+      // Failed to process transaction
     } finally {
       setIsProcessing(false);
     }
@@ -309,7 +309,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
       setCurrentSuggestion(null);
 
     } catch (error) {
-      console.error('Failed to add transaction:', error);
+      // Failed to add transaction
     }
   };
 
@@ -337,7 +337,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
         return newSet;
       });
     } catch (error) {
-      console.error('Failed to delete transaction:', error);
+      // Failed to delete transaction
     }
   };
 
@@ -351,7 +351,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
         setTransactions(updated);
         setSelectedTransactions(new Set());
       } catch (error) {
-        console.error('Failed to bulk delete transactions:', error);
+        // Failed to bulk delete transactions
       }
     }
   };
@@ -369,7 +369,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Export failed:', error);
+      // Export failed
     }
   };
 
@@ -709,7 +709,7 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
                                 className="action-button"
                                 onClick={() => {
                                   // This would open an edit modal
-                                  console.log('Edit transaction', transaction.id);
+                                  // Edit transaction functionality
                                 }}
                               >
                                 <Icon name="edit" size={12} />
