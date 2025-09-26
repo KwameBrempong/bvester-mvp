@@ -510,10 +510,27 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
                   {transactions.length === 0 ? (
                     <div className="empty-state">
                       <div className="empty-state-icon">
-                        <Icon name="transactions" size={24} color="var(--gold-primary)" />
+                        <Icon name="cash" size={32} color="var(--gold-primary)" />
                       </div>
-                      <h4>Start Recording Transactions</h4>
-                      <p>Add your first business transaction using the input below or voice recording.</p>
+                      <h4>Welcome to Your Financial Hub</h4>
+                      <p>Start tracking your business transactions to gain valuable insights into your financial performance.</p>
+                      <div className="empty-state-features">
+                        <div className="feature-item">
+                          <Icon name="microphone" size={16} color="var(--gold-primary)" />
+                          <span>Voice-powered recording</span>
+                        </div>
+                        <div className="feature-item">
+                          <Icon name="brain" size={16} color="var(--gold-primary)" />
+                          <span>AI-assisted categorization</span>
+                        </div>
+                        <div className="feature-item">
+                          <Icon name="chart-bar" size={16} color="var(--gold-primary)" />
+                          <span>Real-time analytics</span>
+                        </div>
+                      </div>
+                      <div className="empty-state-action">
+                        <p className="action-prompt">👇 Type your first transaction below</p>
+                      </div>
                     </div>
                   ) : (
                     <div>
@@ -657,10 +674,24 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
                 {filteredTransactions.length === 0 ? (
                   <div className="empty-state">
                     <div className="empty-state-icon">
-                      <Icon name="search" size={24} color="var(--gold-primary)" />
+                      <Icon name="search" size={32} color="var(--gray-400)" />
                     </div>
-                    <h4>No Transactions Found</h4>
-                    <p>Try adjusting your search terms or filters.</p>
+                    <h4>No Matching Transactions</h4>
+                    <p>We couldn't find any transactions matching your current search criteria.</p>
+                    <div className="empty-state-suggestions">
+                      <div className="suggestion-item">
+                        <Icon name="filter" size={14} color="var(--gray-500)" />
+                        <span>Clear your filters</span>
+                      </div>
+                      <div className="suggestion-item">
+                        <Icon name="search" size={14} color="var(--gray-500)" />
+                        <span>Try different keywords</span>
+                      </div>
+                      <div className="suggestion-item">
+                        <Icon name="add" size={14} color="var(--gold-primary)" />
+                        <span>Add a new transaction</span>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div>
@@ -735,55 +766,45 @@ const TransactionHub: React.FC<TransactionHubProps> = ({ user, onClose }) => {
 
           {/* Analytics Tab */}
           {activeTab === 'analytics' && analytics && (
-            <div style={{ padding: 'var(--space-lg)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-lg)', marginBottom: 'var(--space-xl)' }}>
-                <div className="kpi-card">
-                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Total Income</h6>
-                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--success-600)' }}>
+            <div className="analytics-panel">
+              <div className="kpi-grid">
+                <div className="kpi-card income-card">
+                  <h6 className="kpi-label">Total Income</h6>
+                  <div className="kpi-value income-value">
                     {formatCurrency(analytics.totalIncome)}
                   </div>
                 </div>
-                <div className="kpi-card">
-                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Total Expenses</h6>
-                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--error-600)' }}>
+                <div className="kpi-card expense-card">
+                  <h6 className="kpi-label">Total Expenses</h6>
+                  <div className="kpi-value expense-value">
                     {formatCurrency(analytics.totalExpenses)}
                   </div>
                 </div>
-                <div className="kpi-card">
-                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Net Income</h6>
-                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: analytics.netIncome >= 0 ? 'var(--success-600)' : 'var(--error-600)' }}>
+                <div className="kpi-card net-income-card">
+                  <h6 className="kpi-label">Net Income</h6>
+                  <div className={`kpi-value ${analytics.netIncome >= 0 ? 'income-value' : 'expense-value'}`}>
                     {formatCurrency(analytics.netIncome)}
                   </div>
                 </div>
-                <div className="kpi-card">
-                  <h6 style={{ margin: '0 0 var(--space-sm) 0', fontSize: 'var(--text-sm)', color: 'var(--gray-700)', fontWeight: 'var(--font-medium)' }}>Transactions</h6>
-                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--black-primary)' }}>
+                <div className="kpi-card count-card">
+                  <h6 className="kpi-label">Transactions</h6>
+                  <div className="kpi-value count-value">
                     {analytics.transactionCount}
                   </div>
                 </div>
               </div>
 
               {/* Category Breakdown */}
-              <div style={{ marginBottom: 'var(--space-xl)' }}>
-                <h5 style={{ marginBottom: 'var(--space-md)', color: 'var(--black-primary)', fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)' }}>Top Categories</h5>
+              <div className="category-breakdown">
+                <h5 className="breakdown-title">Top Categories</h5>
                 {analytics.categoryBreakdown.slice(0, 5).map((cat) => (
-                  <div key={cat.category} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
-                    <span style={{ textTransform: 'capitalize', color: 'var(--gray-800)', fontWeight: 'var(--font-medium)' }}>{cat.category}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-                      <div style={{
-                        width: '100px',
-                        height: '8px',
-                        backgroundColor: 'var(--gray-200)',
-                        borderRadius: 'var(--radius-full)',
-                        overflow: 'hidden'
-                      }}>
-                        <div style={{
-                          width: `${cat.percentage}%`,
-                          height: '100%',
-                          backgroundColor: 'var(--gold-primary)'
-                        }} />
+                  <div key={cat.category} className="category-item">
+                    <span className="category-name">{cat.category}</span>
+                    <div className="category-metrics">
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${cat.percentage}%` }} />
                       </div>
-                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)', color: 'var(--black-primary)' }}>
+                      <span className="category-amount">
                         {formatCurrency(cat.amount)}
                       </span>
                     </div>

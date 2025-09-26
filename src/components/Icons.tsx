@@ -53,7 +53,19 @@ import {
   HiOutlineFlag,
   HiOutlineTruck,
   HiOutlineSpeakerphone,
-  HiOutlineShoppingBag
+  HiOutlineShoppingBag,
+  HiOutlineLightningBolt,
+  HiOutlineBriefcase,
+  HiOutlineSearch,
+  HiOutlineMicrophone,
+  HiOutlinePaperAirplane,
+  HiOutlineFilter,
+  HiOutlineTrash,
+  HiOutlinePencil,
+  HiOutlineStop,
+  HiOutlineExclamationTriangle,
+  HiOutlineCheck,
+  HiOutlineViewList
 } from 'react-icons/hi';
 
 import {
@@ -69,7 +81,8 @@ import {
   HiMiniUserGroup,
   HiMiniBuildingOffice,
   HiCake,
-  HiCube
+  HiCube,
+  HiCircleStack
 } from 'react-icons/hi2';
 
 // Icon component wrapper for consistent styling
@@ -171,6 +184,22 @@ const Icon: React.FC<IconProps> = ({ name, size = 20, color, className = '' }) =
     'food': <HiCake {...iconProps} />,
     'megaphone': <HiOutlineSpeakerphone {...iconProps} />,
     'package': <HiCube {...iconProps} />,
+    'lightning': <HiOutlineLightningBolt {...iconProps} />,
+    'briefcase': <HiOutlineBriefcase {...iconProps} />,
+    'file-text': <HiOutlineDocumentText {...iconProps} />,
+    'list': <HiOutlineViewList {...iconProps} />,
+    'microphone': <HiOutlineMicrophone {...iconProps} />,
+    'send': <HiOutlinePaperAirplane {...iconProps} />,
+    'loader': <HiOutlineRefresh {...iconProps} />,
+    'filter': <HiOutlineFilter {...iconProps} />,
+    'trash': <HiOutlineTrash {...iconProps} />,
+    'edit': <HiOutlinePencil {...iconProps} />,
+    'search': <HiOutlineSearch {...iconProps} />,
+    'brain': <HiOutlineLightBulb {...iconProps} />,
+    'check': <HiOutlineCheck {...iconProps} />,
+    'x': <HiOutlineX {...iconProps} />,
+    'stop': <HiOutlineStop {...iconProps} />,
+    'warning': <HiOutlineExclamationTriangle {...iconProps} />,
   };
 
   return iconMap[name] || <HiOutlineQuestionMarkCircle {...iconProps} />;
