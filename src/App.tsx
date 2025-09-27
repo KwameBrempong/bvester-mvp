@@ -272,10 +272,11 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     userType: string;
   }) => {
     if (!user?.username) {
+      console.error('❌ Profile completion failed: No username found');
       return;
     }
 
-    // Profile completion started
+    console.log('🚀 Starting profile completion for user:', user.username);
 
     const username = user.username;
     const role = profileData.userType === 'investor' ? 'viewer' : 'owner';
@@ -287,6 +288,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       };
     }
     const userEmail = (user as CognitoUser).attributes?.email || '';
+    console.log('📧 User email from Cognito:', userEmail);
 
     const normalizedProfile = buildUserProfile(username, {
       ...userState.profile,
@@ -302,20 +304,49 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
       role,
     });
 
-    // Normalized profile created
+    console.log('📋 Normalized profile created:', {
+      userId: normalizedProfile.userId,
+      businessName: normalizedProfile.businessName,
+      email: normalizedProfile.email,
+      completionPercentage: normalizedProfile.profileCompletionPercentage
+    });
 
     localStorage.setItem(`profile_${username}_current`, JSON.stringify(normalizedProfile));
     dispatch(hydrateProfile(normalizedProfile));
     setProfileCompleted(normalizedProfile.profileCompletionPercentage >= 60);
 
     try {
+      console.log('💾 Attempting to persist profile to backend...');
+
       if (userState.profile) {
+        console.log('🔄 Updating existing profile');
         await dispatch(updateUserProfile({ userId: username, updates: normalizedProfile })).unwrap();
       } else {
+        console.log('➕ Creating new profile');
         await dispatch(createUserProfile({ ...normalizedProfile })).unwrap();
       }
+
+      console.log('✅ Profile successfully persisted to backend');
     } catch (error) {
-      // Failed to persist profile details to backend
+      console.error('❌ Failed to persist profile to backend:', error);
+
+      // Check if it's a 404 error specifically
+      if (error instanceof Error) {
+        if (error.message.includes('404') || error.message.includes('not found')) {
+          console.error('🔍 404 Error Details:', {
+            message: error.message,
+            userId: username,
+            profileExists: !!userState.profile
+          });
+        }
+
+        // Show error to user for debugging
+        setAuthError(`Profile creation failed: ${error.message}. Please try refreshing the page.`);
+        return;
+      }
+
+      setAuthError('Failed to save profile. Please try again.');
+      return;
     }
 
     // Check if user came from assessment CTA and automatically show assessment

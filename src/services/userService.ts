@@ -10,12 +10,27 @@ export class UserService {
    */
   static async createUserProfile(profile: UserProfile): Promise<UserProfile> {
     try {
+      console.log('🆕 Creating user profile for userId:', profile.userId);
+      console.log('📝 Profile data:', {
+        businessName: profile.businessName,
+        email: profile.email,
+        location: profile.location,
+        region: profile.region,
+        role: profile.role
+      });
+
       // Verify user doesn't already exist to prevent conflicts
+      console.log('🔍 Checking if profile already exists...');
       const existingProfile = await this.getUserProfile(profile.userId);
       if (existingProfile) {
-        throw new Error(`User profile already exists for userId: ${profile.userId}`);
+        const errorMsg = `User profile already exists for userId: ${profile.userId}`;
+        console.error('❌', errorMsg);
+        throw new Error(errorMsg);
       }
-      const result = await client.models.UserProfile.create({
+
+      console.log('✅ No existing profile found, proceeding with creation');
+
+      const createPayload = {
         userId: profile.userId,
         businessName: profile.businessName,
         ownerName: profile.ownerName,
@@ -41,15 +56,50 @@ export class UserService {
         isBusinessVerified: profile.isBusinessVerified || false,
         profileCompletedAt: profile.profileCompletedAt,
         lastUpdated: profile.lastUpdated
+      };
+
+      console.log('📤 Sending create request to Amplify API...');
+      const result = await client.models.UserProfile.create(createPayload);
+
+      console.log('📨 API Response:', {
+        hasData: !!result.data,
+        hasErrors: !!(result.errors && result.errors.length > 0),
+        errorCount: result.errors?.length || 0
       });
 
       if (result.errors && result.errors.length > 0) {
-        throw new Error(`Failed to create user profile: ${result.errors[0].message}`);
+        const errorMessage = `Failed to create user profile: ${result.errors[0].message}`;
+        console.error('❌ API Error:', result.errors);
+        throw new Error(errorMessage);
       }
 
+      console.log('✅ Profile created successfully');
       return profile;
     } catch (error) {
-      // Error creating user profile
+      console.error('💥 Error in createUserProfile:', error);
+
+      // Enhanced error logging for debugging
+      if (error instanceof Error) {
+        console.error('🔍 Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack?.split('\n').slice(0, 5) // First 5 lines of stack trace
+        });
+
+        // Check for specific error patterns
+        if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+          throw new Error('Network error: Unable to connect to the backend service. Please check your internet connection.');
+        }
+
+        if (error.message.includes('403') || error.message.includes('unauthorized')) {
+          throw new Error('Authentication error: Please sign out and sign back in.');
+        }
+
+        if (error.message.includes('404')) {
+          throw new Error('API endpoint not found. The backend service may be unavailable.');
+        }
+      }
+
       throw error;
     }
   }
@@ -59,18 +109,30 @@ export class UserService {
    */
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
+      console.log('🔍 Fetching user profile for userId:', userId);
+
       const result = await client.models.UserProfile.list({
         filter: { userId: { eq: userId } }
       });
 
+      console.log('📨 Profile fetch response:', {
+        hasData: !!result.data,
+        dataLength: result.data?.length || 0,
+        hasErrors: !!(result.errors && result.errors.length > 0),
+        errorCount: result.errors?.length || 0
+      });
+
       if (result.errors && result.errors.length > 0) {
+        console.error('❌ Profile fetch errors:', result.errors);
         throw new Error(`Failed to fetch user profile: ${result.errors[0].message}`);
       }
 
       if (!result.data || result.data.length === 0) {
+        console.log('📭 No profile found for userId:', userId);
         return null;
       }
 
+      console.log('✅ Profile found for userId:', userId);
       const dbProfile = result.data[0];
 
       // Convert database record to UserProfile format
