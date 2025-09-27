@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './slices/userSlice';
 import transactionReducer from './slices/transactionSlice';
-import subscriptionReducer from './slices/subscriptionSlice';
+import subscriptionReducer from './slices/subscriptionSliceV2';
 import assessmentReducer from './slices/assessmentSlice';
 import uiReducer from './slices/uiSlice';
 

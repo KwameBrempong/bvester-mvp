@@ -66,7 +66,7 @@ export const STRIPE_CONFIG = {
 
   // Subscription settings
   subscriptionSettings: {
-    defaultTrialDays: 14,
+    defaultTrialDays: 0,  // No trial - we have a Free tier!
     prorationBehavior: 'create_prorations',
     cancelAtPeriodEnd: true, // Don't cancel immediately
     expandSubscriptionData: ['latest_invoice', 'customer'],

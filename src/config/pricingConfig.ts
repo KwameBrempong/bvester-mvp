@@ -121,8 +121,8 @@ export const PRICING_CONFIG: Record<PricingTier['id'], PricingTier> = {
       annual: 'price_1SBvZfGUhOvqkzBNgYHVdRyy',
     },
     trial: {
-      enabled: true,
-      days: 14,
+      enabled: false,  // No trial needed - we have a Free tier!
+      days: 0,
     },
     foundingMember: {
       enabled: true,

@@ -4,7 +4,8 @@ import MobileBusinessProfile from './MobileBusinessProfile';
 import { ComingSoonState, NoTransactionsState, EmptyState } from '../EmptyStates';
 import Icon from '../Icons';
 import { useUser, useAppDispatch, useAppSelector } from '../../store/hooks';
-import SubscriptionTierManager from '../SubscriptionTierManager';
+import UnifiedSubscription from '../UnifiedSubscription';
+// Legacy components kept for backward compatibility but not used
 import BillingManager from '../BillingManager';
 import { updateUserProfile } from '../../store/slices/userSlice';
 import { notify } from '../../utils/notifications';
@@ -2472,79 +2473,14 @@ export const BillingView: React.FC = () => {
         </div>
       </div>
 
-      {/* CRITICAL FIX: Enhanced Modal Components with Better Error Handling */}
+      {/* CRITICAL FIX: Use Unified Subscription Component */}
       {activeModal === 'subscriptionUpgrade' && (
-        <div
-          className="modal-overlay"
-          onClick={handleCloseModal}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}
-        >
-          <div
-            className="modal-content subscription-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              overflow: 'auto',
-              position: 'relative'
-            }}
-          >
-            <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-              <h3 style={{ margin: 0 }}>Upgrade Subscription</h3>
-              <button
-                onClick={handleCloseModal}
-                className="modal-close"
-                type="button"
-                style={{
-                  position: 'absolute',
-                  top: '15px',
-                  right: '20px',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: '#666'
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body" style={{ padding: '20px' }}>
-              {userId && userEmail ? (
-                <SubscriptionTierManager
-                  userId={userId}
-                  userEmail={userEmail}
-                  onClose={handleCloseModal}
-                />
-              ) : (
-                <div style={{ textAlign: 'center', padding: '40px' }}>
-                  <p>Loading user information...</p>
-                  <p>If this persists, please refresh the page.</p>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="btn btn-primary"
-                    type="button"
-                  >
-                    Refresh Page
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <UnifiedSubscription
+          userEmail={userEmail}
+          userId={userId}
+          onClose={handleCloseModal}
+          source="dashboard"
+        />
       )}
 
       {activeModal === 'billingManagement' && (

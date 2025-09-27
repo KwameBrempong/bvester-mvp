@@ -303,11 +303,8 @@ async function createCheckoutSession(params, headers) {
       },
     };
 
-    if (params.trialDays) {
-      sessionConfig.subscription_data = {
-        trial_period_days: params.trialDays,
-      };
-    }
+    // NO TRIALS - immediate payment only
+    // Removed trial logic completely - we have a Free tier!
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
@@ -816,8 +813,15 @@ async function processStripeWebhook(stripeEvent) {
 }
 
 async function handleCheckoutCompleted(session) {
-  const { customer, metadata } = session;
+  const { customer, metadata, payment_status, amount_total } = session;
   const { userId, isGuestCheckout, tierId } = metadata;
+
+  // IMPORTANT: With no trial, payment should be immediate
+  console.log('Checkout completed with immediate payment:', {
+    payment_status,
+    amount_total: amount_total / 100,
+    currency: session.currency
+  });
 
   console.log('Processing checkout completion:', {
     sessionId: session.id,
