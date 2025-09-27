@@ -4,6 +4,8 @@ import MobileBusinessProfile from './MobileBusinessProfile';
 import { ComingSoonState, NoTransactionsState, EmptyState } from '../EmptyStates';
 import Icon from '../Icons';
 import { useUser, useAppDispatch, useAppSelector } from '../../store/hooks';
+import SubscriptionTierManager from '../SubscriptionTierManager';
+import BillingManager from '../BillingManager';
 import { updateUserProfile } from '../../store/slices/userSlice';
 import { notify } from '../../utils/notifications';
 import { UserProfile } from '../../services/dataService';
@@ -2247,10 +2249,15 @@ export const TransactionsView: React.FC = () => {
 // Billing View
 export const BillingView: React.FC = () => {
   const [activeModal, setActiveModal] = useState<string | null>(null);
+  const userState = useUser();
 
   // Get subscription data from Redux store
   const subscription = useAppSelector((state) => state.subscription);
   const subscriptionTier = subscription.tier || 'starter';
+
+  // Get user information for subscription management
+  const userId = userState.user?.userId || '';
+  const userEmail = userState.user?.email || '';
 
   return (
     <div className="view-container animate-fadeIn">
@@ -2384,31 +2391,36 @@ export const BillingView: React.FC = () => {
       </div>
 
       {/* Modal Components */}
-      {activeModal === 'subscriptionUpgrade' && (
+      {activeModal === 'subscriptionUpgrade' && userId && userEmail && (
         <div className="modal-overlay" onClick={() => setActiveModal(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content subscription-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Upgrade Subscription</h3>
               <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
             </div>
             <div className="modal-body">
-              <p>Subscription upgrade functionality will be implemented here.</p>
-              <p>This will connect to SubscriptionTierManager component.</p>
+              <SubscriptionTierManager
+                userId={userId}
+                userEmail={userEmail}
+                onClose={() => setActiveModal(null)}
+              />
             </div>
           </div>
         </div>
       )}
 
-      {activeModal === 'billingManagement' && (
+      {activeModal === 'billingManagement' && userId && (
         <div className="modal-overlay" onClick={() => setActiveModal(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content billing-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Manage Billing</h3>
               <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
             </div>
             <div className="modal-body">
-              <p>Billing management functionality will be implemented here.</p>
-              <p>This will connect to Stripe Customer Portal.</p>
+              <BillingManager
+                userId={userId}
+                onClose={() => setActiveModal(null)}
+              />
             </div>
           </div>
         </div>
