@@ -993,14 +993,14 @@ body:has(.homepage-revenue) #root {
   font-family: var(--font-heading);
   font-size: 2.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #333;
   margin-bottom: 1rem;
   line-height: 1.2;
 }
 
 .section-header p {
   font-size: 1.125rem;
-  color: var(--text-secondary);
+  color: #666;
   line-height: 1.6;
 }
 
