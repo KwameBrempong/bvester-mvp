@@ -2255,30 +2255,44 @@ export const BillingView: React.FC = () => {
   const subscription = useAppSelector((state) => state.subscription);
   const subscriptionTier = subscription.tier || 'starter';
 
-  // Get user information for subscription management
-  const userId = userState.user?.userId || '';
-  const userEmail = userState.user?.email || '';
+  // CRITICAL FIX: Get user information from correct Redux state structure
+  const userId = userState.userId || '';
+  const userEmail = userState.profile?.email || '';
 
   // CRITICAL FIX: Enhanced button click handlers with validation and debugging
   const handleUpgradeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('Upgrade button clicked', { userId, userEmail, subscriptionTier });
+    console.log('Upgrade button clicked', {
+      userId,
+      userEmail,
+      subscriptionTier,
+      userState: userState,
+      profileExists: !!userState.profile
+    });
 
     if (!userId) {
-      console.error('No userId found, cannot open upgrade modal');
-      notify.error('User information not found. Please try refreshing the page.', 'Error');
+      console.error('No userId found', {
+        userState,
+        isAuthenticated: userState.isAuthenticated,
+        profile: userState.profile
+      });
+      notify.error('Please log in again to access billing features.', 'Authentication Required');
       return;
     }
 
     if (!userEmail) {
-      console.error('No userEmail found, cannot open upgrade modal');
-      notify.error('User email not found. Please try refreshing the page.', 'Error');
+      console.error('No userEmail found', {
+        userId,
+        profile: userState.profile,
+        profileEmail: userState.profile?.email
+      });
+      notify.error('Please complete your profile to access billing features.', 'Profile Required');
       return;
     }
 
-    console.log('Opening subscription upgrade modal');
+    console.log('Opening subscription upgrade modal with valid user data');
     setActiveModal('subscriptionUpgrade');
   };
 
@@ -2286,15 +2300,27 @@ export const BillingView: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('Billing management button clicked', { userId });
+    console.log('Billing management button clicked', { userId, userEmail });
 
     if (!userId) {
-      console.error('No userId found, cannot open billing modal');
-      notify.error('User information not found. Please try refreshing the page.', 'Error');
+      console.error('No userId found, cannot open billing modal', {
+        userState,
+        isAuthenticated: userState.isAuthenticated
+      });
+      notify.error('Please log in again to access billing management.', 'Authentication Required');
       return;
     }
 
-    console.log('Opening billing management modal');
+    if (!userEmail) {
+      console.error('No userEmail found, cannot open billing modal', {
+        userId,
+        profile: userState.profile
+      });
+      notify.error('Please complete your profile to access billing management.', 'Profile Required');
+      return;
+    }
+
+    console.log('Opening billing management modal with valid user data');
     setActiveModal('billingManagement');
   };
 
