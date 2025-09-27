@@ -1,4 +1,5 @@
 import { loadStripe } from '@stripe/stripe-js';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import { environment, logger, security } from './config/environment';
 import { subscriptionService, paymentEventService } from './services/dataService';
 
@@ -50,6 +51,24 @@ class StripeService {
 
   private async delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // CRITICAL FIX: Get JWT token for authenticated API calls
+  private async getAuthToken(): Promise<string | null> {
+    try {
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString();
+
+      if (!idToken) {
+        logger.warn('No ID token found in auth session');
+        return null;
+      }
+
+      return idToken;
+    } catch (error) {
+      logger.error('Failed to get auth token', error);
+      return null;
+    }
   }
 
   // CRITICAL FIX: Enhanced retry logic with better error handling
@@ -201,6 +220,12 @@ class StripeService {
         createdAt: new Date().toISOString(),
       });
 
+      // CRITICAL FIX: Get JWT token for authentication
+      const authToken = await this.getAuthToken();
+      if (!authToken) {
+        throw new Error('Authentication required. Please sign in and try again.');
+      }
+
       // Enhanced request body for advanced features
       const requestBody = {
         action: 'create_checkout_session',
@@ -214,6 +239,7 @@ class StripeService {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`, // CRITICAL FIX: Add JWT token
             'X-Request-ID': eventId,
           },
           body: JSON.stringify(requestBody),
@@ -341,10 +367,12 @@ class StripeService {
       // Then verify with Stripe if we have subscription IDs
       if (dbSubscription?.stripeSubscriptionId) {
         try {
+          const authToken = await this.getAuthToken();
           const response = await fetch(`${API_BASE_URL}/stripe`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
             },
             body: JSON.stringify({
               action: 'get_subscription_status',
@@ -417,10 +445,12 @@ class StripeService {
 
   async cancelSubscription(subscriptionId: string): Promise<boolean> {
     try {
+      const authToken = await this.getAuthToken();
       const response = await fetch(`${API_BASE_URL}/stripe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
         },
         body: JSON.stringify({
           action: 'cancel_subscription',
@@ -437,10 +467,12 @@ class StripeService {
 
   async createCustomerPortalSession(customerId: string, returnUrl: string): Promise<string | null> {
     try {
+      const authToken = await this.getAuthToken();
       const response = await fetch(`${API_BASE_URL}/stripe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
         },
         body: JSON.stringify({
           action: 'create_portal_session',
@@ -534,17 +566,21 @@ class StripeService {
   async updatePaymentMethod(customerId: string, paymentMethodId: string): Promise<boolean> {
     try {
       const response = await this.executeWithRetry(
-        () => fetch(`${API_BASE_URL}/stripe`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'update_payment_method',
-            customerId,
-            paymentMethodId,
-          }),
-        }),
+        async () => {
+          const authToken = await this.getAuthToken();
+          return fetch(`${API_BASE_URL}/stripe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              action: 'update_payment_method',
+              customerId,
+              paymentMethodId,
+            }),
+          });
+        },
         'Update payment method'
       );
 
@@ -558,16 +594,20 @@ class StripeService {
   async getPaymentMethods(customerId: string): Promise<any[]> {
     try {
       const response = await this.executeWithRetry(
-        () => fetch(`${API_BASE_URL}/stripe`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'get_payment_methods',
-            customerId,
-          }),
-        }),
+        async () => {
+          const authToken = await this.getAuthToken();
+          return fetch(`${API_BASE_URL}/stripe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              action: 'get_payment_methods',
+              customerId,
+            }),
+          });
+        },
         'Get payment methods'
       );
 
@@ -586,17 +626,21 @@ class StripeService {
   async getInvoices(customerId: string, limit: number = 10): Promise<any[]> {
     try {
       const response = await this.executeWithRetry(
-        () => fetch(`${API_BASE_URL}/stripe`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'get_invoices',
-            customerId,
-            limit,
-          }),
-        }),
+        async () => {
+          const authToken = await this.getAuthToken();
+          return fetch(`${API_BASE_URL}/stripe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              action: 'get_invoices',
+              customerId,
+              limit,
+            }),
+          });
+        },
         'Get invoices'
       );
 
@@ -615,17 +659,21 @@ class StripeService {
   async generateUsageReport(customerId: string, period: { start: string; end: string }): Promise<any> {
     try {
       const response = await this.executeWithRetry(
-        () => fetch(`${API_BASE_URL}/stripe`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            action: 'generate_usage_report',
-            customerId,
-            period,
-          }),
-        }),
+        async () => {
+          const authToken = await this.getAuthToken();
+          return fetch(`${API_BASE_URL}/stripe`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+            },
+            body: JSON.stringify({
+              action: 'generate_usage_report',
+              customerId,
+              period,
+            }),
+          });
+        },
         'Generate usage report'
       );
 
