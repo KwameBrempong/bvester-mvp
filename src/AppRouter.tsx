@@ -5,7 +5,7 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import '@aws-amplify/ui-react/styles.css';
 import './styles/auth-theme.css';
 import App from './App';
-import Homepage from './components/Homepage';
+import HomepageRevenue from './components/HomepageRevenue';
 import SignupSuccess from './components/SignupSuccess';
 import outputs from '../amplify_outputs.json';
 
@@ -411,7 +411,7 @@ const AppRouter: React.FC = () => {
     );
   }
 
-  return <Homepage onGetStarted={handleGetStarted} />;
+  return <HomepageRevenue onGetStarted={handleGetStarted} />;
 };
 
 export default AppRouter;

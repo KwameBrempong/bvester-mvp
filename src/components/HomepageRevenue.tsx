@@ -4,6 +4,7 @@ import '../styles/homepage-fixes.css';
 import '../styles/homepage-enhanced.css';
 import { PRICING_CONFIG, formatPrice, calculateAnnualSavings, getFoundingMemberSpotInfo, isFoundingMemberEligible } from '../config/pricingConfig';
 import '../styles/homepage-animations.css';
+import UnifiedSubscription from './UnifiedSubscription';
 
 interface HomepageProps {
   onGetStarted: () => void;
@@ -28,6 +29,9 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
 
   // Pricing state
   const [isAnnualPricing, setIsAnnualPricing] = useState(false);
+
+  // Subscription modal state
+  const [showSubscription, setShowSubscription] = useState(false);
 
   // Animation states
   const [liveStats, setLiveStats] = useState({
@@ -127,6 +131,10 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleUpgradeClick = () => {
+    setShowSubscription(true);
   };
 
   const formatCurrency = (amount: number) => {
@@ -753,8 +761,8 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                       Start Free
                     </button>
                   ) : tier.id === 'growth' ? (
-                    <button className="btn btn--primary" onClick={onGetStarted}>
-                      Start {tier.trial?.days}-Day Trial
+                    <button className="btn btn--primary" onClick={handleUpgradeClick}>
+                      Upgrade to Pro
                     </button>
                   ) : (
                     <button className="btn btn--gold" onClick={onGetStarted}>
@@ -1245,6 +1253,14 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           </div>
         )} */}
       </main>
+
+      {/* Unified Subscription Component */}
+      {showSubscription && (
+        <UnifiedSubscription
+          source="homepage"
+          onClose={() => setShowSubscription(false)}
+        />
+      )}
     </div>
   );
 };
