@@ -91,6 +91,8 @@ const checkRateLimit = (identifier, maxRequests = 100, windowMs = 60000) => {
 
 // SECURITY FIX: Actions that don't require authentication
 const publicActions = ['webhook'];
+// NEW: Actions that support optional authentication (guest mode)
+const optionalAuthActions = ['create_checkout_session'];
 
 exports.handler = async (event) => {
   const headers = {
@@ -116,44 +118,69 @@ exports.handler = async (event) => {
       return respond(400, headers, { error: 'Missing action parameter' });
     }
 
-    // Skip auth for public actions
+    // Enhanced authentication handling
     let userInfo = null;
-    if (!publicActions.includes(action)) {
-      // CRITICAL SECURITY FIX: Validate JWT token
-      const authHeader = event.headers.Authorization || event.headers.authorization;
-      const validation = validateJWT(authHeader);
+    const isPublicAction = publicActions.includes(action);
+    const isOptionalAuthAction = optionalAuthActions.includes(action);
 
-      if (!validation.isValid) {
-        console.error('Authentication failed:', validation.error);
+    if (!isPublicAction) {
+      // Try to get authentication
+      const authHeader = event.headers.Authorization || event.headers.authorization;
+
+      if (authHeader) {
+        // Authentication provided - validate it
+        const validation = validateJWT(authHeader);
+
+        if (!validation.isValid) {
+          console.error('Authentication failed:', validation.error);
+          return respond(401, headers, {
+            error: 'Authentication required',
+            details: validation.error
+          });
+        }
+
+        userInfo = validation;
+
+        // SECURITY FIX: Rate limiting per user
+        if (!checkRateLimit(userInfo.userId, 100, 60000)) {
+          console.warn('Rate limit exceeded for user:', userInfo.userId);
+          return respond(429, headers, {
+            error: 'Too many requests. Please try again later.'
+          });
+        }
+
+        // SECURITY FIX: Validate user owns the data they're accessing
+        if (params.userId && params.userId !== userInfo.userId) {
+          console.error('User attempting to access data for different user:', {
+            authenticatedUser: userInfo.userId,
+            requestedUser: params.userId
+          });
+          return respond(403, headers, {
+            error: 'Access denied. You can only access your own data.'
+          });
+        }
+
+        // Auto-inject authenticated user ID for security
+        params.userId = userInfo.userId;
+      } else if (!isOptionalAuthAction) {
+        // No auth provided and auth is required
+        console.error('Authentication required for action:', action);
         return respond(401, headers, {
           error: 'Authentication required',
-          details: validation.error
+          details: 'This action requires authentication'
         });
+      } else {
+        // No auth provided but this action supports guest mode
+        console.log('Processing guest request for action:', action);
+        // For guest checkout, rate limit by IP
+        const clientIP = event.requestContext?.identity?.sourceIp || 'unknown';
+        if (!checkRateLimit(`guest_${clientIP}`, 20, 60000)) { // Lower limit for guests
+          console.warn('Rate limit exceeded for guest IP:', clientIP);
+          return respond(429, headers, {
+            error: 'Too many requests. Please try again later.'
+          });
+        }
       }
-
-      userInfo = validation;
-
-      // SECURITY FIX: Rate limiting per user
-      if (!checkRateLimit(userInfo.userId, 100, 60000)) {
-        console.warn('Rate limit exceeded for user:', userInfo.userId);
-        return respond(429, headers, {
-          error: 'Too many requests. Please try again later.'
-        });
-      }
-
-      // SECURITY FIX: Validate user owns the data they're accessing
-      if (params.userId && params.userId !== userInfo.userId) {
-        console.error('User attempting to access data for different user:', {
-          authenticatedUser: userInfo.userId,
-          requestedUser: params.userId
-        });
-        return respond(403, headers, {
-          error: 'Access denied. You can only access your own data.'
-        });
-      }
-
-      // Auto-inject authenticated user ID for security
-      params.userId = userInfo.userId;
     }
 
     console.log('Processing action:', action, 'for user:', userInfo?.userId || 'public');
@@ -225,11 +252,20 @@ async function createCheckoutSession(params, headers) {
     customerEmail,
     userId,
     productType = 'subscription',
+    planType,
+    billingPeriod,
   } = params;
 
-  if (!priceId || !successUrl || !cancelUrl || !customerEmail || !userId) {
+  // Enhanced validation for both authenticated and guest checkout
+  if (!priceId || !successUrl || !cancelUrl || !customerEmail) {
     return respond(400, headers, { error: 'Missing required parameters for checkout session' });
   }
+
+  const isGuestCheckout = !userId;
+  console.log(`Creating ${isGuestCheckout ? 'guest' : 'authenticated'} checkout session`);
+
+  // For guest checkout, generate a temporary identifier
+  const checkoutUserId = userId || `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   try {
     const sessionConfig = {
@@ -242,7 +278,15 @@ async function createCheckoutSession(params, headers) {
       success_url: successUrl,
       cancel_url: cancelUrl,
       customer_email: customerEmail,
-      metadata: { userId, productType },
+      metadata: {
+        userId: checkoutUserId,
+        originalUserId: userId || '',
+        productType,
+        isGuestCheckout: isGuestCheckout.toString(),
+        planType: planType || '',
+        billingPeriod: billingPeriod || '',
+        customerEmail
+      },
     };
 
     if (params.trialDays) {

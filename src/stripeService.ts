@@ -192,13 +192,19 @@ class StripeService {
     return enhanced;
   }
 
-  async createCheckoutSession(params: CreateCheckoutSessionParams | EnhancedCheckoutSessionParams) {
+  async createCheckoutSession(params: CreateCheckoutSessionParams | EnhancedCheckoutSessionParams, options?: { requireAuth?: boolean }) {
     const startTime = Date.now();
+    const requireAuth = options?.requireAuth ?? true; // Default to requiring auth for backward compatibility
 
     try {
       // Validate input parameters
-      if (!params.priceId || !params.userId || !params.customerEmail) {
-        throw new Error('Missing required parameters: priceId, userId, or customerEmail');
+      if (!params.priceId || !params.customerEmail) {
+        throw new Error('Missing required parameters: priceId or customerEmail');
+      }
+
+      // For guest checkout, userId can be optional
+      if (requireAuth && !params.userId) {
+        throw new Error('Missing required parameter: userId (required for authenticated checkout)');
       }
 
       // Validate email format
@@ -207,12 +213,13 @@ class StripeService {
       }
 
       logger.info('Creating checkout session', {
-        userId: params.userId,
+        userId: params.userId || 'guest',
         priceId: params.priceId,
+        requireAuth,
         hasEnhancedParams: 'trialDays' in params
       });
 
-      // Enhanced payment event logging
+      // Enhanced payment event logging (only for authenticated users)
       const eventId = security.generateId();
       const analytics: PaymentAnalytics = {
         amount: ('analytics' in params && params.analytics?.amount) || 0,
@@ -220,27 +227,40 @@ class StripeService {
         ...(('analytics' in params && params.analytics) || {}),
       };
 
-      await paymentEventService.create({
-        userId: params.userId,
-        eventId,
-        eventType: 'checkout_session_created',
-        eventData: {
-          priceId: params.priceId,
-          customerEmail: params.customerEmail,
-          analytics,
-          enhancedParams: 'trialDays' in params,
-        },
-        createdAt: new Date().toISOString(),
-      });
-
-      // CRITICAL FIX: Get JWT token for authentication
-      console.log('Getting auth token for checkout session...');
-      const authToken = await this.getAuthToken();
-      if (!authToken) {
-        console.error('No auth token available - user may not be properly authenticated');
-        throw new Error('Authentication required. Please sign in and try again.');
+      // Only log to database for authenticated users
+      if (params.userId) {
+        try {
+          await paymentEventService.create({
+            userId: params.userId,
+            eventId,
+            eventType: 'checkout_session_created',
+            eventData: {
+              priceId: params.priceId,
+              customerEmail: params.customerEmail,
+              analytics,
+              enhancedParams: 'trialDays' in params,
+            },
+            createdAt: new Date().toISOString(),
+          });
+        } catch (logError) {
+          console.warn('Failed to log payment event (non-critical):', logError);
+        }
       }
-      console.log('Auth token obtained, proceeding with checkout session creation');
+
+      // ENHANCED: Optional JWT authentication for guest checkout
+      console.log('Getting auth token for checkout session...');
+      let authToken = null;
+
+      if (requireAuth) {
+        authToken = await this.getAuthToken();
+        if (!authToken) {
+          console.error('No auth token available - user may not be properly authenticated');
+          throw new Error('Authentication required. Please sign in and try again.');
+        }
+        console.log('Auth token obtained, proceeding with authenticated checkout session creation');
+      } else {
+        console.log('Guest checkout mode - proceeding without authentication');
+      }
 
       // Enhanced request body for advanced features
       const requestBody = {
@@ -261,7 +281,7 @@ class StripeService {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authToken}`, // CRITICAL FIX: Add JWT token
+            ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}), // Optional JWT token
           },
           body: JSON.stringify(requestBody),
         }),
