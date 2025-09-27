@@ -3,7 +3,7 @@ import DashboardKPIs from './DashboardKPIs';
 import MobileBusinessProfile from './MobileBusinessProfile';
 import { ComingSoonState, NoTransactionsState, EmptyState } from '../EmptyStates';
 import Icon from '../Icons';
-import { useUser, useAppDispatch } from '../../store/hooks';
+import { useUser, useAppDispatch, useAppSelector } from '../../store/hooks';
 import { updateUserProfile } from '../../store/slices/userSlice';
 import { notify } from '../../utils/notifications';
 import { UserProfile } from '../../services/dataService';
@@ -2246,6 +2246,12 @@ export const TransactionsView: React.FC = () => {
 
 // Billing View
 export const BillingView: React.FC = () => {
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  // Get subscription data from Redux store
+  const subscription = useAppSelector((state) => state.subscription);
+  const subscriptionTier = subscription.tier || 'starter';
+
   return (
     <div className="view-container animate-fadeIn">
       <div className="billing-container">
@@ -2376,6 +2382,37 @@ export const BillingView: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal Components */}
+      {activeModal === 'subscriptionUpgrade' && (
+        <div className="modal-overlay" onClick={() => setActiveModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Upgrade Subscription</h3>
+              <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
+            </div>
+            <div className="modal-body">
+              <p>Subscription upgrade functionality will be implemented here.</p>
+              <p>This will connect to SubscriptionTierManager component.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeModal === 'billingManagement' && (
+        <div className="modal-overlay" onClick={() => setActiveModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Manage Billing</h3>
+              <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
+            </div>
+            <div className="modal-body">
+              <p>Billing management functionality will be implemented here.</p>
+              <p>This will connect to Stripe Customer Portal.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
