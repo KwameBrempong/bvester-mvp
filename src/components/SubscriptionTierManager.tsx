@@ -41,20 +41,53 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
     }
   }, [userId, dispatch]);
 
+  // CRITICAL FIX: Enhanced upgrade handler with better error handling and logging
   const handleUpgrade = async (tier: 'growth' | 'accelerate') => {
     try {
+      console.log('Starting upgrade process', { tier, billingPeriod, userId, userEmail });
+
+      if (!userId || !userEmail) {
+        console.error('Missing user information for upgrade', { userId, userEmail });
+        alert('User information is missing. Please refresh the page and try again.');
+        return;
+      }
+
       const priceInfo = priceConfig.platform[tier][billingPeriod];
       const priceId = typeof priceInfo === 'string' ? priceInfo : priceInfo.priceId;
 
-      await dispatch(createCheckoutSession({
+      if (!priceId) {
+        console.error('Price ID not found', { tier, billingPeriod, priceInfo });
+        alert('Pricing configuration error. Please contact support.');
+        return;
+      }
+
+      console.log('Creating checkout session with:', {
+        priceId,
+        userId,
+        customerEmail: userEmail,
+        planType: tier,
+        billingPeriod
+      });
+
+      const result = await dispatch(createCheckoutSession({
         priceId,
         userId,
         customerEmail: userEmail,
         planType: tier,
         billingPeriod,
       }));
+
+      console.log('Checkout session creation result:', result);
+
+      // If successful, close the modal
+      if (onClose) {
+        onClose();
+      }
+
     } catch (error) {
       console.error('Upgrade error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Upgrade failed: ${errorMessage}. Please try again or contact support.`);
     }
   };
 
@@ -127,28 +160,17 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
     },
   };
 
+  // CRITICAL FIX: Remove overlay styling since it's handled by parent modal
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '20px'
+      width: '100%',
+      maxWidth: '1000px'
     }}>
       <div style={{
         background: 'white',
         borderRadius: '16px',
-        maxWidth: '1000px',
         width: '100%',
-        maxHeight: '90vh',
-        overflow: 'auto',
-        boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+        overflow: 'auto'
       }}>
         {/* Header */}
         <div style={{
@@ -411,15 +433,18 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
 
                       <button
                         onClick={(e) => {
+                          e.preventDefault();
                           e.stopPropagation();
+                          console.log('Upgrade button clicked for tier:', tier);
                           handleUpgrade(tier);
                         }}
                         disabled={loading.payment}
+                        type="button"
                         style={{
                           width: '100%',
                           padding: '12px',
                           marginTop: '20px',
-                          background: tierInfo.color,
+                          background: loading.payment ? '#cccccc' : tierInfo.color,
                           color: 'white',
                           border: 'none',
                           borderRadius: '8px',
@@ -427,7 +452,20 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
                           fontWeight: 'bold',
                           cursor: loading.payment ? 'not-allowed' : 'pointer',
                           opacity: loading.payment ? 0.7 : 1,
-                          transition: 'all 0.3s ease'
+                          transition: 'all 0.3s ease',
+                          boxShadow: loading.payment ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!loading.payment) {
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!loading.payment) {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                          }
                         }}
                       >
                         {loading.payment ? 'Processing...' : `Upgrade to ${tierInfo.name}`}

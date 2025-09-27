@@ -2259,6 +2259,54 @@ export const BillingView: React.FC = () => {
   const userId = userState.user?.userId || '';
   const userEmail = userState.user?.email || '';
 
+  // CRITICAL FIX: Enhanced button click handlers with validation and debugging
+  const handleUpgradeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('Upgrade button clicked', { userId, userEmail, subscriptionTier });
+
+    if (!userId) {
+      console.error('No userId found, cannot open upgrade modal');
+      notify.error('User information not found. Please try refreshing the page.', 'Error');
+      return;
+    }
+
+    if (!userEmail) {
+      console.error('No userEmail found, cannot open upgrade modal');
+      notify.error('User email not found. Please try refreshing the page.', 'Error');
+      return;
+    }
+
+    console.log('Opening subscription upgrade modal');
+    setActiveModal('subscriptionUpgrade');
+  };
+
+  const handleBillingManagementClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('Billing management button clicked', { userId });
+
+    if (!userId) {
+      console.error('No userId found, cannot open billing modal');
+      notify.error('User information not found. Please try refreshing the page.', 'Error');
+      return;
+    }
+
+    console.log('Opening billing management modal');
+    setActiveModal('billingManagement');
+  };
+
+  const handleCloseModal = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log('Closing modal');
+    setActiveModal(null);
+  };
+
   return (
     <div className="view-container animate-fadeIn">
       <div className="billing-container">
@@ -2346,7 +2394,9 @@ export const BillingView: React.FC = () => {
             {subscriptionTier === 'starter' && (
               <button
                 className="btn btn-primary"
-                onClick={() => setActiveModal('subscriptionUpgrade')}
+                onClick={handleUpgradeClick}
+                type="button"
+                style={{ cursor: 'pointer' }}
               >
                 Upgrade Plan
               </button>
@@ -2355,13 +2405,17 @@ export const BillingView: React.FC = () => {
               <>
                 <button
                   className="btn btn-outline"
-                  onClick={() => setActiveModal('subscriptionUpgrade')}
+                  onClick={handleUpgradeClick}
+                  type="button"
+                  style={{ cursor: 'pointer' }}
                 >
                   Change Plan
                 </button>
                 <button
                   className="btn btn-outline"
-                  onClick={() => setActiveModal('billingManagement')}
+                  onClick={handleBillingManagementClick}
+                  type="button"
+                  style={{ cursor: 'pointer' }}
                 >
                   Manage Billing
                 </button>
@@ -2381,7 +2435,9 @@ export const BillingView: React.FC = () => {
               <p>Payment methods will be managed through the billing portal for security.</p>
               <button
                 className="btn btn-sm btn-primary"
-                onClick={() => setActiveModal('billingManagement')}
+                onClick={handleBillingManagementClick}
+                type="button"
+                style={{ cursor: 'pointer' }}
               >
                 Manage Payment Methods
               </button>
@@ -2390,37 +2446,149 @@ export const BillingView: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal Components */}
-      {activeModal === 'subscriptionUpgrade' && userId && userEmail && (
-        <div className="modal-overlay" onClick={() => setActiveModal(null)}>
-          <div className="modal-content subscription-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Upgrade Subscription</h3>
-              <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
+      {/* CRITICAL FIX: Enhanced Modal Components with Better Error Handling */}
+      {activeModal === 'subscriptionUpgrade' && (
+        <div
+          className="modal-overlay"
+          onClick={handleCloseModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            className="modal-content subscription-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              position: 'relative'
+            }}
+          >
+            <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+              <h3 style={{ margin: 0 }}>Upgrade Subscription</h3>
+              <button
+                onClick={handleCloseModal}
+                className="modal-close"
+                type="button"
+                style={{
+                  position: 'absolute',
+                  top: '15px',
+                  right: '20px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
             </div>
-            <div className="modal-body">
-              <SubscriptionTierManager
-                userId={userId}
-                userEmail={userEmail}
-                onClose={() => setActiveModal(null)}
-              />
+            <div className="modal-body" style={{ padding: '20px' }}>
+              {userId && userEmail ? (
+                <SubscriptionTierManager
+                  userId={userId}
+                  userEmail={userEmail}
+                  onClose={handleCloseModal}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <p>Loading user information...</p>
+                  <p>If this persists, please refresh the page.</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="btn btn-primary"
+                    type="button"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {activeModal === 'billingManagement' && userId && (
-        <div className="modal-overlay" onClick={() => setActiveModal(null)}>
-          <div className="modal-content billing-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Manage Billing</h3>
-              <button onClick={() => setActiveModal(null)} className="modal-close">×</button>
+      {activeModal === 'billingManagement' && (
+        <div
+          className="modal-overlay"
+          onClick={handleCloseModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            className="modal-content billing-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              position: 'relative'
+            }}
+          >
+            <div className="modal-header" style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+              <h3 style={{ margin: 0 }}>Manage Billing</h3>
+              <button
+                onClick={handleCloseModal}
+                className="modal-close"
+                type="button"
+                style={{
+                  position: 'absolute',
+                  top: '15px',
+                  right: '20px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
             </div>
-            <div className="modal-body">
-              <BillingManager
-                userId={userId}
-                onClose={() => setActiveModal(null)}
-              />
+            <div className="modal-body" style={{ padding: '20px' }}>
+              {userId ? (
+                <BillingManager
+                  userId={userId}
+                  onClose={handleCloseModal}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <p>Loading user information...</p>
+                  <p>If this persists, please refresh the page.</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="btn btn-primary"
+                    type="button"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
