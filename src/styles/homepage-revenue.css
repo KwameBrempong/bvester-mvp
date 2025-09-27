@@ -320,7 +320,7 @@ body:has(.homepage-revenue) #root {
 
 /* Hero Section */
 .hero {
-  padding: 3rem 0 4rem;
+  padding: 1.5rem 0 4rem;
   background: radial-gradient(ellipse at top, rgba(217, 119, 6, 0.1) 0%, transparent 50%);
   position: relative;
   overflow: hidden;

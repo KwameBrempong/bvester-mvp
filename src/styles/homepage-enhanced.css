@@ -512,8 +512,18 @@
   }
 
   .hero__trust-indicators {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .trust-item {
+    white-space: nowrap;
+  }
+
+  .trust-divider {
+    margin: 0 0.25rem;
   }
 }
 
