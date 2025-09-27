@@ -58,15 +58,34 @@ const BillingManager: React.FC<BillingManagerProps> = ({
 
   useEffect(() => {
     if (userId) {
-      dispatch(fetchSubscription(userId));
-      dispatch(fetchPaymentHistory(userId));
+      console.log('BillingManager: Fetching subscription data for userId:', userId);
+      dispatch(fetchSubscription(userId))
+        .then((result) => {
+          console.log('BillingManager: fetchSubscription result:', result);
+        })
+        .catch((error) => {
+          console.error('BillingManager: fetchSubscription error:', error);
+        });
+
+      dispatch(fetchPaymentHistory(userId))
+        .then((result) => {
+          console.log('BillingManager: fetchPaymentHistory result:', result);
+        })
+        .catch((error) => {
+          console.error('BillingManager: fetchPaymentHistory error:', error);
+        });
+
       loadBillingData();
     }
   }, [userId, dispatch]);
 
   const loadBillingData = async () => {
-    if (!customerId) return;
+    if (!customerId) {
+      console.log('No customerId available, skipping billing data load');
+      return;
+    }
 
+    console.log('Loading billing data for customerId:', customerId);
     setIsLoading(true);
     try {
       const [methods, invoiceList] = await Promise.all([
@@ -74,6 +93,7 @@ const BillingManager: React.FC<BillingManagerProps> = ({
         stripeService.getInvoices(customerId)
       ]);
 
+      console.log('Billing data loaded:', { methods, invoiceList });
       setPaymentMethods(methods);
       setInvoices(invoiceList);
     } catch (error) {

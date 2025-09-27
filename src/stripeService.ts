@@ -57,16 +57,29 @@ class StripeService {
   private async getAuthToken(): Promise<string | null> {
     try {
       const session = await fetchAuthSession();
+      console.log('Auth session retrieved:', {
+        hasSession: !!session,
+        hasTokens: !!session.tokens,
+        hasIdToken: !!session.tokens?.idToken
+      });
+
       const idToken = session.tokens?.idToken?.toString();
 
       if (!idToken) {
-        logger.warn('No ID token found in auth session');
+        logger.warn('No ID token found in auth session', {
+          session: !!session,
+          tokens: !!session.tokens,
+          sessionKeys: session ? Object.keys(session) : []
+        });
+        console.error('Auth token missing - session details:', session);
         return null;
       }
 
+      console.log('Auth token retrieved successfully');
       return idToken;
     } catch (error) {
       logger.error('Failed to get auth token', error);
+      console.error('Auth token error:', error);
       return null;
     }
   }
@@ -221,10 +234,13 @@ class StripeService {
       });
 
       // CRITICAL FIX: Get JWT token for authentication
+      console.log('Getting auth token for checkout session...');
       const authToken = await this.getAuthToken();
       if (!authToken) {
+        console.error('No auth token available - user may not be properly authenticated');
         throw new Error('Authentication required. Please sign in and try again.');
       }
+      console.log('Auth token obtained, proceeding with checkout session creation');
 
       // Enhanced request body for advanced features
       const requestBody = {
@@ -233,6 +249,12 @@ class StripeService {
         sessionId: eventId,
         analytics,
       };
+
+      console.log('Sending request to Lambda:', {
+        url: `${API_BASE_URL}/stripe`,
+        hasAuth: !!authToken,
+        requestBody
+      });
 
       const response = await this.executeWithRetry(
         () => fetch(`${API_BASE_URL}/stripe`, {
@@ -246,14 +268,18 @@ class StripeService {
         'Checkout session creation'
       );
 
+      console.log('Lambda response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
         logger.error('Lambda error response', { status: response.status, error: errorText });
+        console.error('Lambda error details:', { status: response.status, errorText });
         throw new Error(`Failed to create checkout session: ${response.status} ${errorText}`);
       }
 
       const responseData = await response.json();
       logger.debug('Lambda response received', responseData);
+      console.log('Raw Lambda response:', responseData);
 
       // Handle API Gateway response wrapper
       let parsedResponse = responseData;
@@ -261,11 +287,14 @@ class StripeService {
       // If the response has statusCode and body properties, it's wrapped by API Gateway
       if (responseData.statusCode && responseData.body) {
         logger.debug('Detected API Gateway wrapped response, parsing body...');
+        console.log('API Gateway wrapped response detected, parsing body...');
         try {
           parsedResponse = JSON.parse(responseData.body);
           logger.debug('Parsed response body', parsedResponse);
+          console.log('Parsed Lambda response body:', parsedResponse);
         } catch (parseError) {
           logger.error('Failed to parse response body', responseData.body);
+          console.error('Failed to parse Lambda response body:', responseData.body);
           throw new Error(`Failed to parse Lambda response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
         }
 
@@ -275,6 +304,7 @@ class StripeService {
             status: responseData.statusCode,
             error: parsedResponse
           });
+          console.error('Lambda returned non-200 status:', responseData.statusCode, parsedResponse);
           throw new Error(`Lambda error: ${parsedResponse.error || 'Unknown error'}${parsedResponse.details ? '\nDetails: ' + parsedResponse.details : ''}`);
         }
       }
@@ -285,6 +315,7 @@ class StripeService {
           error: parsedResponse.error,
           details: parsedResponse.details
         });
+        console.error('Lambda returned error in response:', parsedResponse);
         throw new Error(`Lambda error: ${parsedResponse.error}${parsedResponse.details ? '\nDetails: ' + parsedResponse.details : ''}`);
       }
 
@@ -292,15 +323,20 @@ class StripeService {
 
       if (!sessionId) {
         logger.error('No sessionId in response', parsedResponse);
+        console.error('No sessionId in Lambda response. Full response:', parsedResponse);
         throw new Error('No sessionId returned from Lambda function. Check Lambda logs for details.');
       }
 
+      console.log('Received Stripe sessionId:', sessionId);
+
       const stripe = await stripePromise;
       if (!stripe) {
+        console.error('Stripe library failed to load');
         throw new Error('Stripe failed to load');
       }
 
       logger.info('Redirecting to checkout', { sessionId });
+      console.log('Attempting to redirect to Stripe checkout with sessionId:', sessionId);
 
       // CRITICAL FIX: Enhanced redirect with better error handling
       const { error } = await stripe.redirectToCheckout({ sessionId });
@@ -359,50 +395,64 @@ class StripeService {
   async getSubscriptionStatus(userId: string): Promise<SubscriptionStatus> {
     try {
       logger.info('Fetching subscription status', { userId });
+      console.log('getSubscriptionStatus called for userId:', userId);
 
       // First check our database for cached subscription data
       const dbSubscription = await subscriptionService.get(userId);
+      console.log('Database subscription data:', dbSubscription);
 
       // Then verify with Stripe if we have subscription IDs
       if (dbSubscription?.stripeSubscriptionId) {
         try {
+          console.log('Fetching auth token for subscription status check...');
           const authToken = await this.getAuthToken();
-          const response = await fetch(`${API_BASE_URL}/stripe`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
-            },
-            body: JSON.stringify({
-              action: 'get_subscription_status',
-              userId,
-              stripeSubscriptionId: dbSubscription.stripeSubscriptionId,
-            }),
-          });
 
-          if (response.ok) {
-            const stripeStatus = await response.json();
+          if (!authToken) {
+            console.warn('No auth token available for subscription status check - using cached data');
+            // Fall through to use cached data instead of throwing error
+          } else {
+            const response = await fetch(`${API_BASE_URL}/stripe`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+              },
+              body: JSON.stringify({
+                action: 'get_subscription_status',
+                userId,
+                stripeSubscriptionId: dbSubscription.stripeSubscriptionId,
+              }),
+            });
 
-            // Update our database with latest Stripe data
-            if (stripeStatus.isActive !== undefined) {
-              await subscriptionService.update(userId, {
-                platformTier: stripeStatus.isActive ?
-                  (stripeStatus.plan as 'growth' | 'accelerate') || 'starter' : 'starter',
-                platformExpiryDate: stripeStatus.currentPeriodEnd ?
-                  new Date(stripeStatus.currentPeriodEnd * 1000).toISOString() : undefined,
-                cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd,
-              });
+              if (response.ok) {
+                const stripeStatus = await response.json();
+                console.log('Stripe status response:', stripeStatus);
+
+                // Update our database with latest Stripe data
+                if (stripeStatus.isActive !== undefined) {
+                  await subscriptionService.update(userId, {
+                    platformTier: stripeStatus.isActive ?
+                      (stripeStatus.plan as 'growth' | 'accelerate') || 'starter' : 'starter',
+                    platformExpiryDate: stripeStatus.currentPeriodEnd ?
+                      new Date(stripeStatus.currentPeriodEnd * 1000).toISOString() : undefined,
+                    cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd,
+                  });
+                }
+
+                return {
+                  isActive: stripeStatus.isActive || false,
+                  plan: stripeStatus.plan || null,
+                  currentPeriodEnd: stripeStatus.currentPeriodEnd || null,
+                  cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd || false,
+                };
+              } else {
+                console.warn('Stripe API returned non-OK status:', response.status);
+              }
             }
-
-            return {
-              isActive: stripeStatus.isActive || false,
-              plan: stripeStatus.plan || null,
-              currentPeriodEnd: stripeStatus.currentPeriodEnd || null,
-              cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd || false,
-            };
           }
         } catch (stripeError) {
           logger.warn('Failed to verify with Stripe, using database data', stripeError);
+          console.warn('Stripe verification failed, using cached data:', stripeError);
         }
       }
 
