@@ -182,7 +182,7 @@ export type BusinessAssessment = {
 
 export type UserSubscription = {
   userId: string;
-  platformTier: 'free' | 'pro' | 'business';
+  platformTier: 'starter' | 'growth' | 'accelerate';
   platformExpiryDate?: string;
   stripeSubscriptionId?: string;
   stripeCustomerId?: string;
@@ -635,7 +635,7 @@ export const subscriptionService = {
         // Create new subscription if none exists
         return await this.create({
           userId,
-          platformTier: 'free',
+          platformTier: 'starter',
           acceleratorAccess: 'none',
           createdAt: new Date().toISOString(),
           lastUpdated: new Date().toISOString(),

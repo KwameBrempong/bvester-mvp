@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../styles/homepage-revenue.css';
 import '../styles/homepage-fixes.css';
 import '../styles/homepage-enhanced.css';
+import { PRICING_CONFIG, formatPrice, calculateAnnualSavings, getFoundingMemberSpotInfo, isFoundingMemberEligible } from '../config/pricingConfig';
 import '../styles/homepage-animations.css';
 
 interface HomepageProps {
@@ -55,6 +56,29 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       }));
     }, 5000);
 
+    // Dynamic activity feed messages
+    const activityMessages = [
+      "Sarah from Kumasi just completed her assessment",
+      "Kwame from Accra just improved his score by 25 points",
+      "Akosua from Takoradi just received her business roadmap",
+      "Michael from Tema just connected with 3 investors",
+      "Grace from Cape Coast just generated her financial report",
+      "Emmanuel from Tamale just started his 90-day journey",
+      "Ama from Ho just completed week 1 of building",
+      "Joseph from Sunyani just received funding interest",
+      "Adwoa from Koforidua just unlocked investor matching",
+      "David from Bolgatanga just improved to investment-ready status"
+    ];
+
+    let messageIndex = 0;
+    const activityInterval = setInterval(() => {
+      const activityText = document.getElementById('activity-text');
+      if (activityText) {
+        messageIndex = (messageIndex + 1) % activityMessages.length;
+        activityText.textContent = activityMessages[messageIndex];
+      }
+    }, 4000);
+
     // Scroll animations - reveal elements on scroll
     const observerOptions = {
       root: null,
@@ -82,6 +106,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
       clearInterval(interval);
+      clearInterval(activityInterval);
       animatedElements.forEach(el => observer.unobserve(el));
     };
   }, []);
@@ -113,72 +138,46 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     }).format(amount);
   };
 
-  // Pricing data structure
-  const pricingPlans = {
-    free: {
-      name: 'Free',
-      monthly: 0,
-      annual: 0,
-      description: 'Perfect for getting started',
-      features: [
-        '✓ Investment readiness assessment',
-        '✓ Basic dashboard',
-        '✓ 50 transaction records',
-        '✓ Email support',
-        '✗ Advanced analytics',
-        '✗ Investor connections',
-        '✗ Priority support'
-      ]
-    },
-    growth: {
-      name: 'Growth',
-      monthly: 87,
-      annual: 730,
-      description: 'For growing businesses',
-      popular: true,
-      features: [
-        '✓ Everything in Free',
-        '✓ Unlimited transactions',
-        '✓ Advanced analytics',
-        '✓ Custom reports',
-        '✓ Chat-based record keeping',
-        '✓ Priority email support',
-        '✗ Investor network access'
-      ]
-    },
-    scale: {
-      name: 'Scale',
-      monthly: 497,
-      annual: 4174,
-      description: 'For investment-ready SMEs',
-      features: [
-        '✓ Everything in Growth',
-        '✓ Investor network access',
-        '✓ Dedicated account manager',
-        '✓ Custom integrations',
-        '✓ White-label reports',
-        '✓ Phone & chat support',
-        '✓ API access'
-      ]
+  // State for pricing configuration
+  const [foundingMemberEligible, setFoundingMemberEligible] = useState(false);
+  const [spotsRemaining, setSpotsRemaining] = useState(0);
+
+  // Check founding member eligibility on component mount
+  useEffect(() => {
+    const checkFoundingMember = async () => {
+      const eligible = await isFoundingMemberEligible();
+      const spotInfo = await getFoundingMemberSpotInfo();
+
+      setFoundingMemberEligible(eligible);
+      setSpotsRemaining(spotInfo.remaining);
+    };
+
+    checkFoundingMember();
+  }, []);
+
+  // Get pricing tiers from config
+  const pricingTiers = Object.values(PRICING_CONFIG);
+
+  // Helper functions for new pricing structure
+  const getDisplayPrice = (tier: typeof PRICING_CONFIG.starter, showUSD = false) => {
+    const pricing = isAnnualPricing ? tier.price.annual : tier.price.monthly;
+    const currency = showUSD ? tier.currency.display.usd : tier.currency.display.ghs;
+    const amount = isAnnualPricing ? currency.annual : currency.monthly;
+
+    if (foundingMemberEligible && tier.foundingMember?.enabled) {
+      const foundingPrice = isAnnualPricing ? tier.foundingMember.discountedPrice.annual : tier.foundingMember.discountedPrice.monthly;
+      return foundingPrice;
     }
+
+    return amount;
   };
 
-  const getPrice = (plan: keyof typeof pricingPlans) => {
-    return isAnnualPricing ? pricingPlans[plan].annual : pricingPlans[plan].monthly;
+  const getOriginalPrice = (tier: typeof PRICING_CONFIG.starter) => {
+    return isAnnualPricing ? tier.price.annual : tier.price.monthly;
   };
 
-  const getAnnualSavings = (plan: keyof typeof pricingPlans) => {
-    const monthlyTotal = pricingPlans[plan].monthly * 12;
-    const annualPrice = pricingPlans[plan].annual;
-    return monthlyTotal - annualPrice;
-  };
-
-  const getDiscountPercentage = (plan: keyof typeof pricingPlans) => {
-    if (plan === 'free') return 0;
-    const monthlyTotal = pricingPlans[plan].monthly * 12;
-    const annualPrice = pricingPlans[plan].annual;
-    const savings = monthlyTotal - annualPrice;
-    return Math.round((savings / monthlyTotal) * 100);
+  const hasFoundingDiscount = (tier: typeof PRICING_CONFIG.starter) => {
+    return foundingMemberEligible && tier.foundingMember?.enabled;
   };
 
   return (
@@ -514,7 +513,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           <div className="feed__container">
             <div className="feed__item">
               <span className="feed__avatar">👤</span>
-              <span className="feed__text">Sarah from Kumasi just completed her assessment</span>
+              <span className="feed__text" id="activity-text">Sarah from Kumasi just completed her assessment</span>
               <span className="feed__time">2 min ago</span>
             </div>
           </div>
@@ -683,82 +682,87 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
             </div>
 
             <div className="pricing__grid">
-              {/* Free Tier */}
-              <div className="pricing-card">
-                <div className="pricing__header">
-                  <h3>{pricingPlans.free.name}</h3>
-                  <div className="pricing__price">
-                    <span className="price__amount">₵{getPrice('free')}</span>
-                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
-                  </div>
-                  <p>{pricingPlans.free.description}</p>
-                </div>
+              {pricingTiers.map((tier, index) => (
+                <div
+                  key={tier.id}
+                  className={`pricing-card ${tier.id === 'growth' ? 'pricing-card--popular' : ''} ${tier.isComingSoon ? 'pricing-card--coming-soon' : ''}`}
+                >
+                  {tier.id === 'growth' && <div className="pricing__badge">Most Popular</div>}
+                  {tier.isComingSoon && <div className="pricing__badge pricing__badge--coming-soon">Coming Soon</div>}
 
-                <ul className="pricing__features">
-                  {pricingPlans.free.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
+                  {/* Founding Member Badge */}
+                  {hasFoundingDiscount(tier) && (
+                    <div className="founding-member-badge">
+                      🎯 Founding Member - {tier.foundingMember?.discountPercentage}% Off
+                      <div className="spots-remaining">{spotsRemaining}/1,000 spots left</div>
+                    </div>
+                  )}
 
-                <button className="btn btn--outline" onClick={onGetStarted}>
-                  Get Started Free
-                </button>
-              </div>
+                  <div className="pricing__header">
+                    <h3>{tier.displayName}</h3>
+                    <div className="pricing__price">
+                      {hasFoundingDiscount(tier) && (
+                        <div className="price-strike">
+                          <span className="original-price">{formatPrice(getOriginalPrice(tier), 'GHS')}</span>
+                        </div>
+                      )}
+                      <span className="price__amount">{formatPrice(getDisplayPrice(tier), 'GHS')}</span>
+                      <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
 
-              {/* Growth Tier */}
-              <div className="pricing-card pricing-card--popular">
-                <div className="pricing__badge">Most Popular</div>
-                <div className="pricing__header">
-                  <h3>{pricingPlans.growth.name}</h3>
-                  <div className="pricing__price">
-                    <span className="price__amount">₵{getPrice('growth')}</span>
-                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
-                    {isAnnualPricing && (
-                      <div className="price__savings">
-                        Save ₵{getAnnualSavings('growth')} ({getDiscountPercentage('growth')}% off)
+                      {/* USD Display */}
+                      <div className="price__usd">
+                        ≈ {formatPrice(getDisplayPrice(tier, true), 'USD')} USD
+                      </div>
+
+                      {isAnnualPricing && tier.price.monthly > 0 && (
+                        <div className="price__savings">
+                          Save {formatPrice(calculateAnnualSavings(tier.id).amount, 'GHS')} per year ({calculateAnnualSavings(tier.id).percentage}% off)
+                        </div>
+                      )}
+                    </div>
+
+                    {tier.trial?.enabled && !tier.isComingSoon && (
+                      <div className="pricing__trial">
+                        {tier.trial.days}-day free trial included
                       </div>
                     )}
+
+                    <p>{tier.description}</p>
                   </div>
-                  <p>{pricingPlans.growth.description}</p>
+
+                  <ul className="pricing__features">
+                    {tier.features.map((feature, index) => (
+                      <li key={index}>
+                        {tier.isComingSoon && tier.comingSoonFeatures?.includes(feature) ? (
+                          <span className="feature-coming-soon">
+                            {feature} <span className="coming-soon-label">(Coming Soon)</span>
+                          </span>
+                        ) : (
+                          feature
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {tier.isComingSoon ? (
+                    <button className="btn btn--disabled" disabled>
+                      Coming Soon
+                    </button>
+                  ) : tier.id === 'starter' ? (
+                    <button className="btn btn--outline" onClick={onGetStarted}>
+                      Start Free
+                    </button>
+                  ) : tier.id === 'growth' ? (
+                    <button className="btn btn--primary" onClick={onGetStarted}>
+                      Start {tier.trial?.days}-Day Trial
+                    </button>
+                  ) : (
+                    <button className="btn btn--gold" onClick={onGetStarted}>
+                      Coming Soon
+                    </button>
+                  )}
                 </div>
-
-                <ul className="pricing__features">
-                  {pricingPlans.growth.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-
-                <button className="btn btn--primary" onClick={onGetStarted}>
-                  Start Growth Trial
-                </button>
-              </div>
-
-              {/* Scale Tier */}
-              <div className="pricing-card">
-                <div className="pricing__header">
-                  <h3>{pricingPlans.scale.name}</h3>
-                  <div className="pricing__price">
-                    <span className="price__amount">₵{getPrice('scale')}</span>
-                    <span className="price__period">/{isAnnualPricing ? 'year' : 'month'}</span>
-                    {isAnnualPricing && (
-                      <div className="price__savings">
-                        Save ₵{getAnnualSavings('scale')} ({getDiscountPercentage('scale')}% off)
-                      </div>
-                    )}
-                  </div>
-                  <p>{pricingPlans.scale.description}</p>
-                </div>
-
-                <ul className="pricing__features">
-                  {pricingPlans.scale.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-
-                <button className="btn btn--gold" onClick={onGetStarted}>
-                  Go Scale
-                </button>
-              </div>
+              ))}
             </div>
 
             <div className="pricing__footer">

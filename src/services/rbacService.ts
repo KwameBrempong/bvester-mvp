@@ -78,8 +78,8 @@ export type FeatureAccess = {
   hasCustomBranding: boolean;
 };
 
-const subscriptionFeatures: Record<'free' | 'pro' | 'business', FeatureAccess> = {
-  free: {
+const subscriptionFeatures: Record<'starter' | 'growth' | 'accelerate', FeatureAccess> = {
+  starter: {
     maxTransactions: 20,
     maxReports: 3,
     maxUsers: 1,
@@ -89,7 +89,7 @@ const subscriptionFeatures: Record<'free' | 'pro' | 'business', FeatureAccess> =
     hasPhoneSupport: false,
     hasCustomBranding: false
   },
-  pro: {
+  growth: {
     maxTransactions: 500,
     maxReports: 20,
     maxUsers: 3,
@@ -99,7 +99,7 @@ const subscriptionFeatures: Record<'free' | 'pro' | 'business', FeatureAccess> =
     hasPhoneSupport: false,
     hasCustomBranding: false
   },
-  business: {
+  accelerate: {
     maxTransactions: Infinity,
     maxReports: Infinity,
     maxUsers: 10,
@@ -142,14 +142,14 @@ export const rbacService = {
   },
 
   // Get feature access based on subscription
-  getFeatureAccess(subscriptionTier: 'free' | 'pro' | 'business'): FeatureAccess {
+  getFeatureAccess(subscriptionTier: 'starter' | 'growth' | 'accelerate'): FeatureAccess {
     return subscriptionFeatures[subscriptionTier];
   },
 
   // Check if user can access feature based on subscription
   canAccessFeature(
     userProfile: UserProfile,
-    subscriptionTier: 'free' | 'pro' | 'business',
+    subscriptionTier: 'starter' | 'growth' | 'accelerate',
     feature: keyof FeatureAccess
   ): boolean {
     const featureAccess = this.getFeatureAccess(subscriptionTier);
@@ -160,7 +160,7 @@ export const rbacService = {
 
   // Check usage limits
   checkUsageLimit(
-    subscriptionTier: 'free' | 'pro' | 'business',
+    subscriptionTier: 'starter' | 'growth' | 'accelerate',
     limitType: 'transactions' | 'reports' | 'users',
     currentUsage: number
   ): { withinLimit: boolean; limit: number; remaining: number } {
@@ -232,7 +232,7 @@ export const rbacService = {
   // Get user access summary
   getUserAccessSummary(
     userProfile: UserProfile,
-    subscriptionTier: 'free' | 'pro' | 'business'
+    subscriptionTier: 'starter' | 'growth' | 'accelerate'
   ): {
     role: Role;
     permissions: Permission[];

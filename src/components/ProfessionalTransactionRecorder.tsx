@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUsageLimits } from '../hooks/useUsageLimits';
 import { transactionService, Transaction as PersistedTransaction } from '../services/dataService';
 import { useSubscriptionTier } from '../store/hooks';
+import { PRICING_CONFIG, isFeatureAvailable, checkUsageLimit } from '../config/pricingConfig';
 import Icon from './Icons';
 import { SkeletonLoader } from './LoadingStates';
 import '../styles/transaction-recorder.css';
@@ -46,7 +47,7 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
   const subscriptionTier = useSubscriptionTier();
   const [usageLimitResult, setUsageLimitResult] = useState<any>(null);
 
-  const isPremiumUser = subscriptionTier === 'business';
+  const hasVoiceAccess = subscriptionTier === 'growth' || subscriptionTier === 'accelerate';
 
   useEffect(() => {
     const initialize = async () => {
@@ -111,7 +112,7 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
   };
 
   const initializeSpeechRecognition = () => {
-    if (!isPremiumUser) return;
+    if (!hasVoiceAccess) return;
 
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
@@ -142,7 +143,7 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
 
         if (finalTranscript) {
           setInputText(finalTranscript);
-          handleInputSubmit(finalTranscript);
+          handleVoiceTransactionSubmit(finalTranscript);
         }
       };
 
@@ -159,8 +160,17 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
     }
   };
 
-  const startVoiceRecording = () => {
-    if (!isPremiumUser || !recognitionRef.current) return;
+  const startVoiceRecording = async () => {
+    if (!hasVoiceAccess || !recognitionRef.current) return;
+
+    // Check voice note usage limit for Growth tier users
+    if (subscriptionTier === 'growth') {
+      const voiceUsageCheck = checkUsageLimit({ type: 'voiceNotes', userId: user?.username || '' });
+      if (!voiceUsageCheck.canProceed) {
+        // Show upgrade prompt or usage limit message
+        return;
+      }
+    }
 
     setTranscription('');
     recognitionRef.current.start();
@@ -264,6 +274,23 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
     ];
 
     return suggestions[Math.floor(Math.random() * suggestions.length)];
+  };
+
+  const handleVoiceTransactionSubmit = async (textInput: string) => {
+    if (!user?.username) return;
+
+    // Consume voice note usage for Growth tier users
+    if (subscriptionTier === 'growth') {
+      const voiceUsageResult = await consumeUsage({ type: 'voiceNotes', userId: user.username });
+      if (!voiceUsageResult.canProceed) {
+        // Show usage limit reached message
+        setUsageLimitResult(voiceUsageResult);
+        return;
+      }
+    }
+
+    // Process the voice transaction normally
+    handleInputSubmit(textInput);
   };
 
   const handleInputSubmit = async (textInput?: string) => {
@@ -468,11 +495,11 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
           <button
             className={`tab-button ${activeTab === 'voice' ? 'active' : ''}`}
             onClick={() => setActiveTab('voice')}
-            disabled={!isPremiumUser}
+            disabled={!hasVoiceAccess}
           >
             <Icon name="microphone" size={16} />
             Voice Input
-            {!isPremiumUser && <span className="premium-badge">Premium</span>}
+            {!hasVoiceAccess && <span className="premium-badge">Pro+</span>}
           </button>
         </div>
 
@@ -571,8 +598,16 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
         </div>
 
         {/* Voice Recording Controls */}
-        {activeTab === 'voice' && isPremiumUser && (
+        {activeTab === 'voice' && hasVoiceAccess && (
           <div className="voice-recording-controls">
+            {subscriptionTier === 'growth' && (
+              <div className="voice-usage-indicator">
+                <Icon name="microphone" size={14} />
+                <span>
+                  {checkUsageLimit({ type: 'voiceNotes', userId: user?.username || '' }).remaining} voice notes remaining this month
+                </span>
+              </div>
+            )}
             <button
               className={`voice-button ${isRecording ? 'recording' : ''}`}
               onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
@@ -582,13 +617,20 @@ const ProfessionalTransactionRecorder: React.FC<ProfessionalTransactionRecorderP
             </button>
             <div className="voice-status">
               <h6>{isRecording ? 'Listening...' : 'Tap to record'}</h6>
-              <p>{isRecording ? 'Speak your transaction details' : 'Voice-to-text transaction recording'}</p>
+              <p>
+                {isRecording
+                  ? 'Speak your transaction details'
+                  : subscriptionTier === 'growth'
+                    ? 'Voice recording included with Pro plan'
+                    : 'Voice-to-text transaction recording'
+                }
+              </p>
             </div>
           </div>
         )}
 
         {/* Transcription Area */}
-        {activeTab === 'voice' && isPremiumUser && (
+        {activeTab === 'voice' && hasVoiceAccess && (
           <div className={`transcription-area ${!transcription ? 'empty' : ''}`}>
             {transcription || 'Your speech will appear here...'}
           </div>

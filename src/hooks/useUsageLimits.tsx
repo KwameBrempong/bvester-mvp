@@ -17,7 +17,7 @@ export interface UsageLimitResult {
 }
 
 export interface UsageType {
-  type: 'transactions' | 'reports' | 'users';
+  type: 'transactions' | 'reports' | 'users' | 'voiceNotes';
   action: 'create' | 'check';
   userId: string;
 }
@@ -51,6 +51,13 @@ export const useUsageLimits = () => {
         limit = usage.users.limit;
         featureName = 'users';
         break;
+      case 'voiceNotes':
+        // For voice notes, we'll use a mock usage tracking for now
+        // In a real app, this would come from the usage stats
+        current = parseInt(localStorage.getItem(`voiceNotes_${userId}`) || '0');
+        limit = tier === 'growth' ? 50 : tier === 'accelerate' ? 999999 : 0;
+        featureName = 'voice notes';
+        break;
       default:
         throw new Error(`Unknown usage type: ${type}`);
     }
@@ -66,10 +73,10 @@ export const useUsageLimits = () => {
     if (isAtLimit) {
       limitMessage = `You've reached your ${featureName} limit of ${limit} for this month.`;
 
-      if (tier === 'free') {
-        upgradeMessage = `Upgrade to Pro for ${type === 'transactions' ? '500' : type === 'reports' ? '20' : '3'} ${featureName} per month, or Business for unlimited.`;
-      } else if (tier === 'pro' && type === 'users') {
-        upgradeMessage = `Upgrade to Business for 10 users.`;
+      if (tier === 'starter') {
+        upgradeMessage = `Upgrade to Growth for ${type === 'transactions' ? '500' : type === 'reports' ? '20' : type === 'users' ? '3' : type === 'voiceNotes' ? '50' : '3'} ${featureName} per month, or Accelerate for unlimited.`;
+      } else if (tier === 'growth' && (type === 'users' || type === 'voiceNotes')) {
+        upgradeMessage = `Upgrade to Accelerate for unlimited ${featureName}.`;
       }
     } else if (isNearLimit) {
       limitMessage = `You're approaching your ${featureName} limit. ${remaining} ${featureName} remaining this month.`;
@@ -103,12 +110,18 @@ export const useUsageLimits = () => {
     }
 
     try {
-      // Update usage count in the store
-      await dispatch(updateUsageCount({
-        userId: usageType.userId,
-        type: usageType.type,
-        increment: amount
-      }));
+      if (usageType.type === 'voiceNotes') {
+        // Handle voice notes usage tracking with localStorage for now
+        const currentUsage = parseInt(localStorage.getItem(`voiceNotes_${usageType.userId}`) || '0');
+        localStorage.setItem(`voiceNotes_${usageType.userId}`, String(currentUsage + amount));
+      } else {
+        // Update usage count in the store for other types
+        await dispatch(updateUsageCount({
+          userId: usageType.userId,
+          type: usageType.type,
+          increment: amount
+        }));
+      }
 
       return {
         ...limitCheck,

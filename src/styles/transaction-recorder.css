@@ -458,6 +458,21 @@
   padding: var(--space-lg);
   background: var(--gray-50);
   border-top: 1px solid var(--gray-200);
+  flex-wrap: wrap;
+}
+
+.voice-usage-indicator {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  margin-bottom: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(255, 244, 205, 0.3);
+  border: 1px solid rgba(255, 244, 205, 0.5);
+  border-radius: var(--radius-sm);
 }
 
 .voice-button {

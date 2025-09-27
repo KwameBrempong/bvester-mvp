@@ -264,7 +264,7 @@ class StripeService {
             if (stripeStatus.isActive !== undefined) {
               await subscriptionService.update(userId, {
                 platformTier: stripeStatus.isActive ?
-                  (stripeStatus.plan as 'pro' | 'business') || 'free' : 'free',
+                  (stripeStatus.plan as 'growth' | 'accelerate') || 'starter' : 'starter',
                 platformExpiryDate: stripeStatus.currentPeriodEnd ?
                   new Date(stripeStatus.currentPeriodEnd * 1000).toISOString() : undefined,
                 cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd,
@@ -369,39 +369,52 @@ class StripeService {
   getPriceConfig() {
     return {
       platform: {
-        pro: {
+        growth: {
           monthly: {
-            priceId: 'price_1S9ohYGUhOvqkzBNKogIKA9A',
-            amount: 50,
+            priceId: 'PLACEHOLDER_GROWTH_MONTHLY',
+            amount: 100,
             currency: 'GHS',
             interval: 'month',
             trialDays: 14,
           },
           yearly: {
-            priceId: 'price_1S9ohYGUhOvqkzBNm3e0HaTY',
-            amount: 420, // 30% discount
+            priceId: 'PLACEHOLDER_GROWTH_ANNUAL',
+            amount: 700, // 30% discount
+            currency: 'GHS',
+            interval: 'year',
+            trialDays: 14,
+          },
+          foundingMonthly: {
+            priceId: 'PLACEHOLDER_GROWTH_FOUNDING_MONTHLY',
+            amount: 50, // 50% discount
+            currency: 'GHS',
+            interval: 'month',
+            trialDays: 14,
+          },
+          foundingYearly: {
+            priceId: 'PLACEHOLDER_GROWTH_FOUNDING_ANNUAL',
+            amount: 350, // 50% discount
             currency: 'GHS',
             interval: 'year',
             trialDays: 14,
           },
         },
-        business: {
+        accelerate: {
           monthly: {
-            priceId: 'price_1S9olMGUhOvqkzBNKly5EBsw',
-            amount: 150,
+            priceId: 'PLACEHOLDER_ACCELERATE_MONTHLY',
+            amount: 500,
             currency: 'GHS',
             interval: 'month',
-            trialDays: 14,
           },
           yearly: {
-            priceId: 'price_1S9olMGUhOvqkzBNJXoICO4V',
-            amount: 1260, // 30% discount
+            priceId: 'PLACEHOLDER_ACCELERATE_ANNUAL',
+            amount: 4200, // 30% discount
             currency: 'GHS',
             interval: 'year',
-            trialDays: 14,
           },
         },
       },
+      // Keep legacy accelerator config for now (will be removed later)
       accelerator: {
         full: {
           priceId: 'price_1S9omIGUhOvqkzBNnonB74p5',

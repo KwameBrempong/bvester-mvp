@@ -10,7 +10,7 @@ import { stripeService } from '../../stripeService';
 import { rbacService } from '../../services/rbacService';
 import { logger } from '../../config/environment';
 
-export type SubscriptionTier = 'free' | 'pro' | 'business';
+export type SubscriptionTier = 'starter' | 'growth' | 'accelerate';
 export type AcceleratorAccess = 'none' | 'enrolled' | 'completed';
 
 interface SubscriptionFeatures {
@@ -144,10 +144,10 @@ const calculateUsageStats = (tier: SubscriptionTier, currentUsage: { transaction
 
 const initialState: SubscriptionState = {
   subscription: null,
-  tier: 'free',
+  tier: 'starter',
   isActive: false,
-  features: getFeaturesByTier('free'),
-  usage: calculateUsageStats('free', { transactions: 0, reports: 0, users: 1 }),
+  features: getFeaturesByTier('starter'),
+  usage: calculateUsageStats('starter', { transactions: 0, reports: 0, users: 1 }),
   billing: {
     cancelAtPeriodEnd: false,
     totalPaid: 0,
@@ -180,7 +180,7 @@ export const fetchSubscription = createAsyncThunk(
       if (!dbSubscription) {
         const newSubscription = await subscriptionService.create({
           userId,
-          platformTier: 'free',
+          platformTier: 'starter',
           acceleratorAccess: 'none',
           createdAt: new Date().toISOString(),
           lastUpdated: new Date().toISOString(),
@@ -192,7 +192,7 @@ export const fetchSubscription = createAsyncThunk(
       if (stripeStatus.isActive !== undefined) {
         const updatedSubscription = await subscriptionService.update(userId, {
           platformTier: stripeStatus.isActive ?
-            (stripeStatus.plan as 'pro' | 'business') || 'free' : 'free',
+            (stripeStatus.plan as 'growth' | 'accelerate') || 'starter' : 'starter',
           platformExpiryDate: stripeStatus.currentPeriodEnd ?
             new Date(stripeStatus.currentPeriodEnd * 1000).toISOString() : undefined,
           cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd,
@@ -233,8 +233,8 @@ export const syncWithStripe = createAsyncThunk(
 
       // Update database with Stripe data
       if (stripeStatus.isActive !== undefined) {
-        const platformTier: 'free' | 'pro' | 'business' = stripeStatus.isActive ?
-          (stripeStatus.plan === 'pro' || stripeStatus.plan === 'business' ? stripeStatus.plan : 'free') : 'free';
+        const platformTier: 'starter' | 'growth' | 'accelerate' = stripeStatus.isActive ?
+          (stripeStatus.plan === 'growth' || stripeStatus.plan === 'accelerate' ? stripeStatus.plan : 'starter') : 'starter';
 
         const updates = {
           platformTier,
@@ -286,7 +286,7 @@ export const createCheckoutSession = createAsyncThunk(
     priceId: string;
     userId: string;
     customerEmail: string;
-    planType: 'pro' | 'business';
+    planType: 'growth' | 'accelerate';
     billingPeriod: 'monthly' | 'yearly';
   }, { rejectWithValue }) => {
     try {
@@ -424,7 +424,7 @@ const subscriptionSlice = createSlice({
 
     setTier: (state, action: PayloadAction<SubscriptionTier>) => {
       state.tier = action.payload;
-      state.isActive = action.payload !== 'free';
+      state.isActive = action.payload !== 'starter';
       state.features = getFeaturesByTier(action.payload);
 
       // Recalculate usage stats with new limits
@@ -443,7 +443,7 @@ const subscriptionSlice = createSlice({
       const acceleratorAccess = state.subscription.acceleratorAccess;
 
       state.tier = tier;
-      state.isActive = tier !== 'free';
+      state.isActive = tier !== 'starter';
       state.features = getFeaturesByTier(tier);
 
       // Update usage limits

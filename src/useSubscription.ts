@@ -5,7 +5,7 @@ import { notify } from './utils/notifications';
 import { logger } from './config/environment';
 
 interface UserSubscription {
-  platformTier: 'free' | 'pro' | 'business';
+  platformTier: 'starter' | 'growth' | 'accelerate';
   acceleratorAccess: 'none' | 'enrolled' | 'completed';
   platformExpiryDate?: string;
   acceleratorEnrollmentDate?: string;
@@ -16,7 +16,7 @@ interface UserSubscription {
 
 export const useSubscription = (username?: string) => {
   const [subscription, setSubscription] = useState<UserSubscription>({
-    platformTier: 'free',
+    platformTier: 'starter',
     acceleratorAccess: 'none'
   });
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export const useSubscription = (username?: string) => {
 
       if (!dbSubscription) {
         currentSubscription = {
-          platformTier: 'free',
+          platformTier: 'starter',
           acceleratorAccess: 'none'
         };
 
@@ -53,7 +53,7 @@ export const useSubscription = (username?: string) => {
         try {
           await subscriptionService.create({
             userId: username,
-            platformTier: 'free',
+            platformTier: 'starter',
             acceleratorAccess: 'none',
             createdAt: new Date().toISOString(),
             lastUpdated: new Date().toISOString(),
@@ -77,7 +77,7 @@ export const useSubscription = (username?: string) => {
         const updatedSubscription: UserSubscription = {
           ...currentSubscription,
           platformTier: stripeStatus.isActive ?
-            (stripeStatus.plan as 'pro' | 'business') || 'free' : 'free',
+            (stripeStatus.plan as 'growth' | 'accelerate') || 'starter' : 'starter',
           platformExpiryDate: stripeStatus.currentPeriodEnd ?
             new Date(stripeStatus.currentPeriodEnd * 1000).toISOString() : undefined,
           cancelAtPeriodEnd: stripeStatus.cancelAtPeriodEnd,
@@ -144,14 +144,14 @@ export const useSubscription = (username?: string) => {
           logger.error('Error parsing localStorage subscription data', parseError);
           // Set default subscription
           setSubscription({
-            platformTier: 'free',
+            platformTier: 'starter',
             acceleratorAccess: 'none'
           });
         }
       } else {
         // Set default subscription
         setSubscription({
-          platformTier: 'free',
+          platformTier: 'starter',
           acceleratorAccess: 'none'
         });
       }
@@ -206,7 +206,7 @@ export const useSubscription = (username?: string) => {
       const updatedSubscription: UserSubscription = {
         ...subscription,
         platformTier: webhookData.subscriptionStatus === 'active' && webhookData.plan ? 
-          webhookData.plan : 'free',
+          webhookData.plan : 'starter',
         platformExpiryDate: webhookData.currentPeriodEnd ? 
           new Date(webhookData.currentPeriodEnd * 1000).toISOString() : undefined,
         cancelAtPeriodEnd: webhookData.cancelAtPeriodEnd,
@@ -250,7 +250,7 @@ export const useSubscription = (username?: string) => {
   };
 
   const getTransactionLimit = () => {
-    return subscription.platformTier === 'free' ? 20 : Infinity;
+    return subscription.platformTier === 'starter' ? 20 : Infinity;
   };
 
   const canAccessFeature = (feature: string) => {

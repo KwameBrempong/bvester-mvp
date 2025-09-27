@@ -41,7 +41,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
     }
   }, [userId, dispatch]);
 
-  const handleUpgrade = async (tier: 'pro' | 'business') => {
+  const handleUpgrade = async (tier: 'growth' | 'accelerate') => {
     try {
       const priceInfo = priceConfig.platform[tier][billingPeriod];
       const priceId = typeof priceInfo === 'string' ? priceInfo : priceInfo.priceId;
@@ -58,7 +58,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
     }
   };
 
-  const getPriceDisplay = (tier: 'pro' | 'business', period: 'monthly' | 'yearly') => {
+  const getPriceDisplay = (tier: 'growth' | 'accelerate', period: 'monthly' | 'yearly') => {
     const priceInfo = priceConfig.platform[tier][period];
     if (typeof priceInfo === 'string') return { amount: 0, savings: 0 };
 
@@ -85,8 +85,8 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
   };
 
   const tierFeatures = {
-    free: {
-      name: 'Free',
+    starter: {
+      name: 'Starter',
       color: '#95a5a6',
       features: [
         '20 transactions per month',
@@ -96,29 +96,31 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
         'Email support',
       ],
     },
-    pro: {
-      name: 'Pro',
+    growth: {
+      name: 'Growth',
       color: '#3498db',
       features: [
         '500 transactions per month',
         '20 reports per month',
         '3 users',
+        'Voice recording (50/month)',
         'Advanced analytics',
         'Data export',
-        'Growth Accelerator access',
+        'Advisory board access',
         'Email support',
       ],
     },
-    business: {
-      name: 'Business',
+    accelerate: {
+      name: 'Accelerate',
       color: '#2E8B57',
       features: [
         'Unlimited transactions',
         'Unlimited reports',
         '10 users',
+        'Unlimited voice recording',
         'Advanced analytics',
         'Data export',
-        'Growth Accelerator access',
+        'Full accelerator access',
         'Phone support',
         'Custom branding',
       ],
@@ -283,7 +285,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
           </div>
 
           {/* Billing Period Toggle */}
-          {currentTier === 'free' && (
+          {currentTier === 'starter' && (
             <>
               <div style={{ marginBottom: '24px', textAlign: 'center' }}>
                 <div style={{
@@ -438,7 +440,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
           )}
 
           {/* Current Tier Benefits */}
-          {currentTier !== 'free' && (
+          {currentTier !== 'starter' && (
             <div style={{
               padding: '20px',
               background: '#f8f9fa',
