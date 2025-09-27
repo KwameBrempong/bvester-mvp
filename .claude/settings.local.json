@@ -68,7 +68,8 @@
       "Bash(powershell Compress-Archive:*)",
       "Bash(tar:*)",
       "Bash(aws lambda update-function-code:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(ping:*)"
     ],
     "deny": [],
     "ask": []

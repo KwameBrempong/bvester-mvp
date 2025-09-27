@@ -211,6 +211,7 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
                       required
                       className="form-select"
                     >
+                      <option value="">Select your region</option>
                       {ghanaRegions.map(region => (
                         <option key={region} value={region}>{region}</option>
                       ))}
