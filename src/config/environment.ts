@@ -37,7 +37,7 @@ const getEnvVar = (key: string, fallback?: string): string => {
   return value || fallback || '';
 };
 
-// Validate required environment variables
+// CRITICAL FIX: Enhanced environment validation with security checks
 const validateEnvironment = () => {
   const required = [
     'VITE_AWS_REGION',
@@ -52,13 +52,58 @@ const validateEnvironment = () => {
   ];
 
   const missing = required.filter(key => !import.meta.env[key]);
+  const errors: string[] = [];
 
+  // Check for missing variables
   if (missing.length > 0) {
-    console.error('Missing required environment variables:', missing);
+    errors.push(`Missing environment variables: ${missing.join(', ')}`);
+  }
+
+  // SECURITY: Validate critical configurations
+  const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  if (stripeKey && !stripeKey.startsWith('pk_')) {
+    errors.push('Invalid Stripe publishable key format. Must start with "pk_"');
+  }
+
+  // Validate AWS region format
+  const awsRegion = import.meta.env.VITE_AWS_REGION;
+  if (awsRegion && !/^[a-z]{2}-[a-z]+-\d{1}$/.test(awsRegion)) {
+    errors.push('Invalid AWS region format');
+  }
+
+  // Validate URLs
+  const appsyncUrl = import.meta.env.VITE_AWS_APPSYNC_GRAPHQL_URL;
+  if (appsyncUrl && !appsyncUrl.startsWith('https://')) {
+    errors.push('AppSync URL must use HTTPS');
+  }
+
+  const stripeApiUrl = import.meta.env.VITE_STRIPE_API_BASE_URL;
+  if (stripeApiUrl && !stripeApiUrl.startsWith('https://')) {
+    errors.push('Stripe API URL must use HTTPS');
+  }
+
+  // Check for development defaults in production
+  if (!import.meta.env.DEV) {
+    const encryptionKey = import.meta.env.VITE_ENCRYPTION_KEY;
+    if (encryptionKey === 'dev-key-not-secure') {
+      errors.push('Development encryption key detected in production environment');
+    }
+  }
+
+  // Report errors
+  if (errors.length > 0) {
+    console.error('Environment validation failed:', errors);
+
     // In development, provide helpful error message
     if (import.meta.env.DEV) {
-      throw new Error(`Missing environment variables: ${missing.join(', ')}. Please check your .env file.`);
+      const errorMessage = `Environment Configuration Errors:\n${errors.map(error => `• ${error}`).join('\n')}\n\nPlease check your .env file and fix these issues.`;
+      throw new Error(errorMessage);
+    } else {
+      // In production, log errors but don't crash
+      console.error('Production environment configuration issues detected. Some features may not work correctly.');
     }
+  } else {
+    console.log('✅ Environment validation passed');
   }
 };
 

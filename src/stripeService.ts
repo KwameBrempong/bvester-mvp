@@ -46,33 +46,118 @@ export interface SubscriptionStatus {
 class StripeService {
   private retryAttempts = 3;
   private retryDelay = 1000; // 1 second
+  private maxRetryDelay = 10000; // 10 seconds max
 
   private async delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  // CRITICAL FIX: Enhanced retry logic with better error handling
   private async executeWithRetry<T>(operation: () => Promise<T>, context: string): Promise<T> {
     let lastError: Error;
+    const startTime = Date.now();
 
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
-        return await operation();
+        const result = await operation();
+
+        if (attempt > 1) {
+          logger.info(`${context} succeeded on attempt ${attempt}`, {
+            totalTime: Date.now() - startTime,
+            attempt
+          });
+        }
+
+        return result;
       } catch (error) {
         lastError = error as Error;
 
+        // Check if error is retryable
+        const isRetryable = this.isRetryableError(error);
+
         logger.warn(`${context} attempt ${attempt} failed`, {
           error: lastError.message,
+          isRetryable,
           attempt,
           maxAttempts: this.retryAttempts
         });
 
+        // Don't retry non-retryable errors
+        if (!isRetryable) {
+          logger.error(`${context} failed with non-retryable error`, {
+            error: lastError.message,
+            attempt
+          });
+          break;
+        }
+
         if (attempt < this.retryAttempts) {
-          await this.delay(this.retryDelay * attempt); // Exponential backoff
+          const delay = Math.min(this.retryDelay * Math.pow(2, attempt - 1), this.maxRetryDelay);
+          await this.delay(delay);
         }
       }
     }
 
-    throw lastError!;
+    // Log final failure
+    logger.error(`${context} failed after ${this.retryAttempts} attempts`, {
+      error: lastError!.message,
+      totalTime: Date.now() - startTime
+    });
+
+    throw this.enhanceError(lastError!, context);
+  }
+
+  // CRITICAL FIX: Determine if error is worth retrying
+  private isRetryableError(error: any): boolean {
+    if (!error) return false;
+
+    const errorMessage = error.message?.toLowerCase() || '';
+    const errorCode = error.code || error.status;
+
+    // Don't retry client errors (4xx)
+    if (errorCode >= 400 && errorCode < 500) {
+      return false;
+    }
+
+    // Don't retry authentication errors
+    if (errorMessage.includes('unauthorized') ||
+        errorMessage.includes('invalid') ||
+        errorMessage.includes('forbidden')) {
+      return false;
+    }
+
+    // Retry network/server errors
+    return (
+      errorCode >= 500 || // Server errors
+      errorMessage.includes('network') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('connection') ||
+      errorMessage.includes('fetch')
+    );
+  }
+
+  // CRITICAL FIX: Enhance error messages for users
+  private enhanceError(error: Error, context: string): Error {
+    const enhanced = new Error();
+    enhanced.name = error.name;
+    enhanced.stack = error.stack;
+
+    // Provide user-friendly error messages
+    if (error.message.includes('network') || error.message.includes('fetch')) {
+      enhanced.message = 'Network connection failed. Please check your internet connection and try again.';
+    } else if (error.message.includes('timeout')) {
+      enhanced.message = 'The request timed out. Please try again.';
+    } else if (error.message.includes('invalid') && context.includes('checkout')) {
+      enhanced.message = 'Invalid payment information. Please check your details and try again.';
+    } else if (error.message.includes('declined') && context.includes('payment')) {
+      enhanced.message = 'Payment was declined. Please check with your bank or try a different payment method.';
+    } else if (context.includes('subscription') && error.message.includes('not found')) {
+      enhanced.message = 'Subscription not found. Please contact support for assistance.';
+    } else {
+      enhanced.message = `Payment processing failed: ${error.message}. Please try again or contact support.`;
+    }
+
+    return enhanced;
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams | EnhancedCheckoutSessionParams) {
@@ -192,12 +277,23 @@ class StripeService {
 
       logger.info('Redirecting to checkout', { sessionId });
 
-      // Redirect to Stripe Checkout
+      // CRITICAL FIX: Enhanced redirect with better error handling
       const { error } = await stripe.redirectToCheckout({ sessionId });
 
       if (error) {
         logger.error('Stripe redirect error', error);
-        throw error;
+
+        // Provide user-friendly error message
+        const enhancedError = new Error();
+        if (error.message?.includes('network')) {
+          enhancedError.message = 'Unable to connect to payment processor. Please check your internet connection.';
+        } else if (error.message?.includes('invalid')) {
+          enhancedError.message = 'Invalid payment session. Please try creating a new payment.';
+        } else {
+          enhancedError.message = 'Payment redirect failed. Please try again or contact support.';
+        }
+
+        throw enhancedError;
       }
     } catch (error) {
       const duration = Date.now() - startTime;

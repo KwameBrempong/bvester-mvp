@@ -288,9 +288,12 @@ const AppRouter: React.FC = () => {
         socialProviders={[]}
       >
         {({ signOut, user }) => {
-          // Create a custom signOut handler that redirects to homepage
+          // SECURITY FIX: Enhanced signOut handler with complete cleanup
           const handleCustomSignOut = async () => {
             try {
+              const currentUser = user?.username;
+              console.log('Starting secure logout process for user:', currentUser);
+
               // First, perform Cognito sign out
               if (signOut) {
                 await signOut();
@@ -301,51 +304,75 @@ const AppRouter: React.FC = () => {
               setIsAuthenticated(false);
               setCheckingAuth(false);
 
-              // Clear only Bvester-specific localStorage data to avoid affecting other apps
-              const currentUser = user?.username;
-              Object.keys(localStorage).forEach(key => {
-                if (
+              // CRITICAL: Complete localStorage cleanup
+              const keysToRemove = Object.keys(localStorage).filter(key => {
+                return (
                   key.startsWith('profile_') ||
                   key.startsWith('assessment_') ||
                   key.startsWith('subscription_') ||
                   key.startsWith('transaction_') ||
                   key.startsWith('bvester_') ||
+                  key.startsWith('payment_') ||
+                  key.startsWith('user_') ||
+                  key.startsWith('session_') ||
                   (currentUser && key.includes(currentUser))
-                ) {
-                  localStorage.removeItem(key);
-                }
+                );
+              });
+
+              keysToRemove.forEach(key => {
+                localStorage.removeItem(key);
+                console.log('Removed localStorage key:', key);
               });
 
               // Clear session storage as well
-              Object.keys(sessionStorage).forEach(key => {
-                if (
+              const sessionKeysToRemove = Object.keys(sessionStorage).filter(key => {
+                return (
                   key.startsWith('bvester_') ||
                   key.startsWith('profile_') ||
+                  key.startsWith('session_') ||
                   (currentUser && key.includes(currentUser))
-                ) {
-                  sessionStorage.removeItem(key);
+                );
+              });
+
+              sessionKeysToRemove.forEach(key => {
+                sessionStorage.removeItem(key);
+                console.log('Removed sessionStorage key:', key);
+              });
+
+              // Clear any cookies that might contain session data
+              document.cookie.split(";").forEach(cookie => {
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                if (name.trim().includes('bvester') || name.trim().includes('auth')) {
+                  document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
                 }
               });
 
-              // Force a brief delay to ensure cleanup completes
-              await new Promise(resolve => setTimeout(resolve, 100));
+              // Force garbage collection
+              if (window.gc) {
+                window.gc();
+              }
 
-              // Successfully signed out
-              console.log('User signed out successfully');
+              // Ensure cleanup completes before redirect
+              await new Promise(resolve => setTimeout(resolve, 200));
+
+              console.log('Secure logout completed successfully');
             } catch (error) {
-              console.error('Sign out error:', error);
-              // Still reset state even if there's an error
+              console.error('Logout error:', error);
+
+              // CRITICAL: Even if errors occur, force cleanup
               setShowSignIn(false);
               setIsAuthenticated(false);
               setCheckingAuth(false);
 
-              // Attempt cleanup even on error
-              const currentUser = user?.username;
-              Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('profile_') || (currentUser && key.includes(currentUser))) {
-                  localStorage.removeItem(key);
-                }
-              });
+              // Emergency cleanup
+              try {
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('Emergency storage cleanup completed');
+              } catch (cleanupError) {
+                console.error('Emergency cleanup failed:', cleanupError);
+              }
             }
           };
 

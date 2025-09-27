@@ -168,7 +168,10 @@ const userSlice = createSlice({
       state.userId = action.payload.userId;
       state.isAuthenticated = action.payload.isAuthenticated;
     },
+    // SECURITY FIX: Enhanced user state clearing with localStorage cleanup
     clearUser: (state) => {
+      const currentUserId = state.userId;
+
       state.profile = null;
       state.userId = null;
       state.isAuthenticated = false;
@@ -180,6 +183,31 @@ const userSlice = createSlice({
         missingFields: [],
         lastUpdated: null,
       };
+
+      // CRITICAL: Clear localStorage entries for this user
+      if (typeof window !== 'undefined' && currentUserId) {
+        try {
+          const keysToRemove = Object.keys(localStorage).filter(key => {
+            return (
+              key.startsWith(`profile_${currentUserId}`) ||
+              key.startsWith(`user_${currentUserId}`) ||
+              key.startsWith(`session_${currentUserId}`) ||
+              key.includes(currentUserId)
+            );
+          });
+
+          keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+          });
+
+          logger.info('Cleared localStorage for user logout', {
+            userId: currentUserId,
+            clearedKeys: keysToRemove.length
+          });
+        } catch (error) {
+          logger.warn('Failed to clear localStorage during user clear:', error);
+        }
+      }
     },
     validateUserSession: (state, action: PayloadAction<{ userId: string }>) => {
       // Validate that current session matches expected user

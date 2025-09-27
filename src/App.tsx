@@ -193,52 +193,62 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     const sessionId = `${username}_${Date.now()}`; // Create unique session identifier
 
     const initializeProfile = async () => {
-      // Validate session for current user
-      dispatch(validateUserSession({ userId: username }));
-
-      // Clear any existing user state first to prevent contamination
-      dispatch(clearUser());
-
-      dispatch(setAuthenticated({ userId: username, isAuthenticated: true }));
-
-      // First, always try to fetch from database (authoritative source)
       try {
-        const fetchedProfile = await dispatch(fetchUserProfile(username)).unwrap();
-        if (fetchedProfile && fetchedProfile.userId === username) {
-          // Verify profile belongs to current user
-          dispatch(hydrateProfile(fetchedProfile));
-          localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fetchedProfile));
-          setProfileCompleted(fetchedProfile.profileCompletionPercentage >= 60);
-          return;
+        // SECURITY FIX: Complete cleanup of any existing user data
+        dispatch(clearUser());
+
+        // Clear any localStorage data from previous sessions
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('profile_') || key.startsWith('transaction_') ||
+              key.startsWith('assessment_') || key.startsWith('subscription_')) {
+            localStorage.removeItem(key);
+          }
+        });
+
+        // Validate session for current user
+        dispatch(validateUserSession({ userId: username }));
+        dispatch(setAuthenticated({ userId: username, isAuthenticated: true }));
+
+        // First, always try to fetch from database (authoritative source)
+        try {
+          const fetchedProfile = await dispatch(fetchUserProfile(username)).unwrap();
+          if (fetchedProfile && fetchedProfile.userId === username) {
+            // SECURITY: Verify profile belongs to current user
+            dispatch(hydrateProfile(fetchedProfile));
+            localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fetchedProfile));
+            setProfileCompleted(fetchedProfile.profileCompletionPercentage >= 60);
+            return;
+          }
+        } catch (error) {
+          console.warn('Profile fetch failed, creating new profile:', error);
+        }
+
+        // If no database profile exists, create new user profile
+        const userEmail = (user as any).attributes?.email || '';
+        const fallbackProfile = buildUserProfile(username, {
+          email: userEmail,
+          profileCompletionPercentage: 0,
+          lastUpdated: new Date().toISOString()
+        });
+
+        dispatch(hydrateProfile(fallbackProfile));
+        localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fallbackProfile));
+        setProfileCompleted(false);
+
+        try {
+          await dispatch(createUserProfile({ ...fallbackProfile })).unwrap();
+        } catch (creationError) {
+          console.warn('Profile creation failed:', creationError);
+          setAuthError('Failed to initialize user profile. Please try refreshing the page.');
         }
       } catch (error) {
-        // Profile doesn't exist in database - this is expected for new users
-      }
-
-      // If no database profile exists, check if this is truly a new user
-      // Don't use cached data for new sessions to prevent cross-contamination
-      const userEmail = (user as any).attributes?.email || '';
-      const fallbackProfile = buildUserProfile(username, {
-        email: userEmail,
-        // Force clean slate for new users
-        profileCompletionPercentage: 0,
-        lastUpdated: new Date().toISOString()
-      });
-
-      dispatch(hydrateProfile(fallbackProfile));
-      localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fallbackProfile));
-      setProfileCompleted(false); // Force profile completion for new users
-
-      try {
-        await dispatch(createUserProfile({ ...fallbackProfile })).unwrap();
-      } catch (creationError) {
-        // Profile creation failed - handle gracefully
-        console.warn('Profile creation failed:', creationError);
+        console.error('Profile initialization failed:', error);
+        setAuthError('Failed to initialize user session. Please try logging in again.');
       }
     };
 
     initializeProfile();
-  }, [user?.username, dispatch]); // Removed userState.profile dependency to force fresh initialization
+  }, [user?.username, dispatch]);
 
 
   // Check if profile is completed based on Redux state
