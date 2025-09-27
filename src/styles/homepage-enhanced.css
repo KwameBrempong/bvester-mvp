@@ -390,7 +390,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3rem;
-  margin: 3rem 0;
+  margin: 1.5rem 0 3rem 0;
 }
 
 .founders__story,
@@ -425,6 +425,11 @@
   border-radius: 8px;
   border-left: 4px solid #D4AF37;
   margin-top: 2rem;
+  color: #333 !important;
+}
+
+.highlight-stat strong {
+  color: #333 !important;
 }
 
 .credentials__list {
@@ -438,6 +443,9 @@
   align-items: flex-start;
   gap: 1rem;
   border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .credentials__list .icon {
@@ -467,15 +475,19 @@
 }
 
 .guarantee__box p {
-  color: #666;
+  color: #333 !important;
   font-size: 1.1rem;
   line-height: 1.6;
+}
+
+.guarantee__box strong {
+  color: #333 !important;
 }
 
 .guarantee__note {
   margin-top: 1rem;
   font-style: italic;
-  color: #888;
+  color: #555 !important;
 }
 
 /* ============================================
