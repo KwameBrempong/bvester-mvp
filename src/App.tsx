@@ -8,7 +8,9 @@ import {
   setAuthenticated,
   updateUserProfile,
   createUserProfile,
-  hydrateProfile
+  hydrateProfile,
+  clearUser,
+  validateUserSession
 } from './store/slices/userSlice';
 import ErrorBoundary from './components/ErrorBoundary';
 // Removed unused imports for production cleanup
@@ -188,57 +190,63 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
     }
 
     const username = user.username;
+    const sessionId = `${username}_${Date.now()}`; // Create unique session identifier
 
     const initializeProfile = async () => {
+      // Validate session for current user
+      dispatch(validateUserSession({ userId: username }));
+
+      // Clear any existing user state first to prevent contamination
+      dispatch(clearUser());
+
       dispatch(setAuthenticated({ userId: username, isAuthenticated: true }));
 
-      if (userState.profile) {
-        setProfileCompleted(userState.profile.profileCompletionPercentage >= 60);
-        return;
-      }
-
+      // First, always try to fetch from database (authoritative source)
       try {
         const fetchedProfile = await dispatch(fetchUserProfile(username)).unwrap();
-        if (fetchedProfile) {
+        if (fetchedProfile && fetchedProfile.userId === username) {
+          // Verify profile belongs to current user
           dispatch(hydrateProfile(fetchedProfile));
-          localStorage.setItem(`profile_${username}`, JSON.stringify(fetchedProfile));
+          localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fetchedProfile));
           setProfileCompleted(fetchedProfile.profileCompletionPercentage >= 60);
           return;
         }
       } catch (error) {
-        // Profile fetch failed, using cached data
+        // Profile doesn't exist in database - this is expected for new users
       }
 
-      let storedProfile: Partial<UserProfile> | undefined;
-      const cached = localStorage.getItem(`profile_${username}`);
-      if (cached) {
-        try {
-          storedProfile = JSON.parse(cached);
-        } catch (parseError) {
-          // Failed to parse cached profile data
-        }
-      }
+      // If no database profile exists, check if this is truly a new user
+      // Don't use cached data for new sessions to prevent cross-contamination
+      const userEmail = (user as any).attributes?.email || `${username}@example.com`;
+      const fallbackProfile = buildUserProfile(username, {
+        email: userEmail,
+        // Force clean slate for new users
+        profileCompletionPercentage: 0,
+        lastUpdated: new Date().toISOString()
+      });
 
-      const fallbackProfile = buildUserProfile(username, storedProfile ?? {});
       dispatch(hydrateProfile(fallbackProfile));
-      localStorage.setItem(`profile_${username}`, JSON.stringify(fallbackProfile));
-      setProfileCompleted(fallbackProfile.profileCompletionPercentage >= 60);
+      localStorage.setItem(`profile_${username}_${sessionId}`, JSON.stringify(fallbackProfile));
+      setProfileCompleted(false); // Force profile completion for new users
 
       try {
         await dispatch(createUserProfile({ ...fallbackProfile })).unwrap();
       } catch (creationError) {
-        // Profile creation skipped (likely offline/local mode)
+        // Profile creation failed - handle gracefully
+        console.warn('Profile creation failed:', creationError);
       }
     };
 
     initializeProfile();
-  }, [user?.username, dispatch, userState.profile]);
+  }, [user?.username, dispatch]); // Removed userState.profile dependency to force fresh initialization
 
 
   // Check if profile is completed based on Redux state
   useEffect(() => {
     if (user?.username && userState.profile) {
-      localStorage.setItem(`profile_${user.username}`, JSON.stringify(userState.profile));
+      // Use session-based storage key to prevent cross-user contamination
+      const sessionKey = `profile_${user.username}_current`;
+      localStorage.setItem(sessionKey, JSON.stringify(userState.profile));
       setProfileCompleted(userState.profile.profileCompletionPercentage >= 60);
     }
   }, [user?.username, userState.profile]);
@@ -286,7 +294,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
 
     // Normalized profile created
 
-    localStorage.setItem(`profile_${username}`, JSON.stringify(normalizedProfile));
+    localStorage.setItem(`profile_${username}_current`, JSON.stringify(normalizedProfile));
     dispatch(hydrateProfile(normalizedProfile));
     setProfileCompleted(normalizedProfile.profileCompletionPercentage >= 60);
 

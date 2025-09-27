@@ -89,7 +89,7 @@ export const useSubscription = (username?: string) => {
           const now = new Date();
 
           if (now > expiryDate && !stripeStatus.isActive) {
-            updatedSubscription.platformTier = 'free';
+            updatedSubscription.platformTier = 'starter';
             updatedSubscription.platformExpiryDate = undefined;
             updatedSubscription.stripeSubscriptionId = undefined;
             updatedSubscription.cancelAtPeriodEnd = false;
@@ -132,7 +132,7 @@ export const useSubscription = (username?: string) => {
             const now = new Date();
 
             if (now > expiryDate) {
-              parsedSubscription.platformTier = 'free';
+              parsedSubscription.platformTier = 'starter';
               parsedSubscription.platformExpiryDate = undefined;
               parsedSubscription.stripeSubscriptionId = undefined;
               parsedSubscription.cancelAtPeriodEnd = false;
@@ -196,7 +196,7 @@ export const useSubscription = (username?: string) => {
   const handleStripeWebhookUpdate = (webhookData: {
     userId: string;
     subscriptionStatus: 'active' | 'inactive';
-    plan: 'pro' | 'business' | null;
+    plan: 'growth' | 'accelerate' | null;
     currentPeriodEnd: number | null;
     cancelAtPeriodEnd: boolean;
     stripeSubscriptionId?: string;
@@ -234,11 +234,11 @@ export const useSubscription = (username?: string) => {
 
   // Feature access checks (keeping your existing logic)
   const hasUnlimitedTransactions = () => {
-    return subscription.platformTier !== 'free';
+    return subscription.platformTier !== 'starter';
   };
 
   const hasDetailedReports = () => {
-    return subscription.platformTier !== 'free';
+    return subscription.platformTier !== 'starter';
   };
 
   const hasAcceleratorAccess = () => {
@@ -246,7 +246,7 @@ export const useSubscription = (username?: string) => {
   };
 
   const hasAdvancedAnalytics = () => {
-    return subscription.platformTier === 'business';
+    return subscription.platformTier === 'accelerate';
   };
 
   const getTransactionLimit = () => {
@@ -300,7 +300,7 @@ export const useSubscription = (username?: string) => {
     hasAdvancedAnalytics,
     getTransactionLimit,
     canAccessFeature,
-    isPaidUser: subscription.platformTier !== 'free',
+    isPaidUser: subscription.platformTier !== 'starter',
     isAcceleratorUser: subscription.acceleratorAccess !== 'none',
     // New Stripe-specific methods
     handleStripeWebhookUpdate,

@@ -10,6 +10,11 @@ export class UserService {
    */
   static async createUserProfile(profile: UserProfile): Promise<UserProfile> {
     try {
+      // Verify user doesn't already exist to prevent conflicts
+      const existingProfile = await this.getUserProfile(profile.userId);
+      if (existingProfile) {
+        throw new Error(`User profile already exists for userId: ${profile.userId}`);
+      }
       const result = await client.models.UserProfile.create({
         userId: profile.userId,
         businessName: profile.businessName,
@@ -129,10 +134,20 @@ export class UserService {
       console.log('🔄 Starting profile update for userId:', userId);
       console.log('📝 Updates to apply:', updates);
 
+      // Verify userId consistency
+      if (updates.userId && updates.userId !== userId) {
+        throw new Error('Cannot change userId in profile update');
+      }
+
       // First fetch the existing profile
       const existingProfile = await this.getUserProfile(userId);
       if (!existingProfile) {
         throw new Error('Profile not found');
+      }
+
+      // Additional verification that the profile belongs to the correct user
+      if (existingProfile.userId !== userId) {
+        throw new Error('Profile ownership verification failed');
       }
 
       console.log('📋 Existing profile found:', {
@@ -223,9 +238,19 @@ export class UserService {
    */
   static async initializeUserSubscription(userId: string): Promise<void> {
     try {
+      // Check if subscription already exists
+      const existingSubscriptions = await client.models.UserSubscription.list({
+        filter: { userId: { eq: userId } }
+      });
+
+      if (existingSubscriptions.data && existingSubscriptions.data.length > 0) {
+        console.log('Subscription already exists for user:', userId);
+        return;
+      }
+
       const result = await client.models.UserSubscription.create({
         userId: userId,
-        platformTier: 'free',
+        platformTier: 'starter',
         acceleratorAccess: 'none',
         totalPaid: 0,
         createdAt: new Date().toISOString(),

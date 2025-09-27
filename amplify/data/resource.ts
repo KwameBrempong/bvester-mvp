@@ -104,7 +104,7 @@ const schema = a.schema({
     .model({
       userId: a.string().required(),
       // Platform subscription
-      platformTier: a.enum(['free', 'pro', 'business']),
+      platformTier: a.enum(['starter', 'growth', 'accelerate']),
       platformExpiryDate: a.datetime(),
       stripeSubscriptionId: a.string(),
       stripeCustomerId: a.string(),

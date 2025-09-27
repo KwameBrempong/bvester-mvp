@@ -285,13 +285,13 @@ class StripeService {
 
       // Fallback to database data
       if (dbSubscription) {
-        const isActive = dbSubscription.platformTier !== 'free' &&
+        const isActive = dbSubscription.platformTier !== 'starter' &&
           (!dbSubscription.platformExpiryDate ||
            new Date(dbSubscription.platformExpiryDate) > new Date());
 
         return {
           isActive,
-          plan: dbSubscription.platformTier !== 'free' ? dbSubscription.platformTier : null,
+          plan: dbSubscription.platformTier !== 'starter' ? dbSubscription.platformTier : null,
           currentPeriodEnd: dbSubscription.platformExpiryDate ?
             Math.floor(new Date(dbSubscription.platformExpiryDate).getTime() / 1000) : null,
           cancelAtPeriodEnd: dbSubscription.cancelAtPeriodEnd || false,

@@ -173,6 +173,24 @@ const userSlice = createSlice({
       state.userId = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.loading = false;
+      state.permissions = [];
+      state.profileCompletion = {
+        percentage: 0,
+        missingFields: [],
+        lastUpdated: null,
+      };
+    },
+    validateUserSession: (state, action: PayloadAction<{ userId: string }>) => {
+      // Validate that current session matches expected user
+      if (state.userId && state.userId !== action.payload.userId) {
+        // Session mismatch detected - clear state
+        state.profile = null;
+        state.userId = null;
+        state.isAuthenticated = false;
+        state.error = 'Session validation failed - user mismatch detected';
+        state.permissions = [];
+      }
     },
     clearError: (state) => {
       state.error = null;
@@ -291,10 +309,11 @@ const userSlice = createSlice({
 export const {
   setAuthenticated,
   clearUser,
-    clearError,
-    updateProfileCompletion,
-    updatePermissions,
-    updateVerificationStatus,
-    hydrateProfile
+  validateUserSession,
+  clearError,
+  updateProfileCompletion,
+  updatePermissions,
+  updateVerificationStatus,
+  hydrateProfile
 } = userSlice.actions;
 export default userSlice.reducer;

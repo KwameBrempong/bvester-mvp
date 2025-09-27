@@ -291,28 +291,61 @@ const AppRouter: React.FC = () => {
           // Create a custom signOut handler that redirects to homepage
           const handleCustomSignOut = async () => {
             try {
+              // First, perform Cognito sign out
               if (signOut) {
                 await signOut();
               }
-              // Clear application state and redirect to homepage
+
+              // Clear application state
               setShowSignIn(false);
               setIsAuthenticated(false);
               setCheckingAuth(false);
 
-              // Clear localStorage data
+              // Clear only Bvester-specific localStorage data to avoid affecting other apps
+              const currentUser = user?.username;
               Object.keys(localStorage).forEach(key => {
-                if (key.startsWith('profile_') || key.startsWith('assessment_') || key.includes('aws') || key.includes('amplify')) {
+                if (
+                  key.startsWith('profile_') ||
+                  key.startsWith('assessment_') ||
+                  key.startsWith('subscription_') ||
+                  key.startsWith('transaction_') ||
+                  key.startsWith('bvester_') ||
+                  (currentUser && key.includes(currentUser))
+                ) {
                   localStorage.removeItem(key);
                 }
               });
 
-              // Successfully signed out and redirected to homepage
+              // Clear session storage as well
+              Object.keys(sessionStorage).forEach(key => {
+                if (
+                  key.startsWith('bvester_') ||
+                  key.startsWith('profile_') ||
+                  (currentUser && key.includes(currentUser))
+                ) {
+                  sessionStorage.removeItem(key);
+                }
+              });
+
+              // Force a brief delay to ensure cleanup completes
+              await new Promise(resolve => setTimeout(resolve, 100));
+
+              // Successfully signed out
+              console.log('User signed out successfully');
             } catch (error) {
-              // Sign out error occurred
+              console.error('Sign out error:', error);
               // Still reset state even if there's an error
               setShowSignIn(false);
               setIsAuthenticated(false);
               setCheckingAuth(false);
+
+              // Attempt cleanup even on error
+              const currentUser = user?.username;
+              Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('profile_') || (currentUser && key.includes(currentUser))) {
+                  localStorage.removeItem(key);
+                }
+              });
             }
           };
 

@@ -113,13 +113,12 @@ export const PRICING_CONFIG: Record<PricingTier['id'], PricingTier> = {
       primary: 'GHS',
       display: {
         ghs: { monthly: 100, annual: 700 },
-        usd: { monthly: 8, annual: 57 },
+        usd: { monthly: 25, annual: 210 },
       },
     },
     stripe: {
-      // These will be populated when Stripe products are created
-      monthly: 'PLACEHOLDER_GROWTH_MONTHLY',
-      annual: 'PLACEHOLDER_GROWTH_ANNUAL',
+      monthly: 'price_1SBvZfGUhOvqkzBNTrCPnEdr',
+      annual: 'price_1SBvZfGUhOvqkzBNgYHVdRyy',
     },
     trial: {
       enabled: true,
@@ -132,8 +131,8 @@ export const PRICING_CONFIG: Record<PricingTier['id'], PricingTier> = {
         monthly: 50, // GHS (50% off)
         annual: 350, // GHS (50% off)
       },
-      stripeMonthly: 'PLACEHOLDER_GROWTH_FOUNDING_MONTHLY',
-      stripeAnnual: 'PLACEHOLDER_GROWTH_FOUNDING_ANNUAL',
+      stripeMonthly: 'price_1SBvZgGUhOvqkzBNvh2m1wpG',
+      stripeAnnual: 'price_1SBvZgGUhOvqkzBN3dgtRGkY',
     },
     features: [
       'Limited voice record keeping with cloud storage (50 notes/month)',
@@ -178,13 +177,12 @@ export const PRICING_CONFIG: Record<PricingTier['id'], PricingTier> = {
       primary: 'GHS',
       display: {
         ghs: { monthly: 500, annual: 4200 },
-        usd: { monthly: 39, annual: 338 },
+        usd: { monthly: 125, annual: 1050 },
       },
     },
     stripe: {
-      // These will be populated when Stripe products are created
-      monthly: 'PLACEHOLDER_ACCELERATE_MONTHLY',
-      annual: 'PLACEHOLDER_ACCELERATE_ANNUAL',
+      monthly: 'price_1SBvZhGUhOvqkzBNHKbJp2fS',
+      annual: 'price_1SBvZhGUhOvqkzBNHmGc5aRv',
     },
     features: [
       'All Pro features + advanced voice analytics (transcription/search)',

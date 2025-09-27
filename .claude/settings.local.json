@@ -58,7 +58,8 @@
       "Bash(copy:*)",
       "Bash(aws lambda get-function:*)",
       "Bash(aws ssm:*)",
-      "Bash(aws amplify:*)"
+      "Bash(aws amplify:*)",
+      "Bash(del create-stripe-products.js:*)"
     ],
     "deny": [],
     "ask": []
