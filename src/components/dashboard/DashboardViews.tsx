@@ -2571,9 +2571,10 @@ export const BillingView: React.FC = () => {
               </button>
             </div>
             <div className="modal-body" style={{ padding: '20px' }}>
-              {userId ? (
+              {userId && userEmail ? (
                 <BillingManager
                   userId={userId}
+                  userEmail={userEmail}
                   onClose={handleCloseModal}
                 />
               ) : (
