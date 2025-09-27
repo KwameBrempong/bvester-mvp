@@ -55,7 +55,10 @@
       "Bash(npm run typecheck:*)",
       "Bash(start http://localhost:5180)",
       "Bash(npm run:*)",
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(aws lambda get-function:*)",
+      "Bash(aws ssm:*)",
+      "Bash(aws amplify:*)"
     ],
     "deny": [],
     "ask": []

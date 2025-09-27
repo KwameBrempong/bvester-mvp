@@ -329,7 +329,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
 
               {/* Subscription Tiers */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                {(['pro', 'business'] as const).map((tier) => {
+                {(['growth', 'accelerate'] as const).map((tier) => {
                   const tierInfo = tierFeatures[tier];
                   const pricing = getPriceDisplay(tier, billingPeriod);
 
