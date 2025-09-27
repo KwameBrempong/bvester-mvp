@@ -94,71 +94,34 @@ class DashboardDataService {
   private getDefaultData(): DashboardData {
     return {
       kpis: {
-        revenue: 35000,
-        growth: 25,
-        customers: 105,
-        readinessScore: 72,
-        monthlyData: [
-          { month: 'Jan', revenue: 12000, customers: 45, transactions: 320 },
-          { month: 'Feb', revenue: 15000, customers: 52, transactions: 380 },
-          { month: 'Mar', revenue: 18000, customers: 61, transactions: 420 },
-          { month: 'Apr', revenue: 22000, customers: 73, transactions: 490 },
-          { month: 'May', revenue: 28000, customers: 89, transactions: 560 },
-          { month: 'Jun', revenue: 35000, customers: 105, transactions: 640 },
-        ],
-        categoryBreakdown: [
-          { name: 'Products', value: 45, color: '#D4AF37' },
-          { name: 'Services', value: 30, color: '#FFD700' },
-          { name: 'Subscriptions', value: 15, color: '#B8960F' },
-          { name: 'Other', value: 10, color: '#F4E4B1' },
-        ]
+        revenue: 0,
+        growth: 0,
+        customers: 0,
+        readinessScore: 0,
+        monthlyData: [],
+        categoryBreakdown: []
       },
       profile: {
-        businessName: 'Your Business Name',
-        industry: 'Technology & Innovation',
-        founded: '2022',
-        employees: '10-25',
-        location: 'Accra, Ghana',
-        revenue: 'GHS 500K - 1M',
-        description: 'Add your business description here to help investors understand your value proposition and market opportunity.'
+        businessName: '',
+        industry: '',
+        founded: '',
+        employees: '',
+        location: '',
+        revenue: '',
+        description: ''
       },
       assessment: {
-        overallScore: 72,
+        overallScore: 0,
         categories: {
-          businessModel: 85,
-          financialHealth: 70,
-          marketOpportunity: 75,
-          teamLeadership: 60
+          businessModel: 0,
+          financialHealth: 0,
+          marketOpportunity: 0,
+          teamLeadership: 0
         },
         lastUpdated: new Date().toISOString()
       },
       bootcamp: {
-        modules: [
-          {
-            id: 'foundation',
-            name: 'Foundation Module',
-            progress: 30,
-            completed: 3,
-            total: 10,
-            locked: false
-          },
-          {
-            id: 'financial',
-            name: 'Financial Management',
-            progress: 0,
-            completed: 0,
-            total: 8,
-            locked: false
-          },
-          {
-            id: 'growth',
-            name: 'Advanced Growth',
-            progress: 0,
-            completed: 0,
-            total: 12,
-            locked: true
-          }
-        ]
+        modules: []
       },
       settings: {
         notifications: {

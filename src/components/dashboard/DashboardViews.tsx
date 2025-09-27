@@ -2257,46 +2257,123 @@ export const BillingView: React.FC = () => {
         <div className="subscription-card">
           <div className="subscription-badge">
             <Icon name="star" size={24} color="var(--gold-primary)" />
-            <span>Pro Plan</span>
+            <span>{subscriptionTier.charAt(0).toUpperCase() + subscriptionTier.slice(1)} Plan</span>
           </div>
-          <h3>GHS 99/month</h3>
-          <p>Full access to all features and tools</p>
-          
+          <h3>
+            {subscriptionTier === 'starter' && 'Free Plan'}
+            {subscriptionTier === 'growth' && 'GHS 100/month'}
+            {subscriptionTier === 'accelerate' && 'GHS 500/month'}
+          </h3>
+          <p>
+            {subscriptionTier === 'starter' && 'Basic features for getting started'}
+            {subscriptionTier === 'growth' && 'Professional tools for business growth'}
+            {subscriptionTier === 'accelerate' && 'Premium features and priority support'}
+          </p>
+
           <div className="subscription-features">
-            <div className="feature-item">
-              <Icon name="check" size={16} color="var(--gold-primary)" />
-              <span>Unlimited assessments</span>
-            </div>
-            <div className="feature-item">
-              <Icon name="check" size={16} color="var(--gold-primary)" />
-              <span>All bootcamp modules</span>
-            </div>
-            <div className="feature-item">
-              <Icon name="check" size={16} color="var(--gold-primary)" />
-              <span>Investment X-Ray reports</span>
-            </div>
-            <div className="feature-item">
-              <Icon name="check" size={16} color="var(--gold-primary)" />
-              <span>Priority support</span>
-            </div>
+            {subscriptionTier === 'starter' && (
+              <>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>20 transactions per month</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>3 reports per month</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Basic analytics</span>
+                </div>
+              </>
+            )}
+            {subscriptionTier === 'growth' && (
+              <>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>500 transactions per month</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>20 reports per month</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Voice recording (50/month)</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Advanced analytics</span>
+                </div>
+              </>
+            )}
+            {subscriptionTier === 'accelerate' && (
+              <>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Unlimited transactions</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Unlimited reports</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Unlimited voice recording</span>
+                </div>
+                <div className="feature-item">
+                  <Icon name="check" size={16} color="var(--gold-primary)" />
+                  <span>Full accelerator access</span>
+                </div>
+              </>
+            )}
           </div>
-          
+
           <div className="subscription-actions">
-            <button className="btn btn-outline">Change Plan</button>
-            <button className="btn btn-outline">Cancel Subscription</button>
+            {subscriptionTier === 'starter' && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setActiveModal('subscriptionUpgrade')}
+              >
+                Upgrade Plan
+              </button>
+            )}
+            {(subscriptionTier === 'growth' || subscriptionTier === 'accelerate') && (
+              <>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setActiveModal('subscriptionUpgrade')}
+                >
+                  Change Plan
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setActiveModal('billingManagement')}
+                >
+                  Manage Billing
+                </button>
+              </>
+            )}
           </div>
         </div>
         
         <div className="payment-methods">
           <h3>Payment Methods</h3>
-          <div className="payment-card">
-            <Icon name="card" size={24} color="var(--gray-600)" />
-            <div className="payment-info">
-              <span className="payment-type">•••• •••• •••• 4242</span>
-              <span className="payment-expiry">Expires 12/24</span>
+          {subscriptionTier === 'starter' ? (
+            <div className="payment-placeholder">
+              <p>No payment methods added yet. Upgrade to a paid plan to add payment methods.</p>
             </div>
-            <button className="btn btn-sm btn-outline">Update</button>
-          </div>
+          ) : (
+            <div className="payment-placeholder">
+              <p>Payment methods will be managed through the billing portal for security.</p>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={() => setActiveModal('billingManagement')}
+              >
+                Manage Payment Methods
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

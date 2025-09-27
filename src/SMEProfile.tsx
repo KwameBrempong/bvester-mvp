@@ -24,8 +24,8 @@ export default function SMEProfile({ onProfileComplete }: SMEProfileProps) {
   const [formData, setFormData] = useState({
     businessName: '',
     businessType: '',
-    location: 'Accra', // Default to Accra
-    region: 'Greater Accra',
+    location: '', // No default location
+    region: '',
     yearEstablished: '',
     numberOfEmployees: '',
     monthlyRevenue: '',

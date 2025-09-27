@@ -30,7 +30,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
   const subscriptionStatus = useSubscriptionStatus();
   const loading = useSubscriptionLoading();
 
-  const [selectedTier, setSelectedTier] = useState<'pro' | 'business'>('pro');
+  const [selectedTier, setSelectedTier] = useState<'growth' | 'accelerate'>('growth');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   const priceConfig = stripeService.getPriceConfig();

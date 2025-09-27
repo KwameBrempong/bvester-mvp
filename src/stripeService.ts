@@ -371,28 +371,28 @@ class StripeService {
       platform: {
         growth: {
           monthly: {
-            priceId: 'PLACEHOLDER_GROWTH_MONTHLY',
+            priceId: 'price_1SBvZfGUhOvqkzBNTrCPnEdr',
             amount: 100,
             currency: 'GHS',
             interval: 'month',
             trialDays: 14,
           },
           yearly: {
-            priceId: 'PLACEHOLDER_GROWTH_ANNUAL',
+            priceId: 'price_1SBvZfGUhOvqkzBNgYHVdRyy',
             amount: 700, // 30% discount
             currency: 'GHS',
             interval: 'year',
             trialDays: 14,
           },
           foundingMonthly: {
-            priceId: 'PLACEHOLDER_GROWTH_FOUNDING_MONTHLY',
+            priceId: 'price_1SBvZgGUhOvqkzBNvh2m1wpG',
             amount: 50, // 50% discount
             currency: 'GHS',
             interval: 'month',
             trialDays: 14,
           },
           foundingYearly: {
-            priceId: 'PLACEHOLDER_GROWTH_FOUNDING_ANNUAL',
+            priceId: 'price_1SBvZgGUhOvqkzBN3dgtRGkY',
             amount: 350, // 50% discount
             currency: 'GHS',
             interval: 'year',
@@ -401,13 +401,13 @@ class StripeService {
         },
         accelerate: {
           monthly: {
-            priceId: 'PLACEHOLDER_ACCELERATE_MONTHLY',
+            priceId: 'price_1SBvZhGUhOvqkzBNHKbJp2fS',
             amount: 500,
             currency: 'GHS',
             interval: 'month',
           },
           yearly: {
-            priceId: 'PLACEHOLDER_ACCELERATE_ANNUAL',
+            priceId: 'price_1SBvZhGUhOvqkzBNHmGc5aRv',
             amount: 4200, // 30% discount
             currency: 'GHS',
             interval: 'year',

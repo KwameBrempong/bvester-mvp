@@ -97,13 +97,13 @@ const buildUserProfile = (username: string, overrides: Partial<UserProfile> = {}
 
   const profile: UserProfile = {
     userId: username,
-    businessName: overrides.businessName ?? 'My Business',
-    ownerName: overrides.ownerName ?? username,
-    email: overrides.email ?? `${username}@example.com`,
+    businessName: overrides.businessName ?? '',
+    ownerName: overrides.ownerName ?? '',
+    email: overrides.email ?? '',
     phone: overrides.phone ?? '',
-    location: overrides.location ?? 'Accra',
-    region: overrides.region ?? 'Greater Accra',
-    businessType: overrides.businessType ?? 'SME',
+    location: overrides.location ?? '',
+    region: overrides.region ?? '',
+    businessType: overrides.businessType ?? '',
     businessDescription: overrides.businessDescription ?? '',
     registrationNumber: overrides.registrationNumber ?? '',
     tinNumber: overrides.tinNumber ?? '',
@@ -217,7 +217,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
 
       // If no database profile exists, check if this is truly a new user
       // Don't use cached data for new sessions to prevent cross-contamination
-      const userEmail = (user as any).attributes?.email || `${username}@example.com`;
+      const userEmail = (user as any).attributes?.email || '';
       const fallbackProfile = buildUserProfile(username, {
         email: userEmail,
         // Force clean slate for new users
@@ -276,7 +276,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
         email?: string;
       };
     }
-    const userEmail = (user as CognitoUser).attributes?.email || `${username}@example.com`;
+    const userEmail = (user as CognitoUser).attributes?.email || '';
 
     const normalizedProfile = buildUserProfile(username, {
       ...userState.profile,
@@ -530,7 +530,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
             <Suspense fallback={<LoadingSpinner />}>
               <SubscriptionTierManager
                 userId={user.username}
-                userEmail={userState.profile?.email || `${user.username}@example.com`}
+                userEmail={userState.profile?.email || (user as any).attributes?.email || ''}
                 onClose={() => setShowSubscriptionTierManager(false)}
               />
             </Suspense>
@@ -542,7 +542,7 @@ const AppContent = memo(({ user, signOut }: AppProps) => {
             <Suspense fallback={<LoadingSpinner />}>
               <BillingManager
                 userId={user.username}
-                userEmail={userState.profile?.email || `${user.username}@example.com`}
+                userEmail={userState.profile?.email || (user as any).attributes?.email || ''}
                 customerId={userState.profile?.stripeCustomerId}
                 onClose={() => setShowBillingManager(false)}
               />
