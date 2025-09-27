@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/homepage-perfect.css';
 import '../styles/homepage-fixes.css';
-import { stripeService } from '../stripeService';
+import unifiedCheckoutService from '../services/UnifiedCheckoutService';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 interface HomepageProps {
   onGetStarted: () => void;
@@ -65,11 +66,11 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     setIsProcessing(true);
 
     try {
-      console.log('🚀 Starting guest checkout for tier:', selectedTier, 'email:', email);
+      console.log('🚀 Starting unified checkout for tier:', selectedTier, 'email:', email);
 
-      const session = await stripeService.createGuestCheckoutSession({
+      const result = await unifiedCheckoutService.createCheckout({
+        email,
         tierId: selectedTier,
-        customerEmail: email,
         billing: 'monthly', // Default to monthly
         isFoundingMember: true // Enable founding member pricing
       });
@@ -77,11 +78,15 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
       console.log('✅ Checkout session created, redirecting to Stripe...');
 
       // Redirect to Stripe checkout
-      window.location.href = session.url;
+      window.location.href = result.url;
 
     } catch (error) {
-      console.error('❌ Guest checkout failed:', error);
-      alert('Something went wrong. Please try again or contact support.');
+      console.error('❌ Checkout failed:', error);
+
+      // Get user-friendly error
+      const friendlyError = getUserFriendlyError(error);
+      alert(friendlyError.message);
+
       setIsProcessing(false);
     }
   };

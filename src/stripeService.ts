@@ -770,13 +770,22 @@ class StripeService {
     console.log('🚀 Creating guest checkout session for tier:', params.tierId);
 
     try {
-      // Import pricing config to get the correct price ID
-      const { getStripePrice } = await import('./config/pricingConfig');
+      // Use centralized Stripe configuration
+      const { getStripePriceId } = await import('./config/stripeConfig');
 
       const billing = params.billing || 'monthly';
-      const priceId = getStripePrice(params.tierId, billing, params.isFoundingMember);
+      const isFoundingMember = params.isFoundingMember ?? true; // Default to founding member
+      const priceId = getStripePriceId(params.tierId, billing, isFoundingMember);
 
       if (!priceId) {
+        // Fallback for accelerate founding member (not yet created in Stripe)
+        if (params.tierId === 'accelerate' && isFoundingMember) {
+          const regularPriceId = getStripePriceId(params.tierId, billing, false);
+          if (regularPriceId) {
+            console.warn('Using regular price for Accelerate tier - founding member price not configured');
+            throw new Error('Founding member pricing for Accelerate tier coming soon! Please use regular pricing for now.');
+          }
+        }
         throw new Error(`No Stripe price ID found for tier: ${params.tierId}, billing: ${billing}`);
       }
 

@@ -8,6 +8,7 @@ import {
   useSubscriptionStatus,
   useSubscriptionLoading,
 } from '../store/hooks';
+import { getUserFriendlyError, logError } from '../utils/errorMessages';
 import { fetchSubscription, createCheckoutSession } from '../store/slices/subscriptionSlice';
 import { stripeService } from '../stripeService';
 
@@ -32,6 +33,7 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
 
   const [selectedTier, setSelectedTier] = useState<'growth' | 'accelerate'>('growth');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [upgradeError, setUpgradeError] = useState<string | null>(null);
 
   const priceConfig = stripeService.getPriceConfig();
 
@@ -45,10 +47,12 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
   const handleUpgrade = async (tier: 'growth' | 'accelerate') => {
     try {
       console.log('Starting upgrade process', { tier, billingPeriod, userId, userEmail });
+      setUpgradeError(null);
 
       if (!userId || !userEmail) {
-        console.error('Missing user information for upgrade', { userId, userEmail });
-        alert('User information is missing. Please refresh the page and try again.');
+        logError('SubscriptionUpgrade', new Error('Missing user information'), { userId, userEmail });
+        const error = getUserFriendlyError({ code: 'PROFILE_INCOMPLETE' });
+        setUpgradeError(error.message);
         return;
       }
 
@@ -56,8 +60,9 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
       const priceId = typeof priceInfo === 'string' ? priceInfo : priceInfo.priceId;
 
       if (!priceId) {
-        console.error('Price ID not found', { tier, billingPeriod, priceInfo });
-        alert('Pricing configuration error. Please contact support.');
+        logError('SubscriptionUpgrade', new Error('Price ID not found'), { tier, billingPeriod });
+        const error = getUserFriendlyError({ code: 'SUB_PRICE_NOT_FOUND' });
+        setUpgradeError(error.message);
         return;
       }
 
@@ -85,9 +90,16 @@ const SubscriptionTierManager: React.FC<SubscriptionTierManagerProps> = ({
       }
 
     } catch (error) {
-      console.error('Upgrade error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Upgrade failed: ${errorMessage}. Please try again or contact support.`);
+      logError('SubscriptionUpgrade', error, { tier, billingPeriod, userId });
+      const friendlyError = getUserFriendlyError(error);
+      setUpgradeError(friendlyError.message);
+
+      // Show action if available
+      if (friendlyError.action === 'Sign In') {
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 3000);
+      }
     }
   };
 

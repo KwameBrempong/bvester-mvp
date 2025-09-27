@@ -25,6 +25,19 @@ const respond = (statusCode, headers, body) => ({
   body: JSON.stringify(body),
 });
 
+// Price ID to tier mapping - must match stripeConfig.ts
+const PRICE_TO_TIER = {
+  // Growth/Pro tier regular
+  'price_1SBvZfGUhOvqkzBNTrCPnEdr': 'growth',  // ₵100/month
+  'price_1SBvZfGUhOvqkzBNgYHVdRyy': 'growth',  // ₵700/year
+  // Growth/Pro tier founding member
+  'price_1SBvZgGUhOvqkzBNvh2m1wpG': 'growth',  // ₵50/month founding
+  'price_1SBvZgGUhOvqkzBN3dgtRGkY': 'growth',  // ₵350/year founding
+  // Accelerate tier
+  'price_1SBvZhGUhOvqkzBNHKbJp2fS': 'accelerate',  // ₵500/month
+  'price_1SBvZhGUhOvqkzBNHmGc5aRv': 'accelerate',  // ₵4200/year
+};
+
 // CRITICAL SECURITY FIX: JWT validation
 const validateJWT = (token) => {
   try {
@@ -97,8 +110,9 @@ const optionalAuthActions = ['create_checkout_session'];
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Request-ID, X-Amz-Date, X-Api-Key, X-Amz-Security-Token',
     'Access-Control-Allow-Methods': 'POST, GET, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Credentials': 'true',
     'Content-Type': 'application/json',
   };
 
@@ -970,11 +984,23 @@ async function handleSubscriptionChange(subscription) {
     if (result.Items && result.Items.length > 0) {
       const userId = result.Items[0].userId;
 
+      // Get the price ID and map to tier
+      const priceId = subscription.items.data[0]?.price?.id;
+      const platformTier = PRICE_TO_TIER[priceId] || 'growth'; // Default to growth if unknown
+
+      console.log('Subscription change detected:', {
+        userId,
+        priceId,
+        platformTier,
+        status: subscription.status
+      });
+
       await updateUserSubscription({
         userId,
         stripeSubscriptionId: subscription.id,
-        platformTier: subscription.items.data[0]?.price?.id === 'price_1QW9M2GUhOvqkzBNv7UXGJG0' ? 'pro' : 'business',
-        cancelAtPeriodEnd: subscription.cancel_at_period_end
+        platformTier,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        status: subscription.status
       });
 
       await logPaymentEvent({
