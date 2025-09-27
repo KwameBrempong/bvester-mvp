@@ -755,6 +755,79 @@ class StripeService {
       return null;
     }
   }
+
+  /**
+   * Create a guest checkout session for payment-first signup flow
+   * This handles direct tier purchases from the homepage without requiring login
+   */
+  async createGuestCheckoutSession(params: {
+    tierId: 'growth' | 'accelerate';
+    customerEmail: string;
+    billing?: 'monthly' | 'annual';
+    isFoundingMember?: boolean;
+  }) {
+    const startTime = Date.now();
+    console.log('🚀 Creating guest checkout session for tier:', params.tierId);
+
+    try {
+      // Import pricing config to get the correct price ID
+      const { getStripePrice } = await import('./config/pricingConfig');
+
+      const billing = params.billing || 'monthly';
+      const priceId = getStripePrice(params.tierId, billing, params.isFoundingMember);
+
+      if (!priceId) {
+        throw new Error(`No Stripe price ID found for tier: ${params.tierId}, billing: ${billing}`);
+      }
+
+      console.log('📝 Guest checkout params:', {
+        tierId: params.tierId,
+        priceId,
+        email: params.customerEmail,
+        billing,
+        isFoundingMember: params.isFoundingMember
+      });
+
+      // Create checkout session with guest mode
+      const checkoutParams: CreateCheckoutSessionParams = {
+        priceId,
+        userId: `guest_${Date.now()}`, // Temporary guest ID
+        customerEmail: params.customerEmail,
+        successUrl: `${window.location.origin}/signup-success?session_id={CHECKOUT_SESSION_ID}&tier=${params.tierId}`,
+        cancelUrl: `${window.location.origin}?cancelled=true`,
+        metadata: {
+          tierId: params.tierId,
+          billing,
+          isGuestCheckout: 'true',
+          isFoundingMember: String(params.isFoundingMember || false),
+          createdAt: new Date().toISOString()
+        }
+      };
+
+      // Use existing checkout session creation with requireAuth: false
+      const session = await this.createCheckoutSession(checkoutParams, { requireAuth: false });
+
+      console.log('✅ Guest checkout session created successfully:', session.sessionId);
+
+      return {
+        sessionId: session.sessionId,
+        url: session.url,
+        tierId: params.tierId,
+        priceId,
+        customerEmail: params.customerEmail
+      };
+
+    } catch (error) {
+      logger.error('Failed to create guest checkout session', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        params,
+        duration: Date.now() - startTime
+      });
+
+      console.error('❌ Guest checkout session creation failed:', error);
+      throw error;
+    }
+  }
 }
 
 export const stripeService = new StripeService();

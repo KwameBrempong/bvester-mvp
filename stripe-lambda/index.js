@@ -704,6 +704,41 @@ async function updateUserSubscription(params, headers) {
   }
 }
 
+// Create new user subscription (for guest checkout)
+async function createUserSubscription(subscriptionData) {
+  try {
+    const subscription = {
+      userId: subscriptionData.userId,
+      platformTier: subscriptionData.platformTier || 'growth',
+      acceleratorAccess: subscriptionData.acceleratorAccess || 'none',
+      stripeCustomerId: subscriptionData.stripeCustomerId,
+      stripeSubscriptionId: subscriptionData.stripeSubscriptionId,
+      totalPaid: subscriptionData.totalPaid || 0,
+      lastPaymentDate: subscriptionData.lastPaymentDate,
+      createdAt: subscriptionData.createdAt || new Date().toISOString(),
+      lastUpdated: subscriptionData.lastUpdated || new Date().toISOString()
+    };
+
+    console.log('Creating user subscription:', {
+      userId: subscription.userId,
+      platformTier: subscription.platformTier,
+      stripeCustomerId: subscription.stripeCustomerId
+    });
+
+    await dynamodb.put({
+      TableName: TABLES.SUBSCRIPTIONS,
+      Item: subscription,
+      ConditionExpression: 'attribute_not_exists(userId)' // Prevent overwriting existing subscriptions
+    }).promise();
+
+    console.log('✅ User subscription created successfully');
+    return subscription;
+  } catch (error) {
+    console.error('❌ Error creating user subscription:', error);
+    throw error;
+  }
+}
+
 // Helper Functions
 async function getUserSubscriptionData(userId) {
   try {
@@ -768,9 +803,135 @@ async function processStripeWebhook(stripeEvent) {
 
 async function handleCheckoutCompleted(session) {
   const { customer, metadata } = session;
-  const { userId } = metadata;
+  const { userId, isGuestCheckout, tierId } = metadata;
 
-  if (userId) {
+  console.log('Processing checkout completion:', {
+    sessionId: session.id,
+    customer,
+    userId,
+    isGuestCheckout,
+    tierId
+  });
+
+  // Handle guest checkout - create account from payment
+  if (isGuestCheckout === 'true' && !userId?.startsWith('guest_')) {
+    console.log('🚀 Processing guest checkout - creating account from payment');
+
+    try {
+      // Get customer details from Stripe
+      const stripeCustomer = await stripe.customers.retrieve(customer);
+      const customerEmail = stripeCustomer.email;
+
+      if (!customerEmail) {
+        console.error('No email found for guest customer:', customer);
+        return;
+      }
+
+      // Create a user account with email as username
+      const newUserId = customerEmail.toLowerCase();
+      const now = new Date().toISOString();
+
+      console.log('Creating user profile for guest checkout:', {
+        userId: newUserId,
+        email: customerEmail,
+        tierId
+      });
+
+      // Create user profile
+      const userProfile = {
+        userId: newUserId,
+        businessName: '', // Will be filled during onboarding
+        ownerName: '',
+        email: customerEmail,
+        phone: '',
+        location: '',
+        region: '',
+        businessType: '',
+        businessDescription: '',
+        businessLogo: '',
+        ceoName: '',
+        ceoEmail: '',
+        ceoPhone: '',
+        registrationNumber: '',
+        tinNumber: '',
+        yearEstablished: '',
+        employeeCount: '',
+        businessStage: 'existing',
+        role: 'owner',
+        profileCompletionPercentage: 20, // Has email and tier
+        isEmailVerified: true, // Verified by payment
+        isPhoneVerified: false,
+        isBusinessVerified: false,
+        profileCompletedAt: null, // Will be set when profile is completed
+        lastUpdated: now,
+        createdAt: now,
+        // Additional metadata
+        signupMethod: 'payment_first',
+        initialTier: tierId,
+        stripeCustomerId: customer
+      };
+
+      // Save user profile to DynamoDB
+      await dynamodb.put({
+        TableName: TABLES.PROFILES,
+        Item: userProfile,
+        ConditionExpression: 'attribute_not_exists(userId)' // Prevent overwriting existing users
+      }).promise();
+
+      console.log('✅ User profile created successfully for guest checkout');
+
+      // Create subscription record
+      await createUserSubscription({
+        userId: newUserId,
+        platformTier: tierId === 'accelerate' ? 'accelerate' : 'growth',
+        stripeCustomerId: customer,
+        createdAt: now,
+        lastUpdated: now,
+        totalPaid: session.amount_total / 100,
+        lastPaymentDate: now
+      });
+
+      // Log payment event with new user ID
+      await logPaymentEvent({
+        userId: newUserId,
+        eventType: 'checkout_session_completed',
+        stripeCustomerId: customer,
+        eventData: {
+          sessionId: session.id,
+          customerId: customer,
+          isGuestCheckout: true,
+          accountCreated: true
+        }
+      });
+
+      console.log('✅ Guest checkout account creation completed successfully');
+
+    } catch (error) {
+      console.error('❌ Error creating account from guest checkout:', error);
+
+      // Still log the payment event even if account creation failed
+      try {
+        await logPaymentEvent({
+          userId: `guest_${session.id}`,
+          eventType: 'checkout_session_completed',
+          stripeCustomerId: customer,
+          eventData: {
+            sessionId: session.id,
+            customerId: customer,
+            isGuestCheckout: true,
+            accountCreationFailed: true,
+            error: error.message
+          }
+        });
+      } catch (logError) {
+        console.error('Failed to log payment event for failed guest checkout:', logError);
+      }
+    }
+  }
+  // Handle existing user checkout
+  else if (userId && !userId.startsWith('guest_')) {
+    console.log('Processing checkout for existing user:', userId);
+
     await logPaymentEvent({
       userId,
       eventType: 'checkout_session_completed',
@@ -787,6 +948,10 @@ async function handleCheckoutCompleted(session) {
       stripeCustomerId: customer,
       lastPaymentDate: new Date().toISOString()
     });
+
+    console.log('✅ Existing user checkout completed');
+  } else {
+    console.log('Skipping checkout processing - no valid userId found');
   }
 }
 

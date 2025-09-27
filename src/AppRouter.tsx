@@ -6,6 +6,7 @@ import '@aws-amplify/ui-react/styles.css';
 import './styles/auth-theme.css';
 import App from './App';
 import HomepageRevenue from './components/HomepageRevenue';
+import SignupSuccess from './components/SignupSuccess';
 import outputs from '../amplify_outputs.json';
 
 // Configure Amplify with backend outputs
@@ -15,6 +16,7 @@ const AppRouter: React.FC = () => {
   const [showSignIn, setShowSignIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState(window.location.pathname);
 
   // Check if user is already authenticated on mount
   useEffect(() => {
@@ -36,6 +38,16 @@ const AppRouter: React.FC = () => {
     checkAuthStatus();
   }, []);
 
+  // Handle route changes
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentRoute(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleGetStarted = () => {
     setShowSignIn(true);
   };
@@ -43,6 +55,14 @@ const AppRouter: React.FC = () => {
   const handleBackToHome = () => {
     setShowSignIn(false);
     setIsAuthenticated(false);
+    setCurrentRoute('/');
+    window.history.pushState({}, '', '/');
+  };
+
+  const handleContinueFromSuccess = () => {
+    setShowSignIn(true);
+    setCurrentRoute('/');
+    window.history.pushState({}, '', '/');
   };
 
   // Show loading state while checking authentication
@@ -71,6 +91,11 @@ const AppRouter: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  // Handle signup success route
+  if (currentRoute === '/signup-success') {
+    return <SignupSuccess onContinue={handleContinueFromSuccess} />;
   }
 
   if (showSignIn || isAuthenticated) {

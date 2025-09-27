@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/homepage-perfect.css';
 import '../styles/homepage-fixes.css';
+import { stripeService } from '../stripeService';
 
 interface HomepageProps {
   onGetStarted: () => void;
@@ -17,6 +18,10 @@ const navLinks = [
 const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<'growth' | 'accelerate' | null>(null);
+  const [email, setEmail] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +50,47 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleTierSelect = (tier: 'growth' | 'accelerate') => {
+    setSelectedTier(tier);
+    setShowEmailModal(true);
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !selectedTier) return;
+
+    setIsProcessing(true);
+
+    try {
+      console.log('🚀 Starting guest checkout for tier:', selectedTier, 'email:', email);
+
+      const session = await stripeService.createGuestCheckoutSession({
+        tierId: selectedTier,
+        customerEmail: email,
+        billing: 'monthly', // Default to monthly
+        isFoundingMember: true // Enable founding member pricing
+      });
+
+      console.log('✅ Checkout session created, redirecting to Stripe...');
+
+      // Redirect to Stripe checkout
+      window.location.href = session.url;
+
+    } catch (error) {
+      console.error('❌ Guest checkout failed:', error);
+      alert('Something went wrong. Please try again or contact support.');
+      setIsProcessing(false);
+    }
+  };
+
+  const closeEmailModal = () => {
+    setShowEmailModal(false);
+    setSelectedTier(null);
+    setEmail('');
+    setIsProcessing(false);
   };
 
   return (
@@ -307,7 +353,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                 <li>Full business health X-Ray &amp; benchmarks</li>
                 <li>Diaspora investor introductions</li>
               </ul>
-              <button className="btn btn--gold" onClick={onGetStarted}>Upgrade to Pro</button>
+              <button className="btn btn--gold" onClick={() => handleTierSelect('growth')}>Upgrade to Pro</button>
             </div>
             <div className="plan plan--enterprise">
               <div className="plan__header">
@@ -321,7 +367,7 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
                 <li>Dedicated growth coach &amp; experts</li>
                 <li>Priority access to partner capital</li>
               </ul>
-              <button className="btn btn--ghost" onClick={onGetStarted}>Join Next Cohort</button>
+              <button className="btn btn--ghost" onClick={() => handleTierSelect('accelerate')}>Join Next Cohort</button>
             </div>
           </div>
         </section>
@@ -436,6 +482,61 @@ const Homepage: React.FC<HomepageProps> = ({ onGetStarted }) => {
           </div>
         </div>
       </footer>
+
+      {/* Email Collection Modal for Guest Checkout */}
+      {showEmailModal && (
+        <div className="email-modal-overlay" onClick={closeEmailModal}>
+          <div className="email-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="email-modal-header">
+              <h3>Get Started with {selectedTier === 'growth' ? 'Pro' : 'Accelerator'}</h3>
+              <button className="email-modal-close" onClick={closeEmailModal} disabled={isProcessing}>×</button>
+            </div>
+            <div className="email-modal-body">
+              <p>Enter your email to proceed to secure payment and instant access to your dashboard.</p>
+              <form onSubmit={handleEmailSubmit}>
+                <div className="email-form-group">
+                  <label htmlFor="email">Email Address</label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    disabled={isProcessing}
+                  />
+                </div>
+                <div className="email-form-pricing">
+                  {selectedTier === 'growth' ? (
+                    <div className="pricing-details">
+                      <span className="original-price">₵100/month</span>
+                      <span className="founding-price">₵50/month</span>
+                      <span className="discount-badge">50% OFF - Founding Member</span>
+                    </div>
+                  ) : (
+                    <div className="pricing-details">
+                      <span className="original-price">₵500/month</span>
+                      <span className="founding-price">₵250/month</span>
+                      <span className="discount-badge">50% OFF - Founding Member</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="btn btn--gold email-submit-btn"
+                  disabled={isProcessing || !email}
+                >
+                  {isProcessing ? 'Processing...' : 'Continue to Payment →'}
+                </button>
+              </form>
+              <p className="email-modal-note">
+                Your account will be created automatically after successful payment.
+                No signup required!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

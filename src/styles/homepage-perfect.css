@@ -902,3 +902,156 @@ blockquote cite {
     grid-template-columns: 1fr;
   }
 }
+
+/* Email Modal Styles for Guest Checkout */
+.email-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.email-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.email-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 2rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.email-modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #0a0a0a;
+}
+
+.email-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.email-modal-close:hover {
+  color: #0a0a0a;
+}
+
+.email-modal-body {
+  padding: 2rem;
+}
+
+.email-modal-body > p {
+  margin: 0 0 1.5rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.email-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.email-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #0a0a0a;
+}
+
+.email-form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.email-form-group input:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.email-form-pricing {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.pricing-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.original-price {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 0.875rem;
+}
+
+.founding-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0a0a0a;
+}
+
+.discount-badge {
+  background: linear-gradient(135deg, #d4af37, #ffd700);
+  color: #0a0a0a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.email-submit-btn {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.email-modal-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .email-modal {
+    margin: 1rem;
+    max-width: none;
+  }
+
+  .email-modal-header,
+  .email-modal-body {
+    padding: 1.5rem;
+  }
+}
