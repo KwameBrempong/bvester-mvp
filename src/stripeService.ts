@@ -449,7 +449,6 @@ class StripeService {
                 console.warn('Stripe API returned non-OK status:', response.status);
               }
             }
-          }
         } catch (stripeError) {
           logger.warn('Failed to verify with Stripe, using database data', stripeError);
           console.warn('Stripe verification failed, using cached data:', stripeError);
