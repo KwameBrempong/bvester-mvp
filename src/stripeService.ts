@@ -240,7 +240,6 @@ class StripeService {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${authToken}`, // CRITICAL FIX: Add JWT token
-            'X-Request-ID': eventId,
           },
           body: JSON.stringify(requestBody),
         }),

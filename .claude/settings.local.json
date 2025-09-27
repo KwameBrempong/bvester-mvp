@@ -62,7 +62,13 @@
       "Bash(del create-stripe-products.js:*)",
       "WebFetch(domain:bvester.com)",
       "WebFetch(domain:main.d3oqn8j8j0j4o9.amplifyapp.com)",
-      "WebFetch(domain:main.d278kt9d0wtgjd.amplifyapp.com)"
+      "WebFetch(domain:main.d278kt9d0wtgjd.amplifyapp.com)",
+      "Bash(aws logs tail:*)",
+      "Bash(aws logs describe-log-streams:*)",
+      "Bash(powershell Compress-Archive:*)",
+      "Bash(tar:*)",
+      "Bash(aws lambda update-function-code:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []
